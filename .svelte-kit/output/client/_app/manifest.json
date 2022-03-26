@@ -1,0 +1,83 @@
+{
+  ".svelte-kit/build/runtime/internal/start.js": {
+    "file": "start-d8ff5f0d.js",
+    "src": ".svelte-kit/build/runtime/internal/start.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor-8200e901.js",
+      "_preload-helper-ec9aa979.js",
+      "_paths-6758d194.js"
+    ],
+    "dynamicImports": [
+      "src/routes/__layout.svelte",
+      ".svelte-kit/build/components/error.svelte",
+      "src/routes/index.svelte",
+      "src/routes/[code]/index.svelte"
+    ]
+  },
+  "src/routes/__layout.svelte": {
+    "file": "pages/__layout.svelte-8ab01773.js",
+    "src": "src/routes/__layout.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-8200e901.js",
+      "_paths-6758d194.js"
+    ],
+    "css": [
+      "assets/pages/__layout.svelte-a46b723c.css"
+    ]
+  },
+  ".svelte-kit/build/components/error.svelte": {
+    "file": "error.svelte-88bb22a3.js",
+    "src": ".svelte-kit/build/components/error.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-8200e901.js"
+    ]
+  },
+  "src/routes/index.svelte": {
+    "file": "pages/index.svelte-b14b8478.js",
+    "src": "src/routes/index.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-8200e901.js"
+    ]
+  },
+  "src/routes/[code]/index.svelte": {
+    "file": "pages/_code_/index.svelte-66608175.js",
+    "src": "src/routes/[code]/index.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_preload-helper-ec9aa979.js",
+      "_vendor-8200e901.js",
+      "_paths-6758d194.js"
+    ],
+    "dynamicImports": [
+      "src/lib/neighbours.json"
+    ],
+    "css": [
+      "assets/pages/_code_/index.svelte-0cdd8842.css"
+    ]
+  },
+  "_vendor-8200e901.js": {
+    "file": "chunks/vendor-8200e901.js",
+    "css": [
+      "assets/vendor-4ff902fe.css"
+    ]
+  },
+  "_paths-6758d194.js": {
+    "file": "chunks/paths-6758d194.js"
+  },
+  "_preload-helper-ec9aa979.js": {
+    "file": "chunks/preload-helper-ec9aa979.js"
+  },
+  "src/lib/neighbours.json": {
+    "file": "chunks/neighbours-25764e6a.js",
+    "src": "src/lib/neighbours.json",
+    "isDynamicEntry": true
+  }
+}

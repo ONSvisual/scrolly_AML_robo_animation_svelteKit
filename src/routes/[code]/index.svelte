@@ -103,7 +103,8 @@
   
 
   
-  {#if data && country}
+  {#if data && country && story}
+  {story}
   <Header
 	bgcolor="#206095"
 	bgfixed={true}

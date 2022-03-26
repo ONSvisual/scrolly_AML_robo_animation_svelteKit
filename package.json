@@ -53,6 +53,11 @@
   },
   "type": "module",
   "dependencies": {
-    "archieml": "^0.5.0"
+    "archieml": "^0.5.0",
+    "d3-scale-chromatic": "^3.0.0",
+    "d3-selection": "^3.0.0",
+    "flubber": "^0.4.2",
+    "line-intersect": "^3.0.0",
+    "topojson": "^3.0.2"
   }
 }
