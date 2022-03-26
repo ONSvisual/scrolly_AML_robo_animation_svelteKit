@@ -1,0 +1,37 @@
+<script>
+	import Select from "./Select.svelte";
+	import items from "./items.json";
+	
+	// Single select
+	let selected = null;
+	function doSelect(event) {
+		selected = event.detail;
+	}
+	function doClear() {
+		selected = null;
+	}
+	
+
+</script>
+
+
+<form>
+	<label for="single">Select one local authority:</label>
+	<Select id="single" idKey="areacd" labelKey="areanm" {items} on:select={doSelect} on:clear={doClear}/>
+</form>
+
+<p>Selected: {selected ? selected.areanm : 'None'}</p>
+
+<style>
+	@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+	:global(body) {
+		font-family: 'Open Sans', sans-serif;
+	}
+	label {
+		margin: 20px 0 4px 0;
+		font-weight: bold;
+	}
+	p {
+		margin: 4px 0 20px 0;
+	}
+</style>
