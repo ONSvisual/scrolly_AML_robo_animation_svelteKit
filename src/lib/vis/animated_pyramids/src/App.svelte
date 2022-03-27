@@ -3,7 +3,7 @@
   import rankings from './rankings.js'
   import { tweened } from 'svelte/motion'
   import { sineInOut } from 'svelte/easing'
-  import { interpolate } from 'flubber'
+  //import { interpolate } from 'flubber'
   import Pyramid from './Pyramid.svelte'
   import pyramidStore from './pyramid'
   let order = rankings.map((e) => e[0])

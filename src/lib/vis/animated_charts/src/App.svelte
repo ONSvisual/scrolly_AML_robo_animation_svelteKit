@@ -4,7 +4,7 @@
 	import Text from "./Text.svelte"
   import { tweened } from 'svelte/motion'
 	import { cubicInOut } from 'svelte/easing'
-  import { interpolate } from "$lib/vis/animated_charts/node_modules/flubber/index.js"
+  import { interpolate } from "$lib/flubber/index.js"
   console.log("interpolate",interpolate)
   import { geoAlbers, geoPath, geoProjection, geoMercator } from 'd3-geo'
   import { extent } from 'd3-array'

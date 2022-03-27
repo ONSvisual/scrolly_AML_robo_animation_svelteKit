@@ -12,7 +12,6 @@ import "topojson";
 import { interpolateViridis } from "d3-scale-chromatic";
 import { select } from "d3-selection";
 import { checkIntersection } from "line-intersect";
-import "flubber";
 const getStores = () => {
   const stores = getContext("__svelte__");
   return {
