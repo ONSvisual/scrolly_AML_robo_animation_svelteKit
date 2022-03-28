@@ -17,7 +17,6 @@
     "@onsvisual/svelte-maps": "^0.0.15",
     "@sveltejs/adapter-auto": "next",
     "@sveltejs/adapter-static": "next",
-    "@sveltejs/kit": "next",
     "@turf/bbox": "^6.5.0",
     "d3-dsv": "latest",
     "d3-geo": "^3.0.1",
