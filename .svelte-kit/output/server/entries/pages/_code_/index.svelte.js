@@ -12748,9 +12748,11 @@ const css = {
   map: null
 };
 const App = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let { selected: selected2 = null } = $$props;
+  let { selected: selected2 = null, selection = null } = $$props;
   if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
     $$bindings.selected(selected2);
+  if ($$props.selection === void 0 && $$bindings.selection && selection !== void 0)
+    $$bindings.selection(selection);
   $$result.css.add(css);
   return `<form><label for="${"single"}" class="${"svelte-1iad7dh"}">Select one local authority:</label>
 	${validate_component(Select_1, "Select").$$render($$result, {
@@ -12806,7 +12808,7 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
   let $$rendered;
   do {
     $$settled = true;
-    selection && goto(`/${selection.areacd}`);
+    selection && goto(`/${selection}`);
     $$rendered = `${data && country && story ? `${escape(story)}
   ${validate_component(Header, "Header").$$render($$result, {
       bgcolor: "#206095",
@@ -12822,12 +12824,12 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
 	<p class="${"text-big"}" style="${"margin-top: 5px"}"><!-- HTML_TAG_START -->${story[0].lede}<!-- HTML_TAG_END --></p>
 	<br>
     
-	<div class="${"ons-field"}">${validate_component(App, "Dropdown").$$render($$result, { selected: selection }, {
-          selected: ($$value) => {
+	<div class="${"ons-field"}">${validate_component(App, "Dropdown").$$render($$result, { selection }, {
+          selection: ($$value) => {
             selection = $$value;
             $$settled = false;
           }
-        }, {})}${escape(JSON.stringify(selection))}</div>
+        }, {})}</div>
 	<div style="${"margin-top: 90px;"}">${validate_component(Arrow, "Arrow").$$render($$result, { color: "white", animation }, {}, {
           default: () => {
             return `Scroll to begin`;

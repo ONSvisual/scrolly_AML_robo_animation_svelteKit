@@ -1,14 +1,16 @@
 <script>
 	import Select from "./Select.svelte";
 	import items from "./items.json";
-	export let selected = null
+	export let selected = null, selection=null
 	// Single select
 
 	function doSelect(event) {
-		selected = event.detail;
+		selected = event.detail
+		selection=selected.areacd
 	}
 	function doClear() {
 		selected = null;
+		selection=null
 	}
 	
 

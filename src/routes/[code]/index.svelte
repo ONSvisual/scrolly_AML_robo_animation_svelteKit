@@ -123,7 +123,7 @@
 	<br />
     
 	<div class="ons-field">
-		<Dropdown bind:selected={selection.areacd}/>{JSON.stringify(selection.areacd)}
+		<Dropdown bind:selection={selection}/>
 	  </div>
 	<div style="margin-top: 90px;">
 	  <Arrow color="white" {animation}>Scroll to begin</Arrow>
