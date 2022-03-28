@@ -55,12 +55,6 @@ function writable(value, start = noop) {
   return { set, update, subscribe: subscribe2 };
 }
 const all_data = writable();
-function guard(name) {
-  return () => {
-    throw new Error(`Cannot call ${name}(...) on the server`);
-  };
-}
-const goto = guard("goto");
 const step = writable(1);
 const tracker = writable(1);
 const txt = `
@@ -12808,7 +12802,6 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
   let $$rendered;
   do {
     $$settled = true;
-    selection && goto(`/${selection}`);
     $$rendered = `${data && country && story ? `${escape(story)}
   ${validate_component(Header, "Header").$$render($$result, {
       bgcolor: "#206095",

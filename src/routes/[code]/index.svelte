@@ -98,7 +98,7 @@
 	  Map1: {},
 	}
 
-	$: selection && goto(`/${selection}`)
+//	$: selection && goto(`/${selection}`)
   </script>
   
 
@@ -123,7 +123,7 @@
 	<br />
     
 	<div class="ons-field">
-		<Dropdown bind:selection={selection}/>
+		<Dropdown bind:selection={selection} />
 	  </div>
 	<div style="margin-top: 90px;">
 	  <Arrow color="white" {animation}>Scroll to begin</Arrow>
