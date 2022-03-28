@@ -1,5 +1,5 @@
 import { c as create_ssr_component, g as getContext, e as escape, a as add_attribute, s as setContext, v as validate_component } from "../../chunks/index-cf0e86af.js";
-import { a as assets } from "../../chunks/paths-6758d194.js";
+import { a as assets } from "../../chunks/paths-396f020f.js";
 var app = "";
 const themes = {
   "light": {

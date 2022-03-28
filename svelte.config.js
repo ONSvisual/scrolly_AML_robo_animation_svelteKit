@@ -9,8 +9,8 @@ const production = process.env.NODE_ENV === 'production';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
-		//adapter: static_adapter(),
-		adapter: adapter(),
+		adapter: static_adapter(),
+		//adapter: adapter(),
 
 		files: {
 			assets: 'static',

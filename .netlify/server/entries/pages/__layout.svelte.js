@@ -1,31 +1,27 @@
-var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
 var __export = (target, all) => {
-  __markAsModule(target);
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
-var __reExport = (target, module2, desc) => {
-  if (module2 && typeof module2 === "object" || typeof module2 === "function") {
-    for (let key of __getOwnPropNames(module2))
-      if (!__hasOwnProp.call(target, key) && key !== "default")
-        __defProp(target, key, { get: () => module2[key], enumerable: !(desc = __getOwnPropDesc(module2, key)) || desc.enumerable });
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
   }
-  return target;
+  return to;
 };
-var __toModule = (module2) => {
-  return __reExport(__markAsModule(__defProp(module2 != null ? __create(__getProtoOf(module2)) : {}, "default", module2 && module2.__esModule && "default" in module2 ? { get: () => module2.default, enumerable: true } : { value: module2, enumerable: true })), module2);
-};
-__export(exports, {
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var stdin_exports = {};
+__export(stdin_exports, {
   default: () => _layout
 });
-var import_index_cf0e86af = __toModule(require("../../chunks/index-cf0e86af.js"));
-var import_paths_6758d194 = __toModule(require("../../chunks/paths-6758d194.js"));
+module.exports = __toCommonJS(stdin_exports);
+var import_index_cf0e86af = require("../../chunks/index-cf0e86af.js");
+var import_paths_396f020f = require("../../chunks/paths-396f020f.js");
 var app = "";
 const themes = {
   "light": {
@@ -63,7 +59,7 @@ const ONSHeader = (0, import_index_cf0e86af.c)(($$result, $$props, $$bindings, s
   if ($$props.center === void 0 && $$bindings.center && center !== void 0)
     $$bindings.center(center);
   $$result.css.add(css$1);
-  return `<nav style="${"border-bottom-color: " + (0, import_index_cf0e86af.e)(theme2["muted"]) + "; " + (0, import_index_cf0e86af.e)(filled ? "background-color: " + theme2["pale"] + ";" : "white")}" class="${"svelte-1ly5odw"}"><div class="${["col-wide middle", center ? "center" : ""].join(" ").trim()}"><a href="${"https://www.ons.gov.uk/"}" class="${"svelte-1ly5odw"}"><picture class="${"svelte-1ly5odw"}">${filled == true ? `<img src="${(0, import_index_cf0e86af.e)(import_paths_6758d194.a) + "/img/ons-logo-pos-en.svg"}" alt="${"Office for National Statistics"}" class="${"svelte-1ly5odw"}">` : `<img src="${(0, import_index_cf0e86af.e)(import_paths_6758d194.a) + "/img/ons-logo-black-en.svg"}" alt="${"Office for National Statistics"}" class="${"svelte-1ly5odw"}">`}</picture></a></div>
+  return `<nav style="${"border-bottom-color: " + (0, import_index_cf0e86af.e)(theme2["muted"]) + "; " + (0, import_index_cf0e86af.e)(filled ? "background-color: " + theme2["pale"] + ";" : "white")}" class="${"svelte-1ly5odw"}"><div class="${["col-wide middle", center ? "center" : ""].join(" ").trim()}"><a href="${"https://www.ons.gov.uk/"}" class="${"svelte-1ly5odw"}"><picture class="${"svelte-1ly5odw"}">${filled == true ? `<img src="${(0, import_index_cf0e86af.e)(import_paths_396f020f.a) + "/img/ons-logo-pos-en.svg"}" alt="${"Office for National Statistics"}" class="${"svelte-1ly5odw"}">` : `<img src="${(0, import_index_cf0e86af.e)(import_paths_396f020f.a) + "/img/ons-logo-black-en.svg"}" alt="${"Office for National Statistics"}" class="${"svelte-1ly5odw"}">`}</picture></a></div>
 </nav>`;
 });
 var ONSFooter_svelte_svelte_type_style_lang = "";
@@ -76,7 +72,7 @@ const ONSFooter = (0, import_index_cf0e86af.c)(($$result, $$props, $$bindings, s
   if ($$props.theme === void 0 && $$bindings.theme && theme2 !== void 0)
     $$bindings.theme(theme2);
   $$result.css.add(css);
-  return `<footer style="${"color: " + (0, import_index_cf0e86af.e)(theme2["text"]) + "; background-color: " + (0, import_index_cf0e86af.e)(theme2["pale"]) + ";"}" class="${"svelte-137hs7y"}"><div class="${"col-wide"}" data-analytics="${"footer"}"><a href="${"https://www.ons.gov.uk/"}" class="${"svelte-137hs7y"}">${theme2.name == "dark" ? `<img class="${"logo-img svelte-137hs7y"}" src="${(0, import_index_cf0e86af.e)(import_paths_6758d194.a) + "/img/ons-logo-neg-en.svg"}" alt="${"Office for National Statistics"}">` : `<img class="${"logo-img svelte-137hs7y"}" src="${(0, import_index_cf0e86af.e)(import_paths_6758d194.a) + "/img/ons-logo-black-en.svg"}" alt="${"Office for National Statistics"}">`}</a>
+  return `<footer style="${"color: " + (0, import_index_cf0e86af.e)(theme2["text"]) + "; background-color: " + (0, import_index_cf0e86af.e)(theme2["pale"]) + ";"}" class="${"svelte-137hs7y"}"><div class="${"col-wide"}" data-analytics="${"footer"}"><a href="${"https://www.ons.gov.uk/"}" class="${"svelte-137hs7y"}">${theme2.name == "dark" ? `<img class="${"logo-img svelte-137hs7y"}" src="${(0, import_index_cf0e86af.e)(import_paths_396f020f.a) + "/img/ons-logo-neg-en.svg"}" alt="${"Office for National Statistics"}">` : `<img class="${"logo-img svelte-137hs7y"}" src="${(0, import_index_cf0e86af.e)(import_paths_396f020f.a) + "/img/ons-logo-black-en.svg"}" alt="${"Office for National Statistics"}">`}</a>
 		<ul class="${"svelte-137hs7y"}"><li class="${"svelte-137hs7y"}"><a href="${"https://www.ons.gov.uk/aboutus/contactus"}" class="${"link svelte-137hs7y"}" style="${"color: " + (0, import_index_cf0e86af.e)(theme2["text"])}">Contact us</a></li>
 			<li class="${"svelte-137hs7y"}"><a href="${"https://www.ons.gov.uk/help/privacynotice"}" class="${"link svelte-137hs7y"}" style="${"color: " + (0, import_index_cf0e86af.e)(theme2["text"])}">Cookies and privacy</a></li></ul>
 		<hr style="${"border-top-color: " + (0, import_index_cf0e86af.e)(theme2["muted"])}" class="${"svelte-137hs7y"}">

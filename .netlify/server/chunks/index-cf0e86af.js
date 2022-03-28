@@ -1,11 +1,22 @@
 var __defProp = Object.defineProperty;
-var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
-  __markAsModule(target);
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
-__export(exports, {
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var stdin_exports = {};
+__export(stdin_exports, {
   a: () => add_attribute,
   b: () => safe_not_equal,
   c: () => create_ssr_component,
@@ -28,6 +39,7 @@ __export(exports, {
   t: () => createEventDispatcher,
   v: () => validate_component
 });
+module.exports = __toCommonJS(stdin_exports);
 function noop() {
 }
 const identity = (x) => x;
@@ -40,7 +52,7 @@ function run(fn) {
   return fn();
 }
 function blank_object() {
-  return Object.create(null);
+  return /* @__PURE__ */ Object.create(null);
 }
 function run_all(fns) {
   fns.forEach(run);
@@ -58,7 +70,7 @@ function subscribe(store, ...callbacks) {
 const is_client = typeof window !== "undefined";
 let now = is_client ? () => window.performance.now() : () => Date.now();
 let raf = is_client ? (cb) => requestAnimationFrame(cb) : noop;
-const tasks = new Set();
+const tasks = /* @__PURE__ */ new Set();
 function run_tasks(now2) {
   tasks.forEach((task) => {
     if (!task.c(now2)) {
@@ -116,7 +128,7 @@ function getContext(key) {
 }
 Promise.resolve();
 const globals = typeof window !== "undefined" ? window : typeof globalThis !== "undefined" ? globalThis : global;
-const boolean_attributes = new Set([
+const boolean_attributes = /* @__PURE__ */ new Set([
   "allowfullscreen",
   "allowpaymentrequest",
   "async",
@@ -255,9 +267,9 @@ function create_ssr_component(fn) {
     return html;
   }
   return {
-    render: (props = {}, { $$slots = {}, context = new Map() } = {}) => {
+    render: (props = {}, { $$slots = {}, context = /* @__PURE__ */ new Map() } = {}) => {
       on_destroy = [];
-      const result = { title: "", head: "", css: new Set() };
+      const result = { title: "", head: "", css: /* @__PURE__ */ new Set() };
       const html = $$render(result, props, {}, $$slots, context);
       run_all(on_destroy);
       return {
