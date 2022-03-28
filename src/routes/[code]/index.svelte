@@ -36,6 +36,7 @@
 
   <script>
 
+	let selection
 	import { afterNavigate, goto } from '$app/navigation';
 	import lookup from '$lib/lookup.js'
 
@@ -97,8 +98,7 @@
 	  Map1: {},
 	}
 
-	function redirectTo(url){/*console.log("NEW URL:",url.selected); */goto(url.selected)}
-
+	$: selection && goto(`/${selection.areacd}`)
   </script>
   
 
@@ -123,7 +123,7 @@
 	<br />
     
 	<div class="ons-field">
-		<Dropdown/>
+		<Dropdown bind:selected={selection}/>{JSON.stringify(selection)}
 	  </div>
 	<div style="margin-top: 90px;">
 	  <Arrow color="white" {animation}>Scroll to begin</Arrow>

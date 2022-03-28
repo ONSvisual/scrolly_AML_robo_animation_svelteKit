@@ -55,6 +55,12 @@ function writable(value, start = noop) {
   return { set, update, subscribe: subscribe2 };
 }
 const all_data = writable();
+function guard(name) {
+  return () => {
+    throw new Error(`Cannot call ${name}(...) on the server`);
+  };
+}
+const goto = guard("goto");
 const step = writable(1);
 const tracker = writable(1);
 const txt = `
@@ -12742,6 +12748,9 @@ const css = {
   map: null
 };
 const App = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let { selected: selected2 = null } = $$props;
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
+    $$bindings.selected(selected2);
   $$result.css.add(css);
   return `<form><label for="${"single"}" class="${"svelte-1iad7dh"}">Select one local authority:</label>
 	${validate_component(Select_1, "Select").$$render($$result, {
@@ -12751,7 +12760,7 @@ const App = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     items
   }, {}, {})}</form>
 
-<p class="${"svelte-1iad7dh"}">Selected: ${escape("None")}</p>`;
+<p class="${"svelte-1iad7dh"}">Selected: ${escape(selected2 ? selected2.areanm : "None")}</p>`;
 });
 const prerender = true;
 let selected, test;
@@ -12776,6 +12785,7 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
   let $all_data, $$unsubscribe_all_data;
   $$unsubscribe_story_json = subscribe(story_json, (value) => $story_json = value);
   $$unsubscribe_all_data = subscribe(all_data, (value) => $all_data = value);
+  let selection;
   let { data, myNeighbours } = $$props;
   all_data.set(data);
   const country = data.CODE[0];
@@ -12796,6 +12806,7 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
   let $$rendered;
   do {
     $$settled = true;
+    selection && goto(`/${selection.areacd}`);
     $$rendered = `${data && country && story ? `${escape(story)}
   ${validate_component(Header, "Header").$$render($$result, {
       bgcolor: "#206095",
@@ -12811,7 +12822,12 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
 	<p class="${"text-big"}" style="${"margin-top: 5px"}"><!-- HTML_TAG_START -->${story[0].lede}<!-- HTML_TAG_END --></p>
 	<br>
     
-	<div class="${"ons-field"}">${validate_component(App, "Dropdown").$$render($$result, {}, {}, {})}</div>
+	<div class="${"ons-field"}">${validate_component(App, "Dropdown").$$render($$result, { selected: selection }, {
+          selected: ($$value) => {
+            selection = $$value;
+            $$settled = false;
+          }
+        }, {})}${escape(JSON.stringify(selection))}</div>
 	<div style="${"margin-top: 90px;"}">${validate_component(Arrow, "Arrow").$$render($$result, { color: "white", animation }, {}, {
           default: () => {
             return `Scroll to begin`;

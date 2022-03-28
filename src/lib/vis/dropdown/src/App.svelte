@@ -1,9 +1,9 @@
 <script>
 	import Select from "./Select.svelte";
 	import items from "./items.json";
-	
+	export let selected = null
 	// Single select
-	let selected = null;
+
 	function doSelect(event) {
 		selected = event.detail;
 	}
