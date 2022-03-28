@@ -4,7 +4,7 @@
     "src": ".svelte-kit/build/index.js",
     "isEntry": true,
     "imports": [
-      "_index-cf0e86af.js",
+      "_index-0089343d.js",
       "_paths-396f020f.js"
     ]
   },
@@ -14,7 +14,7 @@
     "isEntry": true,
     "imports": [
       "src/routes/index.svelte",
-      "_index-cf0e86af.js"
+      "_index-0089343d.js"
     ]
   },
   "src/routes/index.svelte": {
@@ -22,7 +22,7 @@
     "src": "src/routes/index.svelte",
     "isEntry": true,
     "imports": [
-      "_index-cf0e86af.js"
+      "_index-0089343d.js"
     ]
   },
   "src/routes/__layout.svelte": {
@@ -30,7 +30,7 @@
     "src": "src/routes/__layout.svelte",
     "isEntry": true,
     "imports": [
-      "_index-cf0e86af.js",
+      "_index-0089343d.js",
       "_paths-396f020f.js"
     ],
     "css": [
@@ -42,7 +42,7 @@
     "src": ".svelte-kit/runtime/components/error.svelte",
     "isEntry": true,
     "imports": [
-      "_index-cf0e86af.js"
+      "_index-0089343d.js"
     ]
   },
   "src/routes/[code]/index.svelte": {
@@ -50,7 +50,7 @@
     "src": "src/routes/[code]/index.svelte",
     "isEntry": true,
     "imports": [
-      "_index-cf0e86af.js",
+      "_index-0089343d.js",
       "_paths-396f020f.js"
     ],
     "dynamicImports": [
@@ -63,8 +63,8 @@
   "_paths-396f020f.js": {
     "file": "chunks/paths-396f020f.js"
   },
-  "_index-cf0e86af.js": {
-    "file": "chunks/index-cf0e86af.js"
+  "_index-0089343d.js": {
+    "file": "chunks/index-0089343d.js"
   },
   "src/lib/neighbours.json": {
     "file": "chunks/neighbours-25764e6a.js",

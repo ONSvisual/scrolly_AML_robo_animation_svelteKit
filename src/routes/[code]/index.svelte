@@ -11,7 +11,7 @@
 	//import neighbours from '$lib/neighbours.js'
 	let a
 	let b
-	export let title,dogs
+
  export async function load({ params, fetch, session, stuff }) {
    const response = await fetch(`${assets}/data/place_data/${params.code}.json`);
    	test=params.code

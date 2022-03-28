@@ -1,4 +1,4 @@
-import { g as getContext, n as noop, b as safe_not_equal, c as create_ssr_component, d as subscribe, f as each, e as escape, a as add_attribute, h as assign, i as now, l as loop, j as identity, v as validate_component, k as globals, o as spread, p as escape_object, q as escape_attribute_value, m as missing_component, r as add_classes, t as createEventDispatcher } from "../../../chunks/index-cf0e86af.js";
+import { g as getContext, n as noop, d as safe_not_equal, c as create_ssr_component, f as subscribe, e as each, b as escape, a as add_attribute, h as assign, i as now, l as loop, j as identity, v as validate_component, k as globals, o as spread, p as escape_object, q as escape_attribute_value, m as missing_component, r as add_classes, t as createEventDispatcher } from "../../../chunks/index-0089343d.js";
 import { a as assets, b as base } from "../../../chunks/paths-396f020f.js";
 import pkg from "archieml";
 import { polygonLength, polygonArea } from "d3-polygon";
@@ -433,11 +433,11 @@ const Path = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $metric, $$unsubscribe_metric;
   let $y, $$unsubscribe_y;
   let $area_cd, $$unsubscribe_area_cd;
-  let { d, centroid, fill, fillOpacity, title: title2, mouseover, mouseout, value, pop, metric, y: y2, selected: selected2, area_cd, label_opacity, zoom } = $$props;
+  let { d, centroid, fill, fillOpacity, title, mouseover, mouseout, value, pop, metric, y: y2, selected: selected2, area_cd, label_opacity, zoom } = $$props;
   $$unsubscribe_d = subscribe(d, (value2) => $d = value2);
   $$unsubscribe_fill = subscribe(fill, (value2) => $fill = value2);
   $$unsubscribe_fillOpacity = subscribe(fillOpacity, (value2) => $fillOpacity = value2);
-  $$unsubscribe_title = subscribe(title2, (value2) => $title = value2);
+  $$unsubscribe_title = subscribe(title, (value2) => $title = value2);
   $$unsubscribe_value = subscribe(value, (value2) => $value = value2);
   $$unsubscribe_metric = subscribe(metric, (value2) => $metric = value2);
   $$unsubscribe_y = subscribe(y2, (value2) => $y = value2);
@@ -450,8 +450,8 @@ const Path = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.fill(fill);
   if ($$props.fillOpacity === void 0 && $$bindings.fillOpacity && fillOpacity !== void 0)
     $$bindings.fillOpacity(fillOpacity);
-  if ($$props.title === void 0 && $$bindings.title && title2 !== void 0)
-    $$bindings.title(title2);
+  if ($$props.title === void 0 && $$bindings.title && title !== void 0)
+    $$bindings.title(title);
   if ($$props.mouseover === void 0 && $$bindings.mouseover && mouseover !== void 0)
     $$bindings.mouseover(mouseover);
   if ($$props.mouseout === void 0 && $$bindings.mouseout && mouseout !== void 0)
@@ -592,8 +592,8 @@ const Text = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $title, $$unsubscribe_title;
   let $value, $$unsubscribe_value;
   let $metric, $$unsubscribe_metric;
-  let { d, centroid, fill, fillOpacity, title: title2, mouseover, mouseout, value, pop, metric, selected: selected2, area_cd, label_opacity, zoom, x: x2, y: y2, k: k2 } = $$props;
-  $$unsubscribe_title = subscribe(title2, (value2) => $title = value2);
+  let { d, centroid, fill, fillOpacity, title, mouseover, mouseout, value, pop, metric, selected: selected2, area_cd, label_opacity, zoom, x: x2, y: y2, k: k2 } = $$props;
+  $$unsubscribe_title = subscribe(title, (value2) => $title = value2);
   $$unsubscribe_value = subscribe(value, (value2) => $value = value2);
   $$unsubscribe_metric = subscribe(metric, (value2) => $metric = value2);
   $$unsubscribe_label_opacity = subscribe(label_opacity, (value2) => $label_opacity = value2);
@@ -608,8 +608,8 @@ const Text = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.fill(fill);
   if ($$props.fillOpacity === void 0 && $$bindings.fillOpacity && fillOpacity !== void 0)
     $$bindings.fillOpacity(fillOpacity);
-  if ($$props.title === void 0 && $$bindings.title && title2 !== void 0)
-    $$bindings.title(title2);
+  if ($$props.title === void 0 && $$bindings.title && title !== void 0)
+    $$bindings.title(title);
   if ($$props.mouseover === void 0 && $$bindings.mouseover && mouseover !== void 0)
     $$bindings.mouseover(mouseover);
   if ($$props.mouseout === void 0 && $$bindings.mouseout && mouseout !== void 0)
@@ -4314,12 +4314,12 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     k: tweened(k, { duration: 200 })
   };
   let mouseover = function(d) {
-    let title2 = d.target.getAttribute("title");
+    let title = d.target.getAttribute("title");
     let value = d.target.getAttribute("value").toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
     d.target.getAttribute("pop");
     let metric = d.target.getAttribute("metric");
     select(".tooltip").style("opacity", 1);
-    select(".tooltip").html(title2 + "<br>" + value + metric).style("left", d.clientX + 10 + "px").style("top", d.clientY - 28 + "px");
+    select(".tooltip").html(title + "<br>" + value + metric).style("left", d.clientX + 10 + "px").style("top", d.clientY - 28 + "px");
   };
   let mouseout = function(d) {
     select(".tooltip").style("opacity", 0);
@@ -12790,7 +12790,6 @@ const prerender = true;
 let selected, test;
 let a;
 let b;
-let title, dogs;
 async function load({ params, fetch, session, stuff }) {
   const response = await fetch(`${assets}/data/place_data/${params.code}.json`);
   test = params.code;
@@ -12937,4 +12936,4 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
   $$unsubscribe_all_data();
   return $$rendered;
 });
-export { U5Bcodeu5D as default, dogs, load, prerender, selected, test, title };
+export { U5Bcodeu5D as default, load, prerender, selected, test };
