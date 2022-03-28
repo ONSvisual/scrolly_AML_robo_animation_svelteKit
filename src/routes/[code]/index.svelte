@@ -29,7 +29,7 @@
 
    return {props:{data,myNeighbours,test}}
   }
-  console.log(page)
+  //console.log(page)
 
 
 </script>
@@ -39,14 +39,14 @@
 	import { afterNavigate, goto } from '$app/navigation';
 	import lookup from '$lib/lookup.js'
 
-	$: selected && console.log(`${base}/${selected}`)
+	$: selected //&& console.log(`${base}/${selected}`)
  	export let data, myNeighbours
-	 console.log("myNeighbours",myNeighbours)
+	 //console.log("myNeighbours",myNeighbours)
 	all_data.set(data)
 
 
 	const country = data.CODE[0] 
-	console.log("countrty", country)
+	//console.log("countrty", country)
 
 	import { getContext } from 'svelte'
 	//COMPONENTS
@@ -97,7 +97,7 @@
 	  Map1: {},
 	}
 
-	function redirectTo(url){console.log("NEW URL:",url.selected); goto(url.selected)}
+	function redirectTo(url){/*console.log("NEW URL:",url.selected); */goto(url.selected)}
 
   </script>
   

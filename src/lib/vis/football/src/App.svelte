@@ -13,7 +13,7 @@
   let people = data.LA.DENSITY.DENSITY11 / 187
   let mostPeople=Math.ceil(data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.PEOPLE_PER_FOOOTY_PITCH)
   let leastPeople=data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.PEOPLE_PER_FOOOTY_PITCH
-  console.log("PEOPLE", people)
+  //console.log("PEOPLE", people)
   let intersect = checkIntersection
   let peopleHere = people
 
@@ -125,7 +125,7 @@
     e.scale = e.x / eX
     e.skew = Math.atan2(eY + e.y, e.x - eX) * 180 * Math.PI
   })
-  console.log(points)
+  //console.log(points)
   let stepPrev=-1
 
 
@@ -136,7 +136,7 @@
 
 
   function change(step) {
-    console.log(step)
+   // console.log(step)
    if (step != stepPrev) {
       if (step == 9){changePeople(peopleHere)}
       if (step == 10){changePeople(mostPeople)}
@@ -148,7 +148,7 @@
   }
 
   function testData(){
-    console.log(data);
+   // console.log(data);
     return true
   }
  $: animation && change(animation)

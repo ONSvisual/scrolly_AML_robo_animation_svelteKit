@@ -1,5 +1,5 @@
-import { g as getContext, n as noop, d as safe_not_equal, c as create_ssr_component, f as subscribe, e as each, b as escape, a as add_attribute, h as assign, i as now, l as loop, j as identity, v as validate_component, k as globals, o as spread, p as escape_object, q as escape_attribute_value, m as missing_component, r as add_classes, t as createEventDispatcher } from "../../../chunks/index-0089343d.js";
-import { a as assets, b as base } from "../../../chunks/paths-396f020f.js";
+import { n as noop, d as safe_not_equal, c as create_ssr_component, f as subscribe, e as each, b as escape, a as add_attribute, h as assign, i as now, l as loop, j as identity, v as validate_component, k as globals, o as spread, p as escape_object, q as escape_attribute_value, m as missing_component, g as getContext, r as add_classes, t as createEventDispatcher } from "../../../chunks/index-0089343d.js";
+import { a as assets } from "../../../chunks/paths-396f020f.js";
 import pkg from "archieml";
 import { polygonLength, polygonArea } from "d3-polygon";
 import Path$1 from "svgpath";
@@ -12,31 +12,6 @@ import "topojson";
 import { interpolateViridis } from "d3-scale-chromatic";
 import { select } from "d3-selection";
 import { checkIntersection } from "line-intersect";
-const getStores = () => {
-  const stores = getContext("__svelte__");
-  return {
-    page: {
-      subscribe: stores.page.subscribe
-    },
-    navigating: {
-      subscribe: stores.navigating.subscribe
-    },
-    get preloading() {
-      console.error("stores.preloading is deprecated; use stores.navigating instead");
-      return {
-        subscribe: stores.navigating.subscribe
-      };
-    },
-    session: stores.session,
-    updated: stores.updated
-  };
-};
-const page = {
-  subscribe(fn) {
-    const store = getStores().page;
-    return store.subscribe(fn);
-  }
-};
 const subscriber_queue = [];
 function writable(value, start = noop) {
   let stop;
@@ -12803,7 +12778,6 @@ async function load({ params, fetch, session, stuff }) {
   Object.keys(b).forEach((e) => myNeighbours[e] = b[e].flat().slice(0, 9));
   return { props: { data, myNeighbours, test } };
 }
-console.log(page);
 let top = 0;
 let threshold = 0.5;
 let bottom = 1;
@@ -12813,10 +12787,8 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
   $$unsubscribe_story_json = subscribe(story_json, (value) => $story_json = value);
   $$unsubscribe_all_data = subscribe(all_data, (value) => $all_data = value);
   let { data, myNeighbours } = $$props;
-  console.log("myNeighbours", myNeighbours);
   all_data.set(data);
   const country = data.CODE[0];
-  console.log("countrty", country);
   let story;
   story = $story_json;
   let theme = getContext("theme");
@@ -12834,7 +12806,6 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
   let $$rendered;
   do {
     $$settled = true;
-    selected && console.log(`${base}/${selected}`);
     $$rendered = `${data && country && story ? `${escape(story)}
   ${validate_component(Header, "Header").$$render($$result, {
       bgcolor: "#206095",

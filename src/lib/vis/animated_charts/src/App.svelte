@@ -27,7 +27,7 @@
   let chart_key=false
   //$: country=$all_data.CODE[0]
 export let progress, animation, width, height, padding
-console.log ("ALL DATA", $all_data)
+//console.log ("ALL DATA", $all_data)
 	//const padding = 80
   import {dims} from '$lib/background_dimensions' 
 
@@ -110,7 +110,7 @@ let FirstMeridian = +path({
 						verticalStrokes:false,
 						horizontalStrokes:true
 			}
-		console.log("axes", axes)
+	//	console.log("axes", axes)
     let x = []
     arr.forEach((e, i) => {
       x.push({
@@ -247,7 +247,7 @@ let frequencyBellRegion = function(){
   let region_data=JSON.parse(JSON.stringify(frequency))
   region_data[country].forEach(e=>e.lads=e.lads.filter(el=>region_codes.includes(el)))
   region_data[country]=region_data[country].filter(e=>e.lads.length)
-  console.log("region_codes",region_codes,"region_data",region_data)
+ // console.log("region_codes",region_codes,"region_data",region_data)
 values=[]
     let minX=+region_data[country][0].growth, maxX=+region_data[country][region_data[country].length-1].growth, rangeX=maxX-minX, maxY=region_data[country].map(e=>e.lads.length).sort((a,b)=>b-a)[0]
     for(let i=minX; i<maxX+1; i++)values.push(i)
@@ -325,7 +325,7 @@ data = data.sort((a, b) => b.growth - a.growth)
     //console.log("bar_data",data)
 
     //regionMap
-console.log("BAR_DATA",bar_data)
+//console.log("BAR_DATA",bar_data)
 let region_codes=bar_data.map(e=>e.LAD17CD)
     data.forEach((e, i) => {
       e.xys_region = `M${0} ${0}, ${
