@@ -98,7 +98,7 @@
 	  Map1: {},
 	}
 
-//	$: selection && goto(`/${selection}`)
+	$: selection && goto(`/${selection}`)
   </script>
   
 
