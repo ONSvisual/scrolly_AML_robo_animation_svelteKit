@@ -4222,7 +4222,6 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let key = true;
   let chart_key = false;
   let { progress, animation, width: width2, height, padding } = $$props;
-  console.log("ALL DATA", $all_data);
   const mercator = geoMercator().center(country == "E" ? [-2, 52.5] : [-3.9, 52.3]).scale(country == "E" ? width2 < height ? width2 * 7 : height * 5 : width2 < height ? width2 * 15 : height * 15).translate([width2 / 2, height / 2]);
   const easing = cubicInOut;
   let axes;
@@ -4260,7 +4259,6 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       verticalStrokes: false,
       horizontalStrokes: true
     };
-    console.log("axes", axes);
     let x2 = [];
     arr.forEach((e, i) => {
       x2.push({
@@ -4367,7 +4365,6 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let region_data = JSON.parse(JSON.stringify(frequency));
       region_data[country].forEach((e) => e.lads = e.lads.filter((el) => region_codes2.includes(el)));
       region_data[country] = region_data[country].filter((e) => e.lads.length);
-      console.log("region_codes", region_codes2, "region_data", region_data);
       values = [];
       let minX = +region_data[country][0].growth, maxX = +region_data[country][region_data[country].length - 1].growth, rangeX = maxX - minX;
       region_data[country].map((e) => e.lads.length).sort((a2, b2) => b2 - a2)[0];
@@ -4421,7 +4418,6 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       }
     });
     data = data.sort((a2, b2) => b2.growth - a2.growth);
-    console.log("BAR_DATA", bar_data);
     let region_codes = bar_data.map((e) => e.LAD17CD);
     data.forEach((e, i) => {
       e.xys_region = `M${0} ${0}, ${0} ${0}, ${0} ${0},${0} ${0}Z`;
@@ -5339,6 +5335,9 @@ var folk = [
   }
 ];
 let vp = 300;
+function testData() {
+  return true;
+}
 const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $zeds, $$unsubscribe_zeds;
   let { animation, height, width: width2, padding, data } = $$props;
@@ -5346,7 +5345,6 @@ const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let people = data.LA.DENSITY.DENSITY11 / 187;
   let mostPeople = Math.ceil(data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.PEOPLE_PER_FOOOTY_PITCH);
   let leastPeople = data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.PEOPLE_PER_FOOOTY_PITCH;
-  console.log("PEOPLE", people);
   let intersect = checkIntersection;
   let peopleHere = people;
   pitch.forEach((e) => {
@@ -5434,10 +5432,8 @@ const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     e.scale = e.x / eX;
     e.skew = Math.atan2(eY + e.y, e.x - eX) * 180 * Math.PI;
   });
-  console.log(points);
   let stepPrev = -1;
   function change(step2) {
-    console.log(step2);
     if (step2 != stepPrev) {
       if (step2 == 9) {
         changePeople(peopleHere);
@@ -5451,10 +5447,6 @@ const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       stepPrev = step2;
     }
     return step2;
-  }
-  function testData() {
-    console.log(data);
-    return true;
   }
   if ($$props.animation === void 0 && $$bindings.animation && animation !== void 0)
     $$bindings.animation(animation);
@@ -12770,10 +12762,8 @@ async function load({ params, fetch, session, stuff }) {
   test = params.code;
   a = await import("../../../chunks/neighbours-25764e6a.js");
   b = a.default;
-  console.log("code", b);
   selected = params.code;
   let data = await response.json();
-  console.log(data);
   let myNeighbours = {};
   Object.keys(b).forEach((e) => myNeighbours[e] = b[e].flat().slice(0, 9));
   return { props: { data, myNeighbours, test } };

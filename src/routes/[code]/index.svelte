@@ -19,11 +19,11 @@
   	b = a.default;
 
 
-   console.log("code",b)
+   //console.log("code",b)
    selected=params.code
   
    let data = await response.json()
-   console.log(data)
+   //console.log(data)
    let myNeighbours={};
    Object.keys(b).forEach(e=>myNeighbours[e]=b[e].flat().slice(0,9))
 
