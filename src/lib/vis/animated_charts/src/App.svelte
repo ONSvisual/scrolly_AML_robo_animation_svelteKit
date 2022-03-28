@@ -1,4 +1,5 @@
 <script>
+
 	import Axis from './Axis.svelte'
   import Path from './Path.svelte'
 	import Text from "./Text.svelte"
@@ -6,8 +7,8 @@
 	import { cubicInOut } from 'svelte/easing'
   import { interpolate } from "$lib/flubber/index.js"
   console.log("interpolate",interpolate)
-  import { geoAlbers, geoPath, geoProjection, geoMercator } from 'd3-geo'
-  import { extent } from 'd3-array'
+  import { geoAlbers, geoPath, geoProjection, geoMercator } from '../node_modules/d3-geo/src/index.js'
+  import { extent } from '../node_modules/d3-array/src/index.js'
   import { onMount } from 'svelte'
   import { feature } from 'topojson'
   import { interpolateViridis } from 'd3-scale-chromatic'

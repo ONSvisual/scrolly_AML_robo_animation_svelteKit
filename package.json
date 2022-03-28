@@ -19,6 +19,8 @@
     "@sveltejs/adapter-static": "next",
     "@sveltejs/kit": "next",
     "@turf/bbox": "^6.5.0",
+    "@types/d3-array": "^3.0.2",
+    "@types/d3-geo": "^3.0.2",
     "d3-dsv": "latest",
     "d3-geo": "^3.0.1",
     "debounce": "^1.2.0",
