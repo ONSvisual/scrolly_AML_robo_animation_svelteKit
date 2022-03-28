@@ -27,7 +27,10 @@ const config = {
 			optimizeDeps: {
 				include: ['esm-dep > cjs-dep']
 			  }
-        }
+        },
+		optimizeDeps: {
+			include: ['esm-dep > cjs-dep']
+		  }
 	}
 };
 
