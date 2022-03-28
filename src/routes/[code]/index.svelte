@@ -98,7 +98,7 @@
 	  Map1: {},
 	}
 
-	$: selection && goto(`/${selection.areacd}`)
+	$: selection && goto(`/${selection}`)
   </script>
   
 
@@ -123,7 +123,7 @@
 	<br />
     
 	<div class="ons-field">
-		<Dropdown bind:selected={selection}/>{JSON.stringify(selection)}
+		<Dropdown bind:selected={selection.areacd}/>{JSON.stringify(selection.areacd)}
 	  </div>
 	<div style="margin-top: 90px;">
 	  <Arrow color="white" {animation}>Scroll to begin</Arrow>
