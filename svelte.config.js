@@ -24,13 +24,7 @@ const config = {
             base: production ? '' : ''
         },
 	    vite: {
-			optimizeDeps: {
-				include: ['esm-dep > cjs-dep']
-			  }
-        },
-		optimizeDeps: {
-			include: ['esm-dep > cjs-dep']
-		  }
+        }
 	}
 };
 
