@@ -216,7 +216,7 @@ export default {
     "E06000003": "Redcar and Cleveland",
     "E07000236": "Redditch",
     "E07000211": "Reigate and Banstead",
-    "W06000016": "Rhondda Cynon Taf",
+    "W06000016": "Rhondda Cynon Taff",
     "E07000124": "Ribble Valley",
     "E09000027": "Richmond upon Thames",
     "E07000166": "Richmondshire",
