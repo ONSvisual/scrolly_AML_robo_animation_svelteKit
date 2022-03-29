@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   //import {dims} from '$lib/backgroud_dimensions'   
-  export let height, width, count=0, index=0, offset=0, progress=0, family="", component, animation="",padding=50, country, data
+  export let height, width, count=0, index=0, offset=0, progress=0, family="", component, animation="",padding=50, country, all_data, selected
   import { step } from '$lib/step.js'
   import { tracker } from '$lib/tracker.js'  
   import {story_json} from "$lib/story"
@@ -9,7 +9,7 @@
   import Football  from '$lib/vis/football/src/App.svelte'
   import Pyramids  from '$lib/vis/animated_pyramids/src/App.svelte' 
   import robojournalist from '$lib/robojournalist'
-  import { all_data } from '$lib/stores.js'
+
   let story =$story_json
 //console.log("STORY",story)
   //$: $dims && height=$dims.h, width=$dims.w
@@ -32,11 +32,11 @@ function getPadding(){padding=Math.min(...[height/10, width/10]);  return paddin
 if(height)getPadding()
 
 </script>
-
+{#if animation && all_data && country}
 <div class="container" bind:clientHeight={height} bind:clientWidth={width} family={family} component={component}>
 
 {#if height}
-{#if animation}<h3 class= "title_over" x={getPadding()} y={padding/2}  >{ robojournalist(animation.section.actions['data-title'],$all_data) }</h3>{/if}
+{#if animation}<h3 class= "title_over" x={getPadding()} y={padding/2}  >{ robojournalist(animation.section.actions['data-title'],all_data) }</h3>{/if}
   <svg {height} {width} {count} {index} {offset} {progress} {animation}>
     
 <!--  <rect
@@ -63,7 +63,7 @@ if(height)getPadding()
     <text x="200" y="650">step: {getStep(animation.section.actions['data-id'])}</text>
     <text x="200" y="700">step_change:{$tracker}</text> 
     {/if}  -->
- {#if animation && $all_data}
+
   <!--<slot step={getStep(animation.section.actions['data-id'])}></slot>-->
   <svelte:component
   this={components[component]}
@@ -75,19 +75,21 @@ if(height)getPadding()
   {width}
   {padding}
   {country}
-  {data}
   family={family}
   component={component}    
-  animation={updateStep(animation.section.actions['data-id'])} />
- 
-  {/if}
+  animation={updateStep(animation.section.actions['data-id'])}
+  {all_data} 
+  {selected}
+  />
+  
+
 
   
   </svg>
 {/if}
 <div class="tooltip" style="opacity:0" ></div>
 </div>
-
+{/if}
 <style>
 
     .container{

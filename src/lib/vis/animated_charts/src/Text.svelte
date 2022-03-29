@@ -3,7 +3,7 @@
 	export let d,centroid,fill,fillOpacity,title,mouseover,mouseout,value,pop,metric,selected,area_cd,label_opacity,zoom,x,y,k
 
 	let labels=document.getElementsByClassName("labels")
-	console.log("labels",labels)
+
 </script>
 
 <g class="label">

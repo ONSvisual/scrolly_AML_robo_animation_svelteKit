@@ -7,9 +7,9 @@
   import Pyramid from './Pyramid.svelte'
   import pyramidStore from './pyramid'
   let order = rankings.map((e) => e[0])
-  import { all_data } from '../../../stores.js'
+
   import { step } from '../../animated_charts/src/step'
-  export let animation, data, height, padding, width
+  export let animation, height, padding, width, all_data
 
   function groupBy(objectArray, property) {
     return objectArray.reduce(function (acc, obj) {
@@ -83,16 +83,16 @@
     return bars
   }
 
-  pyramidStore.set(makeDataPyramid(data.LA.PYRAMID01))
+  pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID01))
 
 let changePyramid = details => console.log("do something"+details)
-let la_change=data.LA.PYRAMID11.map((e,i)=>e.map((el,ii)=>el-data.LA.PYRAMID01[i][ii]))
+let la_change=all_data.LA.PYRAMID11.map((e,i)=>e.map((el,ii)=>el-all_data.LA.PYRAMID01[i][ii]))
 let la_change_blended=la_change[0].map((e,i)=>e+la_change[1][i])
 
-let arr=[data.LA.PYRAMID01.flat(),data.LA.PYRAMID11.flat(),data.COUNTRY.PYRAMID01.flat(),data.COUNTRY.PYRAMID01.flat()]
+let arr=[all_data.LA.PYRAMID01.flat(),all_data.LA.PYRAMID11.flat(),all_data.COUNTRY.PYRAMID01.flat(),all_data.COUNTRY.PYRAMID01.flat()]
 let w=((width-(padding*2))/2)/(Math.max(...arr.flat()))
 
-let country_change=data.COUNTRY.PYRAMID11.map((e,i)=>e.map((el,ii)=>el-data.COUNTRY.PYRAMID01[i][ii]))
+let country_change=all_data.COUNTRY.PYRAMID11.map((e,i)=>e.map((el,ii)=>el-all_data.COUNTRY.PYRAMID01[i][ii]))
 let country_change_blended=country_change[0].map((e,i)=>e+country_change[1][i])
 
 let arr_blended=[la_change_blended,country_change_blended]
@@ -116,18 +116,15 @@ country_change_divided[0]=country_change_divided[0].map(e=>(e/w)*w_change)
 country_change_divided[1]=country_change_divided[1].map(e=>(e/w_change)*w)
   console.log("COUNTRY_CHANGE_DIVIDED",w, w_change,country_change_divided)
 
-data.LA.PYRAMID01
-data.COUNTRY.PYRAMID01
-data.COUNTRY.PYRAMID11
 
 let stepPrev;
 let request;
     function change(stp) {
       if (stp != stepPrev) {
      //   if (stp <= 11) {request="bars";pyramidStore.set(makeDataPyramid(data.LA.PYRAMID11))}
-        if (stp == 12) {request="bars";pyramidStore.set(makeDataPyramid(data.LA.PYRAMID01),{easing:sineInOut})}    
-        if (stp == 13) {request="bars";pyramidStore.set(makeDataPyramid(data.LA.PYRAMID11),{easing:sineInOut})}
-        if (stp == 14) {request="bars";pyramidStore.set(makeDataPyramid(data.COUNTRY.PYRAMID11),{easing:sineInOut})}
+        if (stp == 12) {request="bars";pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID01),{easing:sineInOut})}    
+        if (stp == 13) {request="bars";pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID11),{easing:sineInOut})}
+        if (stp == 14) {request="bars";pyramidStore.set(makeDataPyramid(all_data.COUNTRY.PYRAMID11),{easing:sineInOut})}
         if (stp == 15) {request="bars";pyramidStore.set(makeDataPyramid(country_change_divided),{easing:sineInOut})}
         if (stp == 16) {request="bars";pyramidStore.set(makeDataPyramid(la_change_divided),{easing:sineInOut})}
         if (stp >= 17) {request="comparison2"}

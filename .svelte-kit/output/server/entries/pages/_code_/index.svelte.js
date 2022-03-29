@@ -8,7 +8,7 @@ import "earcut";
 import "topojson-client";
 import { extent } from "d3-array";
 import { geoMercator, geoPath } from "d3-geo";
-import "topojson";
+import * as topojson from "topojson";
 import { interpolateViridis } from "d3-scale-chromatic";
 import { select } from "d3-selection";
 import { checkIntersection } from "line-intersect";
@@ -54,7 +54,6 @@ function writable(value, start = noop) {
   }
   return { set, update, subscribe: subscribe2 };
 }
-const all_data = writable();
 const step = writable(1);
 const tracker = writable(1);
 const txt = `
@@ -408,7 +407,7 @@ const Path = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $metric, $$unsubscribe_metric;
   let $y, $$unsubscribe_y;
   let $area_cd, $$unsubscribe_area_cd;
-  let { d, centroid, fill, fillOpacity, title, mouseover, mouseout, value, pop, metric, y: y2, selected: selected2, area_cd, label_opacity, zoom } = $$props;
+  let { d, centroid, fill, fillOpacity, title, mouseover, mouseout, value, pop, metric, y: y2, selected, area_cd, label_opacity, zoom } = $$props;
   $$unsubscribe_d = subscribe(d, (value2) => $d = value2);
   $$unsubscribe_fill = subscribe(fill, (value2) => $fill = value2);
   $$unsubscribe_fillOpacity = subscribe(fillOpacity, (value2) => $fillOpacity = value2);
@@ -439,8 +438,8 @@ const Path = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.metric(metric);
   if ($$props.y === void 0 && $$bindings.y && y2 !== void 0)
     $$bindings.y(y2);
-  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
-    $$bindings.selected(selected2);
+  if ($$props.selected === void 0 && $$bindings.selected && selected !== void 0)
+    $$bindings.selected(selected);
   if ($$props.area_cd === void 0 && $$bindings.area_cd && area_cd !== void 0)
     $$bindings.area_cd(area_cd);
   if ($$props.label_opacity === void 0 && $$bindings.label_opacity && label_opacity !== void 0)
@@ -455,7 +454,7 @@ const Path = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   $$unsubscribe_metric();
   $$unsubscribe_y();
   $$unsubscribe_area_cd();
-  return `<path${add_attribute("id", selected2 ? "selected" : null, 0)}${add_attribute("d", $d, 0)}${add_attribute("centroid", centroid, 0)} class="${"shape"}"${add_attribute("fill", $fill, 0)}${add_attribute("title", $title, 0)}${add_attribute("fill-opacity", $fillOpacity, 0)}${add_attribute("stroke-width", selected2 ? "1pt" : "0.5pt", 0)}${add_attribute("stroke", selected2 ? "black" : "", 0)} style="${"vector-effect: non-scaling-stroke;"}"${add_attribute("value", $value, 0)}${add_attribute("pop", pop, 0)}${add_attribute("metric", $metric, 0)}${add_attribute("y", $y, 0)}${add_attribute("area_cd", $area_cd, 0)}${add_attribute("zoom", zoom, 0)}>${selected2 ? `<animate attributeName="${"stroke-width"}" values="${"0;4;0"}" dur="${"2s"}" begin="${"0s"}" repeatCount="${"indefinite"}"></animate>` : ``}</path>
+  return `<path${add_attribute("id", selected ? "selected" : null, 0)}${add_attribute("d", $d, 0)}${add_attribute("centroid", centroid, 0)} class="${"shape"}"${add_attribute("fill", $fill, 0)}${add_attribute("title", $title, 0)}${add_attribute("fill-opacity", $fillOpacity, 0)}${add_attribute("stroke-width", selected ? "1pt" : "0.5pt", 0)}${add_attribute("stroke", selected ? "black" : "", 0)} style="${"vector-effect: non-scaling-stroke;"}"${add_attribute("value", $value, 0)}${add_attribute("pop", pop, 0)}${add_attribute("metric", $metric, 0)}${add_attribute("y", $y, 0)}${add_attribute("area_cd", $area_cd, 0)}${add_attribute("zoom", zoom, 0)}>${selected ? `<animate attributeName="${"stroke-width"}" values="${"0;4;0"}" dur="${"2s"}" begin="${"0s"}" repeatCount="${"indefinite"}"></animate>` : ``}</path>
 `;
 });
 function cubicInOut(t) {
@@ -467,32 +466,32 @@ function sineInOut(t) {
 function is_date(obj) {
   return Object.prototype.toString.call(obj) === "[object Date]";
 }
-function get_interpolator(a2, b2) {
-  if (a2 === b2 || a2 !== a2)
-    return () => a2;
-  const type = typeof a2;
-  if (type !== typeof b2 || Array.isArray(a2) !== Array.isArray(b2)) {
+function get_interpolator(a, b) {
+  if (a === b || a !== a)
+    return () => a;
+  const type = typeof a;
+  if (type !== typeof b || Array.isArray(a) !== Array.isArray(b)) {
     throw new Error("Cannot interpolate values of different type");
   }
-  if (Array.isArray(a2)) {
-    const arr = b2.map((bi, i) => {
-      return get_interpolator(a2[i], bi);
+  if (Array.isArray(a)) {
+    const arr = b.map((bi, i) => {
+      return get_interpolator(a[i], bi);
     });
     return (t) => arr.map((fn) => fn(t));
   }
   if (type === "object") {
-    if (!a2 || !b2)
+    if (!a || !b)
       throw new Error("Object cannot be null");
-    if (is_date(a2) && is_date(b2)) {
-      a2 = a2.getTime();
-      b2 = b2.getTime();
-      const delta = b2 - a2;
-      return (t) => new Date(a2 + t * delta);
+    if (is_date(a) && is_date(b)) {
+      a = a.getTime();
+      b = b.getTime();
+      const delta = b - a;
+      return (t) => new Date(a + t * delta);
     }
-    const keys = Object.keys(b2);
+    const keys = Object.keys(b);
     const interpolators = {};
     keys.forEach((key) => {
-      interpolators[key] = get_interpolator(a2[key], b2[key]);
+      interpolators[key] = get_interpolator(a[key], b[key]);
     });
     return (t) => {
       const result = {};
@@ -503,8 +502,8 @@ function get_interpolator(a2, b2) {
     };
   }
   if (type === "number") {
-    const delta = b2 - a2;
-    return (t) => a2 + t * delta;
+    const delta = b - a;
+    return (t) => a + t * delta;
   }
   throw new Error(`Cannot interpolate ${type} values`);
 }
@@ -567,14 +566,13 @@ const Text = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $title, $$unsubscribe_title;
   let $value, $$unsubscribe_value;
   let $metric, $$unsubscribe_metric;
-  let { d, centroid, fill, fillOpacity, title, mouseover, mouseout, value, pop, metric, selected: selected2, area_cd, label_opacity, zoom, x: x2, y: y2, k: k2 } = $$props;
+  let { d, centroid, fill, fillOpacity, title, mouseover, mouseout, value, pop, metric, selected, area_cd, label_opacity, zoom, x: x2, y: y2, k: k2 } = $$props;
   $$unsubscribe_title = subscribe(title, (value2) => $title = value2);
   $$unsubscribe_value = subscribe(value, (value2) => $value = value2);
   $$unsubscribe_metric = subscribe(metric, (value2) => $metric = value2);
   $$unsubscribe_label_opacity = subscribe(label_opacity, (value2) => $label_opacity = value2);
   $$unsubscribe_k = subscribe(k2, (value2) => $k = value2);
-  let labels = document.getElementsByClassName("labels");
-  console.log("labels", labels);
+  document.getElementsByClassName("labels");
   if ($$props.d === void 0 && $$bindings.d && d !== void 0)
     $$bindings.d(d);
   if ($$props.centroid === void 0 && $$bindings.centroid && centroid !== void 0)
@@ -595,8 +593,8 @@ const Text = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.pop(pop);
   if ($$props.metric === void 0 && $$bindings.metric && metric !== void 0)
     $$bindings.metric(metric);
-  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
-    $$bindings.selected(selected2);
+  if ($$props.selected === void 0 && $$bindings.selected && selected !== void 0)
+    $$bindings.selected(selected);
   if ($$props.area_cd === void 0 && $$bindings.area_cd && area_cd !== void 0)
     $$bindings.area_cd(area_cd);
   if ($$props.label_opacity === void 0 && $$bindings.label_opacity && label_opacity !== void 0)
@@ -614,27 +612,27 @@ const Text = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   $$unsubscribe_title();
   $$unsubscribe_value();
   $$unsubscribe_metric();
-  return `<g class="${"label"}"><text class="${"titles"}"${add_attribute("x", centroid[0], 0)}${add_attribute("y", centroid[1], 0)} text-anchor="${"middle"}"${add_attribute("font-size", 15 / $k, 0)}${add_attribute("opacity", $label_opacity, 0)} style="${"pointer-events: none;"}"${add_attribute("id", selected2 ? "selectedText" : null, 0)}>${escape($title)}</text><text class="${"titles"}"${add_attribute("x", centroid[0], 0)}${add_attribute("y", centroid[1] + 20 / $k, 0)} text-anchor="${"middle"}"${add_attribute("font-size", 15 / $k, 0)}${add_attribute("opacity", $label_opacity, 0)} style="${"pointer-events: none;"}"${add_attribute("id", selected2 ? "selectedValue" : null, 0)}>${escape($value + " " + $metric)}</text></g>`;
+  return `<g class="${"label"}"><text class="${"titles"}"${add_attribute("x", centroid[0], 0)}${add_attribute("y", centroid[1], 0)} text-anchor="${"middle"}"${add_attribute("font-size", 15 / $k, 0)}${add_attribute("opacity", $label_opacity, 0)} style="${"pointer-events: none;"}"${add_attribute("id", selected ? "selectedText" : null, 0)}>${escape($title)}</text><text class="${"titles"}"${add_attribute("x", centroid[0], 0)}${add_attribute("y", centroid[1] + 20 / $k, 0)} text-anchor="${"middle"}"${add_attribute("font-size", 15 / $k, 0)}${add_attribute("opacity", $label_opacity, 0)} style="${"pointer-events: none;"}"${add_attribute("id", selected ? "selectedValue" : null, 0)}>${escape($value + " " + $metric)}</text></g>`;
 });
-function distance(a2, b2) {
-  return Math.sqrt((a2[0] - b2[0]) * (a2[0] - b2[0]) + (a2[1] - b2[1]) * (a2[1] - b2[1]));
+function distance(a, b) {
+  return Math.sqrt((a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]));
 }
-function pointAlong(a2, b2, pct) {
-  return [a2[0] + (b2[0] - a2[0]) * pct, a2[1] + (b2[1] - a2[1]) * pct];
+function pointAlong(a, b, pct) {
+  return [a[0] + (b[0] - a[0]) * pct, a[1] + (b[1] - a[1]) * pct];
 }
-function samePoint(a2, b2) {
-  return distance(a2, b2) < 1e-9;
+function samePoint(a, b) {
+  return distance(a, b) < 1e-9;
 }
-function interpolatePoints(a2, b2, string) {
-  let interpolators = a2.map((d, i) => interpolatePoint(d, b2[i]));
+function interpolatePoints(a, b, string) {
+  let interpolators = a.map((d, i) => interpolatePoint(d, b[i]));
   return function(t) {
     let values = interpolators.map((fn) => fn(t));
     return string ? toPathString(values) : values;
   };
 }
-function interpolatePoint(a2, b2) {
+function interpolatePoint(a, b) {
   return function(t) {
-    return a2.map((d, i) => d + t * (b2[i] - d));
+    return a.map((d, i) => d + t * (b[i] - d));
   };
 }
 function isFiniteNumber(number) {
@@ -716,9 +714,9 @@ function addPoints(ring, numPoints) {
   const desiredLength = ring.length + numPoints, step2 = polygonLength(ring) / numPoints;
   let i = 0, cursor = 0, insertAt = step2 / 2;
   while (ring.length < desiredLength) {
-    let a2 = ring[i], b2 = ring[(i + 1) % ring.length], segment = distance(a2, b2);
+    let a = ring[i], b = ring[(i + 1) % ring.length], segment = distance(a, b);
     if (insertAt <= cursor + segment) {
-      ring.splice(i + 1, 0, segment ? pointAlong(a2, b2, (insertAt - cursor) / segment) : a2.slice(0));
+      ring.splice(i + 1, 0, segment ? pointAlong(a, b, (insertAt - cursor) / segment) : a.slice(0));
       insertAt += step2;
       continue;
     }
@@ -728,10 +726,10 @@ function addPoints(ring, numPoints) {
 }
 function bisect(ring, maxSegmentLength = Infinity) {
   for (let i = 0; i < ring.length; i++) {
-    let a2 = ring[i], b2 = i === ring.length - 1 ? ring[0] : ring[i + 1];
-    while (distance(a2, b2) > maxSegmentLength) {
-      b2 = pointAlong(a2, b2, 0.5);
-      ring.splice(i + 1, 0, b2);
+    let a = ring[i], b = i === ring.length - 1 ? ring[0] : ring[i + 1];
+    while (distance(a, b) > maxSegmentLength) {
+      b = pointAlong(a, b, 0.5);
+      ring.splice(i + 1, 0, b);
     }
   }
 }
@@ -3167,12 +3165,10 @@ const ZoomSvg = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $x, $$unsubscribe_x;
   let $y, $$unsubscribe_y;
   let $k, $$unsubscribe_k;
-  let $all_data, $$unsubscribe_all_data;
   let $step, $$unsubscribe_step;
   $$unsubscribe_zm = subscribe(zm, (value) => $zm = value);
-  $$unsubscribe_all_data = subscribe(all_data, (value) => $all_data = value);
   $$unsubscribe_step = subscribe(step, (value) => $step = value);
-  let { viewBox = `0 0 {width} {height}`, height, width: width2, key = true } = $$props;
+  let { viewBox = `0 0 {width} {height}`, height, width: width2, key = true, all_data } = $$props;
   let { svg, x: x2, y: y2, k: k2 } = $$props;
   $$unsubscribe_x = subscribe(x2, (value) => $x = value);
   $$unsubscribe_y = subscribe(y2, (value) => $y = value);
@@ -3185,6 +3181,8 @@ const ZoomSvg = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.width(width2);
   if ($$props.key === void 0 && $$bindings.key && key !== void 0)
     $$bindings.key(key);
+  if ($$props.all_data === void 0 && $$bindings.all_data && all_data !== void 0)
+    $$bindings.all_data(all_data);
   if ($$props.svg === void 0 && $$bindings.svg && svg !== void 0)
     $$bindings.svg(svg);
   if ($$props.x === void 0 && $$bindings.x && x2 !== void 0)
@@ -3198,16 +3196,15 @@ const ZoomSvg = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   $$unsubscribe_x();
   $$unsubscribe_y();
   $$unsubscribe_k();
-  $$unsubscribe_all_data();
   $$unsubscribe_step();
-  return `${width2 ? `<svg id="${"canvas"}"${add_attribute("viewBox", viewBox, 0)}${add_attribute("height", height, 0)}${add_attribute("width", width2, 0)}${add_attribute("zm", $zm, 0)} class="${"svelte-1rh2i4z"}"${add_attribute("this", svg, 0)}><g transform="${"translate(" + escape($x) + ", " + escape($y) + ") scale(" + escape($k) + ")"}" id="${"zoomable"}">${slots.default ? slots.default({}) : ``}</g>${key ? `${validate_component(Key, "Key").$$render($$result, {
+  return `${width2 && all_data ? `<svg id="${"canvas"}"${add_attribute("viewBox", viewBox, 0)}${add_attribute("height", height, 0)}${add_attribute("width", width2, 0)}${add_attribute("zm", $zm, 0)} class="${"svelte-1rh2i4z"}"${add_attribute("this", svg, 0)}><g transform="${"translate(" + escape($x) + ", " + escape($y) + ") scale(" + escape($k) + ")"}" id="${"zoomable"}">${slots.default ? slots.default({}) : ``}</g>${key ? `${validate_component(Key, "Key").$$render($$result, {
     percent: true,
     width: width2,
     height,
     key: "percentage growth",
     uk: "7.9",
-    place: $all_data.LA.PC_CHANGE.FROM01TO11,
-    name: $all_data.NAME,
+    place: all_data.LA.PC_CHANGE.FROM01TO11,
+    name: all_data.NAME,
     max: "30",
     min: -5,
     step: $step
@@ -4204,25 +4201,23 @@ var frequency = {
 const { Object: Object_1$1 } = globals;
 let x = 0, y = 0, k = 1;
 function neighbourBounds(bounds) {
-  let min_x = bounds.sort((a2, b2) => a2[0][0] - b2[0][0])[0][0][0];
-  let max_x = bounds.sort((a2, b2) => b2[1][0] - a2[1][0])[0][1][0];
-  let min_y = bounds.sort((a2, b2) => a2[0][1] - b2[0][1])[0][0][1];
-  let max_y = bounds.sort((a2, b2) => b2[1][1] - a2[1][1])[0][1][1];
+  let min_x = bounds.sort((a, b) => a[0][0] - b[0][0])[0][0][0];
+  let max_x = bounds.sort((a, b) => b[1][0] - a[1][0])[0][1][0];
+  let min_y = bounds.sort((a, b) => a[0][1] - b[0][1])[0][0][1];
+  let max_y = bounds.sort((a, b) => b[1][1] - a[1][1])[0][1][1];
   let neighbour_bounds = [[min_x, min_y], [max_x, max_y]];
   return neighbour_bounds;
 }
 const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let $all_data, $$unsubscribe_all_data;
-  let $selected, $$unsubscribe_selected;
   let $zm, $$unsubscribe_zm;
-  $$unsubscribe_all_data = subscribe(all_data, (value) => $all_data = value);
   $$unsubscribe_zm = subscribe(zm, (value) => $zm = value);
   console.log("interpolate", interpolate);
-  let { country } = $$props;
+  const { feature } = topojson;
+  let { country, all_data } = $$props;
   let key = true;
   let chart_key = false;
-  let { progress, animation, width: width2, height, padding } = $$props;
-  const mercator = geoMercator().center(country == "E" ? [-2, 52.5] : [-3.9, 52.3]).scale(country == "E" ? width2 < height ? width2 * 7 : height * 5 : width2 < height ? width2 * 15 : height * 15).translate([width2 / 2, height / 2]);
+  let { progress, animation, width: width2, height, padding, selected } = $$props;
+  let currentProj, path, Greenwich, FirstMeridian;
   const easing = cubicInOut;
   let axes;
   let loaded;
@@ -4230,14 +4225,9 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let values = [];
   let data = [];
   let timeline;
-  let currentProj = mercator;
-  let path = geoPath().projection(currentProj);
-  let Greenwich = +path({ type: "Point", coordinates: [0, 0] }).split(",")[0].slice(1);
-  let FirstMeridian = +path({ type: "Point", coordinates: [10, 0] }).split(",")[0].slice(1);
   let bar = { left: 85, height: 1.5, scale: 0.18 };
   let newData;
-  let selected2 = writable();
-  $$unsubscribe_selected = subscribe(selected2, (value) => $selected = value);
+  console.log("SELECTED", selected);
   let timelineMaker = (arr) => {
     let y_labels2 = [];
     axes = {
@@ -4274,7 +4264,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
         mouseout,
         pop: arr[i].pop,
         y: writable(arr[i].centroid[1]),
-        selected: arr[i].properties.AREACD == $selected,
+        selected: arr[i].properties.AREACD == selected,
         label_opacity: tweened(0),
         zoom: arr[i].zoom
       });
@@ -4327,14 +4317,14 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       abs: extent(datas.map((e) => e.abs))
     };
     data = data.filter((e) => e.growth !== null);
-    data = data.sort((a2, b2) => b2.growth - a2.growth);
+    data = data.sort((a, b) => b.growth - a.growth);
     (function() {
       values = [];
       let minX = +frequency[country][0].growth, maxX = +frequency[country][frequency[country].length - 1].growth, rangeX = maxX - minX;
-      frequency[country].map((e) => e.lads.length).sort((a2, b2) => b2 - a2)[0];
+      frequency[country].map((e) => e.lads.length).sort((a, b) => b - a)[0];
       for (let i = minX; i < maxX + 1; i++)
         values.push(i);
-      let guidingDim = [width2 - padding, height - padding * 2].sort((a2, b2) => b2 - a2).pop();
+      let guidingDim = [width2 - padding, height - padding * 2].sort((a, b) => b - a).pop();
       let square = {
         x: (guidingDim - padding * 2) / rangeX,
         y: (guidingDim - padding * 2) / rangeX
@@ -4361,16 +4351,16 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     })();
     (function() {
       let region_codes2 = JSON.parse(JSON.stringify(growth));
-      region_codes2 = region_codes2.filter((e) => e.REGION == $all_data.REGION_CODE).sort((a2, b2) => b2.GROWTH - a2.GROWTH).map((e) => e.LAD17CD);
+      region_codes2 = region_codes2.filter((e) => e.REGION == all_data.REGION_CODE).sort((a, b) => b.GROWTH - a.GROWTH).map((e) => e.LAD17CD);
       let region_data = JSON.parse(JSON.stringify(frequency));
       region_data[country].forEach((e) => e.lads = e.lads.filter((el) => region_codes2.includes(el)));
       region_data[country] = region_data[country].filter((e) => e.lads.length);
       values = [];
       let minX = +region_data[country][0].growth, maxX = +region_data[country][region_data[country].length - 1].growth, rangeX = maxX - minX;
-      region_data[country].map((e) => e.lads.length).sort((a2, b2) => b2 - a2)[0];
+      region_data[country].map((e) => e.lads.length).sort((a, b) => b - a)[0];
       for (let i = minX; i < maxX + 1; i++)
         values.push(i);
-      let guidingDim = [width2 - padding, height - padding * 2].sort((a2, b2) => b2 - a2).pop();
+      let guidingDim = [width2 - padding, height - padding * 2].sort((a, b) => b - a).pop();
       let square = {
         x: (guidingDim - padding * 2) / rangeX,
         y: (guidingDim - padding * 2) / rangeX
@@ -4395,7 +4385,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
           console.log("x", x, "y", y);
       });
     })();
-    let bar_data = JSON.parse(JSON.stringify(growth)).filter((e) => e.REGION == $all_data.REGION_CODE).sort((a2, b2) => b2.GROWTH - a2.GROWTH);
+    let bar_data = JSON.parse(JSON.stringify(growth)).filter((e) => e.REGION == all_data.REGION_CODE).sort((a, b) => b.GROWTH - a.GROWTH);
     let bar_extents = {
       growth: extent(bar_data.map((e) => e.GROWTH))
     };
@@ -4417,14 +4407,14 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
         data[data_point].bar = `M${bar.left} ${i * bar.height + padding + 3}, ${bar.left + e.GROWTH * bar.scale} ${i * bar.height + padding + 3}, ${bar.left + e.GROWTH * bar.scale} ${bar.height + i * bar.height + padding},${bar.left} ${bar.height + i * bar.height + padding}Z`;
       }
     });
-    data = data.sort((a2, b2) => b2.growth - a2.growth);
+    data = data.sort((a, b) => b.growth - a.growth);
     let region_codes = bar_data.map((e) => e.LAD17CD);
     data.forEach((e, i) => {
       e.xys_region = `M${0} ${0}, ${0} ${0}, ${0} ${0},${0} ${0}Z`;
       if (region_codes.includes(e.properties.AREACD))
         e.xys_region = e.xys;
     });
-    let national_bar_data = JSON.parse(JSON.stringify(growth)).filter((e) => e.LAD17CD[0] == $selected[0]).sort((a2, b2) => b2.GROWTH - a2.GROWTH);
+    let national_bar_data = JSON.parse(JSON.stringify(growth)).filter((e) => e.LAD17CD[0] == selected[0]).sort((a, b) => b.GROWTH - a.GROWTH);
     let national_bar_extents = {
       growth: extent(national_bar_data.map((e) => e.GROWTH))
     };
@@ -4446,13 +4436,13 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
         data[data_point].national_bar = `M${bar.left} ${i * bar.height + padding}, ${bar.left + e.GROWTH * bar.scale} ${i * bar.height + padding}, ${bar.left + e.GROWTH * bar.scale} ${bar.height + i * bar.height + padding},${bar.left} ${bar.height + i * bar.height + padding}Z`;
       }
     });
-    data = data.sort((a2, b2) => b2.growth - a2.growth);
+    data = data.sort((a, b) => b.growth - a.growth);
     chart = charts.find((e) => e.chart == "absolute");
     chart.axis.x.origin = Greenwich;
     chart.axis.x.spacing = (Greenwich - FirstMeridian) / 10;
     chart.axis.y.origin = height + padding + height / 10;
     chart.axis.y.spacing = (Greenwich - FirstMeridian) / 10;
-    data = data.sort((a2, b2) => b2.abs - a2.abs);
+    data = data.sort((a, b) => b.abs - a.abs);
     data.forEach((e, i) => {
       let peak = e.pop > e.growth / 10 ? e.pop * (e.growth / 6e4) : 1;
       e.absolute = peak !== 1 ? `M${e.centroid[0]},${e.centroid[1]} ${e.centroid[0] - 4},${e.centroid[1]} ${e.centroid[0]},${e.centroid[1] - peak} ${e.centroid[0] + 4},${e.centroid[1]}z` : `M${e.centroid[0] - 4}, ${e.centroid[1]} a${4},${4} 0 1,0 ${4 * 2},0 a${4},${4} 0 1,0 ${4 * -2},0`;
@@ -4469,7 +4459,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let absolute = e.abs;
       e.absoluteBar = `M${bar.left} ${i * bar.height + padding}, ${bar.left + absolute * bar.scale} ${i * bar.height + padding}, ${bar.left + absolute * bar.scale} ${bar.height + i * bar.height + padding},${bar.left} ${bar.height + i * bar.height + padding}Z`;
     });
-    data = data.sort((a2, b2) => b2.growth - a2.growth);
+    data = data.sort((a, b) => b.growth - a.growth);
     bar.height = height / data.length;
     bar.left = padding + Math.abs(extents.pop[0]) / (extents.pop[1] - extents.pop[0]) * width2;
     bar.scale = 1 / (extents.pop[1] - extents.pop[0]) * width2;
@@ -4478,12 +4468,12 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     chart.axis.x.spacing = width2 / 10;
     chart.axis.y.origin = height + padding;
     chart.axis.y.spacing = height / 10;
-    let Data = JSON.parse(JSON.stringify(data)).sort((a2, b2) => b2.pop - a2.pop);
+    let Data = JSON.parse(JSON.stringify(data)).sort((a, b) => b.pop - a.pop);
     Data.forEach((e, i) => {
       let absolute = e.pop;
       data.find((el) => el.y - e.y == 0).popBar = `M${bar.left} ${i * bar.height + padding}, ${bar.left + absolute * bar.scale} ${i * bar.height + padding}, ${bar.left + absolute * bar.scale} ${bar.height + i * bar.height + padding},${bar.left} ${bar.height + i * bar.height + padding}Z`;
     });
-    data = data.sort((a2, b2) => b2.growth - a2.growth);
+    data = data.sort((a, b) => b.growth - a.growth);
     chart = charts.find((e) => e.chart == "circle");
     chart.axis.x.origin = Greenwich;
     chart.axis.x.spacing = (Greenwich - FirstMeridian) / 10;
@@ -4499,7 +4489,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     chart.axis.y.origin = height + padding + height / 10;
     chart.axis.y.spacing = (Greenwich - FirstMeridian) / 10;
     let radius_prev = 0;
-    Data = JSON.parse(JSON.stringify(data)).sort((a2, b2) => b2.pop - a2.pop);
+    Data = JSON.parse(JSON.stringify(data)).sort((a, b) => b.pop - a.pop);
     Data.forEach((e, i) => {
       let radius = Math.sqrt(e.pop / 8e3);
       data.find((el) => el.y - e.y == 0).comparative_circle = `M${padding},${padding + radius_prev} a${radius},${radius} 0 1,0 ${radius * 2},0 a${radius},${radius} 0 1,0 ${radius * -2},0Z`;
@@ -4525,6 +4515,17 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       loaded = true;
     }, 1e3);
     return data;
+  }
+  async function reload() {
+    const response = await fetch("https://raw.githubusercontent.com/ONSvisual/topojson_boundaries/master/geogLA2021EW.json");
+    const json = await response.json();
+    const topoData = feature(json, json.objects.geog);
+    const land = { ...topoData, features: topoData.features };
+    data = land.features.filter((e) => e.properties.AREACD[0] == country);
+    currentProj = geoMercator().center(country == "E" ? [-2, 52.5] : [-3.9, 52.3]).scale(country == "E" ? width2 < height ? width2 * 7 : height * 5 : width2 < height ? width2 * 15 : height * 15).translate([width2 / 2, height / 2]);
+    path = geoPath().projection(currentProj);
+    Greenwich = +path({ type: "Point", coordinates: [0, 0] }).split(",")[0].slice(1);
+    FirstMeridian = +path({ type: "Point", coordinates: [10, 0] }).split(",")[0].slice(1);
   }
   const scaleColor = (val, dataSet, data2) => {
     let scaleExtent = extent(dataSet.map((e) => e[data2]));
@@ -4554,12 +4555,12 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let zoomFactor = charts[current].zoom * itemScale;
       let neighbours_zoom = charts[current].neighbours_zoom;
       if (neighbours_zoom) {
-        let nb = neighbourBounds(data.filter((e) => $all_data.NEIGHBOURS.CODES.includes(e.properties.AREACD)).map((e) => e.bounds));
+        let nb = neighbourBounds(data.filter((e) => all_data.NEIGHBOURS.CODES.includes(e.properties.AREACD)).map((e) => e.bounds));
         zoomFactor = 1 / (Math.max(...[nb[1][0] - nb[0][0], nb[1][1] - nb[0][1]]) / width2);
       }
       let region_zoom = charts[current].region_zoom;
       if (region_zoom) {
-        let region_codes = JSON.parse(JSON.stringify(growth)).filter((e) => e.REGION == $all_data.REGION_CODE).sort((a2, b2) => b2.GROWTH - a2.GROWTH).map((e) => e.LAD17CD);
+        let region_codes = JSON.parse(JSON.stringify(growth)).filter((e) => e.REGION == all_data.REGION_CODE).sort((a, b) => b.GROWTH - a.GROWTH).map((e) => e.LAD17CD);
         let nb = neighbourBounds(data.filter((e) => region_codes.includes(e.properties.AREACD)).map((e) => e.bounds));
         zoomFactor = 1 / (Math.max(...[nb[1][0] - nb[0][0], nb[1][1] - nb[0][1]]) / width2);
       }
@@ -4623,18 +4624,18 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
         if (charts[current].highlight) {
           step2.fillOpacity.set(0.4);
           step2.label_opacity.set(0, { duration: 10, easing });
-          if (charts[current].highlight == 1 && Object.values($all_data.NEIGHBOURS.PC_CHANGE).map((e) => e.CODE).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == $selected) {
+          if (charts[current].highlight == 1 && Object.values(all_data.NEIGHBOURS.PC_CHANGE).map((e) => e.CODE).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected) {
             step2.fillOpacity.set(1);
             step2.label_opacity.set(1, { duration: 10, easing });
-            console.log("BOUNDS", newData.filter((e) => $all_data.NEIGHBOURS.CODES.includes(e.properties.AREACD)).map((e) => e.bounds));
+            console.log("BOUNDS", newData.filter((e) => all_data.NEIGHBOURS.CODES.includes(e.properties.AREACD)).map((e) => e.bounds));
           }
-          if (charts[current].highlight == 2 && Object.values($all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_UP).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == $selected)
+          if (charts[current].highlight == 2 && Object.values(all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_UP).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected)
             step2.fillOpacity.set(1);
-          if (charts[current].highlight == 3 && $all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.LAD17CD == newData[i].properties.AREACD || newData[i].properties.AREACD == $selected)
+          if (charts[current].highlight == 3 && all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.LAD17CD == newData[i].properties.AREACD || newData[i].properties.AREACD == selected)
             step2.fillOpacity.set(1);
-          if (charts[current].highlight == 4 && Object.values($all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == $selected)
+          if (charts[current].highlight == 4 && Object.values(all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected)
             step2.fillOpacity.set(1);
-          if (charts[current].highlight == 5 && Object.values($all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == $selected)
+          if (charts[current].highlight == 5 && Object.values(all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected)
             step2.fillOpacity.set(1);
         } else
           step2.fillOpacity.set(1);
@@ -4643,6 +4644,8 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   }
   if ($$props.country === void 0 && $$bindings.country && country !== void 0)
     $$bindings.country(country);
+  if ($$props.all_data === void 0 && $$bindings.all_data && all_data !== void 0)
+    $$bindings.all_data(all_data);
   if ($$props.progress === void 0 && $$bindings.progress && progress !== void 0)
     $$bindings.progress(progress);
   if ($$props.animation === void 0 && $$bindings.animation && animation !== void 0)
@@ -4653,29 +4656,29 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.height(height);
   if ($$props.padding === void 0 && $$bindings.padding && padding !== void 0)
     $$bindings.padding(padding);
+  if ($$props.selected === void 0 && $$bindings.selected && selected !== void 0)
+    $$bindings.selected(selected);
   axes && loaded && country && forward(animation);
   {
     {
-      selected2.set($all_data.CODE);
       newData = redrawData(data);
     }
   }
-  $$unsubscribe_all_data();
-  $$unsubscribe_selected();
+  all_data && reload();
   $$unsubscribe_zm();
-  return `${validate_component(ZoomSvg, "ZoomSvg").$$render($$result, Object_1$1.assign({ id: "charts1" }, { zm: $zm }, zoomState, { width: width2 }, { height }, { key }, { viewBox: "0 0 " + width2 + " " + height }), {}, {
+  return `${all_data && timeline && width2 && height && selected ? `${validate_component(ZoomSvg, "ZoomSvg").$$render($$result, Object_1$1.assign({ id: "charts1" }, { zm: $zm }, zoomState, { width: width2 }, { height }, { key }, { viewBox: "0 0 " + width2 + " " + height }, { all_data }), {}, {
     default: () => {
-      return `${timeline && width2 && height ? `<g id="${"wrapper"}">${each(timeline, (feature, i) => {
-        return `${validate_component(Path, "Path").$$render($$result, Object_1$1.assign(feature), {}, {})}`;
-      })}${each(timeline, (feature, i) => {
-        return `${validate_component(Text, "Text").$$render($$result, Object_1$1.assign(feature, zoomState, { zm: $zm }), {}, {})}`;
+      return `<g id="${"wrapper"}">${each(timeline, (feature2, i) => {
+        return `${validate_component(Path, "Path").$$render($$result, Object_1$1.assign(feature2), {}, {})}`;
+      })}${each(timeline, (feature2, i) => {
+        return `${validate_component(Text, "Text").$$render($$result, Object_1$1.assign(feature2, zoomState), {}, {})}`;
       })}</g>
 	<use xlink:href="${"#selected"}"></use>
 	<use xlink:href="${"#selectedText"}"></use>	
   <use xlink:href="${"#selectedValue"}"></use>	
-  ${validate_component(Axis, "Axis").$$render($$result, Object_1$1.assign(axes, { width: width2 }, { height }, { padding }, { spacing }, { values }, { chart_key }), {}, {})}` : ``}`;
+  ${validate_component(Axis, "Axis").$$render($$result, Object_1$1.assign(axes, { width: width2 }, { height }, { padding }, { spacing }, { values }, { chart_key }), {}, {})}`;
     }
-  })}`;
+  })}` : ``}`;
 });
 var pitch = [
   {
@@ -5335,16 +5338,13 @@ var folk = [
   }
 ];
 let vp = 300;
-function testData() {
-  return true;
-}
 const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $zeds, $$unsubscribe_zeds;
-  let { animation, height, width: width2, padding, data } = $$props;
-  let pitches = Math.ceil(187 / data.LA.DENSITY.DENSITY11);
-  let people = data.LA.DENSITY.DENSITY11 / 187;
-  let mostPeople = Math.ceil(data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.PEOPLE_PER_FOOOTY_PITCH);
-  let leastPeople = data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.PEOPLE_PER_FOOOTY_PITCH;
+  let { animation, height, width: width2, all_data } = $$props;
+  let pitches = Math.ceil(187 / all_data.LA.DENSITY.DENSITY11);
+  let people = all_data.LA.DENSITY.DENSITY11 / 187;
+  let mostPeople = Math.ceil(all_data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.PEOPLE_PER_FOOOTY_PITCH);
+  let leastPeople = all_data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.PEOPLE_PER_FOOOTY_PITCH;
   let intersect = checkIntersection;
   let peopleHere = people;
   pitch.forEach((e) => {
@@ -5454,13 +5454,11 @@ const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.height(height);
   if ($$props.width === void 0 && $$bindings.width && width2 !== void 0)
     $$bindings.width(width2);
-  if ($$props.padding === void 0 && $$bindings.padding && padding !== void 0)
-    $$bindings.padding(padding);
-  if ($$props.data === void 0 && $$bindings.data && data !== void 0)
-    $$bindings.data(data);
+  if ($$props.all_data === void 0 && $$bindings.all_data && all_data !== void 0)
+    $$bindings.all_data(all_data);
   animation && change(animation);
   $$unsubscribe_zeds();
-  return `${peopleHere && testData ? `<svg style="${"width:" + escape(width2)}"${add_attribute("width", width2, 0)}${add_attribute("height", height, 0)} viewBox="${escape(-width2 / 6) + "\n  " + escape(-height / 2) + "\n  " + escape(width2 / 3) + "\n  " + escape(h_orig)}"><rect${add_attribute("x", -width2 / 2, 0)}${add_attribute("y", -height / 2, 0)}${add_attribute("width", width2, 0)}${add_attribute("height", height, 0)} fill="${"#40826D"}" fill-opacity="${"0.7"}"></rect><g transform="${"scale(" + escape(width2 / 1500) + ")"}">${each(newPitch, (params) => {
+  return `${peopleHere && all_data ? `<svg style="${"width:" + escape(width2)}"${add_attribute("width", width2, 0)}${add_attribute("height", height, 0)} viewBox="${escape(-width2 / 6) + "\n  " + escape(-height / 2) + "\n  " + escape(width2 / 3) + "\n  " + escape(h_orig)}"><rect${add_attribute("x", -width2 / 2, 0)}${add_attribute("y", -height / 2, 0)}${add_attribute("width", width2, 0)}${add_attribute("height", height, 0)} fill="${"#40826D"}" fill-opacity="${"0.7"}"></rect><g transform="${"scale(" + escape(width2 / 1500) + ")"}">${each(newPitch, (params) => {
     return `<line${spread([
       escape_object(params),
       { stroke: "white" },
@@ -9404,7 +9402,7 @@ const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $pyramidStore, $$unsubscribe_pyramidStore;
   $$unsubscribe_pyramidStore = subscribe(pyramidStore, (value) => $pyramidStore = value);
   rankings.map((e) => e[0]);
-  let { animation, data, height, padding, width: width2 } = $$props;
+  let { animation, height, padding, width: width2, all_data } = $$props;
   let makeDataPyramid = (d) => {
     let bars = [[], []];
     let f = d[1], m = d[0];
@@ -9418,17 +9416,17 @@ const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     bars[1].reverse();
     return bars;
   };
-  pyramidStore.set(makeDataPyramid(data.LA.PYRAMID01));
-  let la_change = data.LA.PYRAMID11.map((e, i) => e.map((el, ii) => el - data.LA.PYRAMID01[i][ii]));
+  pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID01));
+  let la_change = all_data.LA.PYRAMID11.map((e, i) => e.map((el, ii) => el - all_data.LA.PYRAMID01[i][ii]));
   let la_change_blended = la_change[0].map((e, i) => e + la_change[1][i]);
   let arr = [
-    data.LA.PYRAMID01.flat(),
-    data.LA.PYRAMID11.flat(),
-    data.COUNTRY.PYRAMID01.flat(),
-    data.COUNTRY.PYRAMID01.flat()
+    all_data.LA.PYRAMID01.flat(),
+    all_data.LA.PYRAMID11.flat(),
+    all_data.COUNTRY.PYRAMID01.flat(),
+    all_data.COUNTRY.PYRAMID01.flat()
   ];
   let w = (width2 - padding * 2) / 2 / Math.max(...arr.flat());
-  let country_change = data.COUNTRY.PYRAMID11.map((e, i) => e.map((el, ii) => el - data.COUNTRY.PYRAMID01[i][ii]));
+  let country_change = all_data.COUNTRY.PYRAMID11.map((e, i) => e.map((el, ii) => el - all_data.COUNTRY.PYRAMID01[i][ii]));
   let country_change_blended = country_change[0].map((e, i) => e + country_change[1][i]);
   let arr_blended = [la_change_blended, country_change_blended];
   let w_change = (width2 - padding * 2) / 2 / Math.max(...arr_blended.flat());
@@ -9458,24 +9456,21 @@ const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   country_change_divided[0] = country_change_divided[0].map((e) => e / w * w_change);
   country_change_divided[1] = country_change_divided[1].map((e) => e / w_change * w);
   console.log("COUNTRY_CHANGE_DIVIDED", w, w_change, country_change_divided);
-  data.LA.PYRAMID01;
-  data.COUNTRY.PYRAMID01;
-  data.COUNTRY.PYRAMID11;
   let stepPrev;
   let request;
   function change(stp) {
     if (stp != stepPrev) {
       if (stp == 12) {
         request = "bars";
-        pyramidStore.set(makeDataPyramid(data.LA.PYRAMID01), { easing: sineInOut });
+        pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID01), { easing: sineInOut });
       }
       if (stp == 13) {
         request = "bars";
-        pyramidStore.set(makeDataPyramid(data.LA.PYRAMID11), { easing: sineInOut });
+        pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID11), { easing: sineInOut });
       }
       if (stp == 14) {
         request = "bars";
-        pyramidStore.set(makeDataPyramid(data.COUNTRY.PYRAMID11), { easing: sineInOut });
+        pyramidStore.set(makeDataPyramid(all_data.COUNTRY.PYRAMID11), { easing: sineInOut });
       }
       if (stp == 15) {
         request = "bars";
@@ -9496,14 +9491,14 @@ const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   console.log("COUNTRY_CHANGE", country_change);
   if ($$props.animation === void 0 && $$bindings.animation && animation !== void 0)
     $$bindings.animation(animation);
-  if ($$props.data === void 0 && $$bindings.data && data !== void 0)
-    $$bindings.data(data);
   if ($$props.height === void 0 && $$bindings.height && height !== void 0)
     $$bindings.height(height);
   if ($$props.padding === void 0 && $$bindings.padding && padding !== void 0)
     $$bindings.padding(padding);
   if ($$props.width === void 0 && $$bindings.width && width2 !== void 0)
     $$bindings.width(width2);
+  if ($$props.all_data === void 0 && $$bindings.all_data && all_data !== void 0)
+    $$bindings.all_data(all_data);
   let $$settled;
   let $$rendered;
   do {
@@ -9606,24 +9601,24 @@ const createText = (template, dict) => {
   const rpn = function(key) {
     const tokens = key.split(" ");
     const operators = {
-      "+": (a2, b2) => a2 + b2,
-      "-": (a2, b2) => a2 - b2,
-      "*": (a2, b2) => a2 * b2,
-      "/": (a2, b2) => a2 / b2,
-      "<": (a2, b2) => a2 < b2,
-      ">": (a2, b2) => a2 > b2,
-      "<=": (a2, b2) => a2 <= b2,
-      ">=": (a2, b2) => a2 >= b2,
-      "===": (a2, b2) => a2 === b2
+      "+": (a, b) => a + b,
+      "-": (a, b) => a - b,
+      "*": (a, b) => a * b,
+      "/": (a, b) => a / b,
+      "<": (a, b) => a < b,
+      ">": (a, b) => a > b,
+      "<=": (a, b) => a <= b,
+      ">=": (a, b) => a >= b,
+      "===": (a, b) => a === b
     };
     const stack = [];
     for (const token of tokens) {
       if (/^-?\d+$/.test(token)) {
         stack.push(Number(token));
       } else if (token in operators) {
-        const b2 = Number(stack.pop());
-        const a2 = Number(stack.pop());
-        stack.push(operators[token](a2, b2));
+        const b = Number(stack.pop());
+        const a = Number(stack.pop());
+        stack.push(operators[token](a, b));
       } else if (token === "'") {
         stack[stack.length - 1] = possessive(stack[stack.length - 1]);
       } else if (token === ",") {
@@ -9722,11 +9717,9 @@ const css$c = {
 const Component = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $tracker, $$unsubscribe_tracker;
   let $$unsubscribe_story_json;
-  let $all_data, $$unsubscribe_all_data;
   $$unsubscribe_tracker = subscribe(tracker, (value) => $tracker = value);
   $$unsubscribe_story_json = subscribe(story_json, (value) => value);
-  $$unsubscribe_all_data = subscribe(all_data, (value) => $all_data = value);
-  let { height, width: width2, count = 0, index = 0, offset = 0, progress = 0, family = "", component, animation = "", padding = 50, country, data } = $$props;
+  let { height, width: width2, count = 0, index = 0, offset = 0, progress = 0, family = "", component, animation = "", padding = 50, country, all_data, selected } = $$props;
   let components = { Animated_charts: App$3, Football: App$2, Pyramids: App$1 };
   function updateStep(stp) {
     tracker.set(stp);
@@ -9760,15 +9753,15 @@ const Component = create_ssr_component(($$result, $$props, $$bindings, slots) =>
     $$bindings.padding(padding);
   if ($$props.country === void 0 && $$bindings.country && country !== void 0)
     $$bindings.country(country);
-  if ($$props.data === void 0 && $$bindings.data && data !== void 0)
-    $$bindings.data(data);
+  if ($$props.all_data === void 0 && $$bindings.all_data && all_data !== void 0)
+    $$bindings.all_data(all_data);
+  if ($$props.selected === void 0 && $$bindings.selected && selected !== void 0)
+    $$bindings.selected(selected);
   $$result.css.add(css$c);
   $$unsubscribe_tracker();
   $$unsubscribe_story_json();
-  $$unsubscribe_all_data();
-  return `<div class="${"container svelte-12dbwcg"}"${add_attribute("family", family, 0)}${add_attribute("component", component, 0)}>${height ? `${animation ? `<h3 class="${"title_over svelte-12dbwcg"}"${add_attribute("x", getPadding(), 0)}${add_attribute("y", padding / 2, 0)}>${escape(createText(animation.section.actions["data-title"], $all_data))}</h3>` : ``}
-  <svg${add_attribute("height", height, 0)}${add_attribute("width", width2, 0)}${add_attribute("count", count, 0)}${add_attribute("index", index, 0)}${add_attribute("offset", offset, 0)}${add_attribute("progress", progress, 0)}${add_attribute("animation", animation, 0)}>${animation && $all_data ? `
-  ${validate_component(components[component] || missing_component, "svelte:component").$$render($$result, {
+  return `${animation && all_data && country ? `<div class="${"container svelte-12dbwcg"}"${add_attribute("family", family, 0)}${add_attribute("component", component, 0)}>${height ? `${animation ? `<h3 class="${"title_over svelte-12dbwcg"}"${add_attribute("x", getPadding(), 0)}${add_attribute("y", padding / 2, 0)}>${escape(createText(animation.section.actions["data-title"], all_data))}</h3>` : ``}
+  <svg${add_attribute("height", height, 0)}${add_attribute("width", width2, 0)}${add_attribute("count", count, 0)}${add_attribute("index", index, 0)}${add_attribute("offset", offset, 0)}${add_attribute("progress", progress, 0)}${add_attribute("animation", animation, 0)}>${validate_component(components[component] || missing_component, "svelte:component").$$render($$result, {
     progress,
     offset,
     index,
@@ -9777,1222 +9770,13 @@ const Component = create_ssr_component(($$result, $$props, $$bindings, slots) =>
     width: width2,
     padding,
     country,
-    data,
     family,
     component,
-    animation: updateStep(animation.section.actions["data-id"])
-  }, {}, {})}` : ``}</svg>` : ``}
-<div class="${"tooltip svelte-12dbwcg"}" style="${"opacity:0"}"></div>
-</div>`;
-});
-var Header_svelte_svelte_type_style_lang = "";
-const css$b = {
-  code: ".short.svelte-19u0sv3{min-height:85vh}.v-padded.svelte-19u0sv3{box-sizing:border-box;padding:40px 0}",
-  map: null
-};
-const Header = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let { theme = getContext("theme") } = $$props;
-  let { bgimage = null } = $$props;
-  let { bgcolor = null } = $$props;
-  let { bgfixed = false } = $$props;
-  let { center = true } = $$props;
-  let { short = false } = $$props;
-  let style = "";
-  if (bgimage) {
-    style += `background-image: url(${bgimage});`;
-  } else {
-    style += "background-image: none;";
-  }
-  if (bgfixed) {
-    style += " background-attachment: fixed;";
-  }
-  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0)
-    $$bindings.theme(theme);
-  if ($$props.bgimage === void 0 && $$bindings.bgimage && bgimage !== void 0)
-    $$bindings.bgimage(bgimage);
-  if ($$props.bgcolor === void 0 && $$bindings.bgcolor && bgcolor !== void 0)
-    $$bindings.bgcolor(bgcolor);
-  if ($$props.bgfixed === void 0 && $$bindings.bgfixed && bgfixed !== void 0)
-    $$bindings.bgfixed(bgfixed);
-  if ($$props.center === void 0 && $$bindings.center && center !== void 0)
-    $$bindings.center(center);
-  if ($$props.short === void 0 && $$bindings.short && short !== void 0)
-    $$bindings.short(short);
-  $$result.css.add(css$b);
-  return `<header style="${"color:white; background-color: " + escape(bgcolor ? bgcolor : theme["background"]) + "; " + escape(style)}" class="${["svelte-19u0sv3", short ? "short" : ""].join(" ").trim()}"><div class="${[
-    "v-padded col-wide middle svelte-19u0sv3",
-    (short ? "short" : "") + " " + (!short ? "height-full" : "")
-  ].join(" ").trim()}" style="${"position: relative"}"><div${add_classes((center ? "center" : "").trim())}>${slots.default ? slots.default({}) : ``}</div></div></header>`;
-});
-var Filler_svelte_svelte_type_style_lang = "";
-const css$a = {
-  code: "section.svelte-1odf9sx{padding:36px 0}",
-  map: null
-};
-const Filler = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let { theme = getContext("theme") } = $$props;
-  let { center = true } = $$props;
-  let { wide = true } = $$props;
-  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0)
-    $$bindings.theme(theme);
-  if ($$props.center === void 0 && $$bindings.center && center !== void 0)
-    $$bindings.center(center);
-  if ($$props.wide === void 0 && $$bindings.wide && wide !== void 0)
-    $$bindings.wide(wide);
-  $$result.css.add(css$a);
-  return `<section style="${"color: " + escape(theme["text"]) + "; background-color: " + escape(theme["background"]) + ";"}" class="${"svelte-1odf9sx"}"><div class="${[
-    "middle",
-    (center ? "center" : "") + " " + (!wide ? "col-medium" : "") + " " + (wide ? "col-wide" : "")
-  ].join(" ").trim()}">${slots.default ? slots.default({}) : ``}</div></section>`;
-});
-var Divider_svelte_svelte_type_style_lang = "";
-var Toggle_svelte_svelte_type_style_lang = "";
-var Arrow_svelte_svelte_type_style_lang = "";
-const css$9 = {
-  code: ".arrow.svelte-1prdo3z{width:48px;height:48px}.left.svelte-1prdo3z{margin-right:10px}.bounce.svelte-1prdo3z{-webkit-animation-duration:2s;animation-duration:2s;-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;-webkit-animation-name:svelte-1prdo3z-bounce;animation-name:svelte-1prdo3z-bounce;-webkit-animation-timing-function:ease;animation-timing-function:ease}@-webkit-keyframes svelte-1prdo3z-bounce{0%{-webkit-transform:translateY(10px);transform:translateY(10px)}30%{-webkit-transform:translateY(-10px);transform:translateY(-10px)}50%{-webkit-transform:translateY(10px);transform:translateY(10px)}100%{-webkit-transform:translateY(10px);transform:translateY(10px)}}@keyframes svelte-1prdo3z-bounce{0%{-webkit-transform:translateY(10px);transform:translateY(10px)}30%{-webkit-transform:translateY(-10px);transform:translateY(-10px)}50%{-webkit-transform:translateY(10px);transform:translateY(10px)}100%{-webkit-transform:translateY(10px);transform:translateY(10px)}}",
-  map: null
-};
-const Arrow = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let { color = "black" } = $$props;
-  let { animation = true } = $$props;
-  let { center = true } = $$props;
-  const colors = ["black", "white"];
-  color = colors.includes(color) ? color : "black";
-  if ($$props.color === void 0 && $$bindings.color && color !== void 0)
-    $$bindings.color(color);
-  if ($$props.animation === void 0 && $$bindings.animation && animation !== void 0)
-    $$bindings.animation(animation);
-  if ($$props.center === void 0 && $$bindings.center && center !== void 0)
-    $$bindings.center(center);
-  $$result.css.add(css$9);
-  return `${center ? `${slots.default ? slots.default({}) : ``}<br>
-<img src="${escape(assets) + "/img/scroll-down-" + escape(color) + ".svg"}" class="${["arrow svelte-1prdo3z", animation ? "bounce" : ""].join(" ").trim()}" alt="${""}" aria-hidden="${"true"}">` : `<img src="${escape(assets) + "/img/scroll-down-" + escape(color) + ".svg"}" class="${["arrow left svelte-1prdo3z", animation ? "bounce" : ""].join(" ").trim()}" alt="${""}" aria-hidden="${"true"}">${slots.default ? slots.default({}) : ``}`}`;
-});
-var Scroller_svelte_svelte_type_style_lang = "";
-const css$8 = {
-  code: "svelte-scroller-outer.svelte-6siu2r{display:block;position:relative;max-width:100%}svelte-scroller-background.svelte-6siu2r{display:block;position:relative;width:100%}svelte-scroller-foreground.svelte-6siu2r{display:block;position:relative;z-index:2;pointer-events:none\r\n	}svelte-scroller-foreground.svelte-6siu2r::after{content:' ';display:block;clear:both}svelte-scroller-background-container.svelte-6siu2r{display:block;position:absolute;width:100%;max-width:100%;pointer-events:none;will-change:transform}",
-  map: null
-};
-const handlers = [];
-if (typeof window !== "undefined") {
-  const run_all = () => handlers.forEach((fn) => fn());
-  window.addEventListener("scroll", run_all);
-  window.addEventListener("resize", run_all);
-}
-if (typeof IntersectionObserver !== "undefined") {
-  const map = /* @__PURE__ */ new Map();
-  new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      const update = map.get(entry.target);
-      const index = handlers.indexOf(update);
-      if (entry.isIntersecting) {
-        if (index === -1)
-          handlers.push(update);
-      } else {
-        update();
-        if (index !== -1)
-          handlers.splice(index, 1);
-      }
-    });
-  }, {
-    rootMargin: "400px 0px"
-  });
-}
-const Scroller = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let { top: top2 = 0 } = $$props;
-  let { bottom: bottom2 = 1 } = $$props;
-  let { threshold: threshold2 = 0.5 } = $$props;
-  let { query = "section" } = $$props;
-  let { parallax = false } = $$props;
-  let { index = 0 } = $$props;
-  let { count = 0 } = $$props;
-  let { offset = 0 } = $$props;
-  let { progress = 0 } = $$props;
-  let { visible = false } = $$props;
-  let { splitscreen = false } = $$props;
-  let { id = null } = $$props;
-  let outer;
-  let bgContainer;
-  let foreground;
-  let background;
-  if ($$props.top === void 0 && $$bindings.top && top2 !== void 0)
-    $$bindings.top(top2);
-  if ($$props.bottom === void 0 && $$bindings.bottom && bottom2 !== void 0)
-    $$bindings.bottom(bottom2);
-  if ($$props.threshold === void 0 && $$bindings.threshold && threshold2 !== void 0)
-    $$bindings.threshold(threshold2);
-  if ($$props.query === void 0 && $$bindings.query && query !== void 0)
-    $$bindings.query(query);
-  if ($$props.parallax === void 0 && $$bindings.parallax && parallax !== void 0)
-    $$bindings.parallax(parallax);
-  if ($$props.index === void 0 && $$bindings.index && index !== void 0)
-    $$bindings.index(index);
-  if ($$props.count === void 0 && $$bindings.count && count !== void 0)
-    $$bindings.count(count);
-  if ($$props.offset === void 0 && $$bindings.offset && offset !== void 0)
-    $$bindings.offset(offset);
-  if ($$props.progress === void 0 && $$bindings.progress && progress !== void 0)
-    $$bindings.progress(progress);
-  if ($$props.visible === void 0 && $$bindings.visible && visible !== void 0)
-    $$bindings.visible(visible);
-  if ($$props.splitscreen === void 0 && $$bindings.splitscreen && splitscreen !== void 0)
-    $$bindings.splitscreen(splitscreen);
-  if ($$props.id === void 0 && $$bindings.id && id !== void 0)
-    $$bindings.id(id);
-  $$result.css.add(css$8);
-  return `
-
-<svelte-scroller-outer class="${["svelte-6siu2r", splitscreen ? "splitscreen" : ""].join(" ").trim()}"${add_attribute("this", outer, 0)}><svelte-scroller-background-container class="${"background-container svelte-6siu2r"}"${add_attribute("this", bgContainer, 0)}><svelte-scroller-background class="${"svelte-6siu2r"}"${add_attribute("this", background, 0)}>${slots.background ? slots.background({}) : ``}</svelte-scroller-background></svelte-scroller-background-container>
-
-	<svelte-scroller-foreground class="${"svelte-6siu2r"}"${add_attribute("this", foreground, 0)}>${slots.foreground ? slots.foreground({}) : ``}</svelte-scroller-foreground>
-</svelte-scroller-outer>`;
-});
-function isOutOfViewport(parent, container) {
-  const parentBounding = parent.getBoundingClientRect();
-  const boundingContainer = container.getBoundingClientRect();
-  const out = {};
-  out.top = parentBounding.top < 0;
-  out.left = parentBounding.left < 0;
-  out.bottom = parentBounding.bottom + boundingContainer.height > (window.innerHeight || document.documentElement.clientHeight);
-  out.right = parentBounding.right > (window.innerWidth || document.documentElement.clientWidth);
-  out.any = out.top || out.left || out.bottom || out.right;
-  return out;
-}
-var Item_svelte_svelte_type_style_lang = "";
-const css$7 = {
-  code: ".item.svelte-3e0qet{cursor:default;height:var(--height, 42px);line-height:var(--height, 42px);padding:var(--itemPadding, 0 20px);color:var(--itemColor, inherit);text-overflow:ellipsis;overflow:hidden;white-space:nowrap}.groupHeader.svelte-3e0qet{text-transform:var(--groupTitleTextTransform, uppercase)}.groupItem.svelte-3e0qet{padding-left:var(--groupItemPaddingLeft, 40px)}.item.svelte-3e0qet:active{background:var(--itemActiveBackground, #b9daff)}.item.active.svelte-3e0qet{background:var(--itemIsActiveBG, #007aff);color:var(--itemIsActiveColor, #fff)}.item.notSelectable.svelte-3e0qet{color:var(--itemIsNotSelectableColor, #999)}.item.first.svelte-3e0qet{border-radius:var(--itemFirstBorderRadius, 4px 4px 0 0)}.item.hover.svelte-3e0qet:not(.active){background:var(--itemHoverBG, #e7f2ff);color:var(--itemHoverColor, inherit)}",
-  map: null
-};
-const Item = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let { isActive = false } = $$props;
-  let { isFirst = false } = $$props;
-  let { isHover = false } = $$props;
-  let { isSelectable = false } = $$props;
-  let { getOptionLabel = void 0 } = $$props;
-  let { item = void 0 } = $$props;
-  let { filterText = "" } = $$props;
-  let itemClasses = "";
-  if ($$props.isActive === void 0 && $$bindings.isActive && isActive !== void 0)
-    $$bindings.isActive(isActive);
-  if ($$props.isFirst === void 0 && $$bindings.isFirst && isFirst !== void 0)
-    $$bindings.isFirst(isFirst);
-  if ($$props.isHover === void 0 && $$bindings.isHover && isHover !== void 0)
-    $$bindings.isHover(isHover);
-  if ($$props.isSelectable === void 0 && $$bindings.isSelectable && isSelectable !== void 0)
-    $$bindings.isSelectable(isSelectable);
-  if ($$props.getOptionLabel === void 0 && $$bindings.getOptionLabel && getOptionLabel !== void 0)
-    $$bindings.getOptionLabel(getOptionLabel);
-  if ($$props.item === void 0 && $$bindings.item && item !== void 0)
-    $$bindings.item(item);
-  if ($$props.filterText === void 0 && $$bindings.filterText && filterText !== void 0)
-    $$bindings.filterText(filterText);
-  $$result.css.add(css$7);
-  {
-    {
-      const classes = [];
-      if (isActive) {
-        classes.push("active");
-      }
-      if (isFirst) {
-        classes.push("first");
-      }
-      if (isHover) {
-        classes.push("hover");
-      }
-      if (item.isGroupHeader) {
-        classes.push("groupHeader");
-      }
-      if (item.isGroupItem) {
-        classes.push("groupItem");
-      }
-      if (!isSelectable) {
-        classes.push("notSelectable");
-      }
-      itemClasses = classes.join(" ");
-    }
-  }
-  return `<div class="${"item " + escape(itemClasses) + " svelte-3e0qet"}"><!-- HTML_TAG_START -->${getOptionLabel(item, filterText)}<!-- HTML_TAG_END --></div>`;
-});
-var List_svelte_svelte_type_style_lang = "";
-const css$6 = {
-  code: ".listContainer.svelte-1uyqfml{box-shadow:var(--listShadow, 0 2px 3px 0 rgba(44, 62, 80, 0.24));border-radius:var(--listBorderRadius, 4px);max-height:var(--listMaxHeight, 250px);overflow-y:auto;background:var(--listBackground, #fff);border:var(--listBorder, none);position:var(--listPosition, absolute);z-index:var(--listZIndex, 2);width:100%;left:var(--listLeft, 0);right:var(--listRight, 0)}.virtualList.svelte-1uyqfml{height:var(--virtualListHeight, 200px)}.listGroupTitle.svelte-1uyqfml{color:var(--groupTitleColor, #8f8f8f);cursor:default;font-size:var(--groupTitleFontSize, 12px);font-weight:var(--groupTitleFontWeight, 600);height:var(--height, 42px);line-height:var(--height, 42px);padding:var(--groupTitlePadding, 0 20px);text-overflow:ellipsis;overflow-x:hidden;white-space:nowrap;text-transform:var(--groupTitleTextTransform, uppercase)}.empty.svelte-1uyqfml{text-align:var(--listEmptyTextAlign, center);padding:var(--listEmptyPadding, 20px 0);color:var(--listEmptyColor, #78848f)}",
-  map: null
-};
-function isItemActive(item, value, optionIdentifier) {
-  return value && value[optionIdentifier] === item[optionIdentifier];
-}
-function isItemFirst(itemIndex) {
-  return itemIndex === 0;
-}
-function isItemHover(hoverItemIndex, item, itemIndex, items2) {
-  return isItemSelectable(item) && (hoverItemIndex === itemIndex || items2.length === 1);
-}
-function isItemSelectable(item) {
-  return item.isGroupHeader && item.isSelectable || item.selectable || !item.hasOwnProperty("selectable");
-}
-const List = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  createEventDispatcher();
-  let { container = void 0 } = $$props;
-  let { VirtualList: VirtualList2 = null } = $$props;
-  let { Item: Item$1 = Item } = $$props;
-  let { isVirtualList = false } = $$props;
-  let { items: items2 = [] } = $$props;
-  let { labelIdentifier = "label" } = $$props;
-  let { getOptionLabel = (option, filterText2) => {
-    if (option)
-      return option.isCreator ? `Create "${filterText2}"` : option[labelIdentifier];
-  } } = $$props;
-  let { getGroupHeaderLabel = null } = $$props;
-  let { itemHeight = 40 } = $$props;
-  let { hoverItemIndex = 0 } = $$props;
-  let { value = void 0 } = $$props;
-  let { optionIdentifier = "value" } = $$props;
-  let { hideEmptyState = false } = $$props;
-  let { noOptionsMessage = "No options" } = $$props;
-  let { isMulti = false } = $$props;
-  let { activeItemIndex = 0 } = $$props;
-  let { filterText = "" } = $$props;
-  let { parent = null } = $$props;
-  let { listPlacement = null } = $$props;
-  let { listAutoWidth = null } = $$props;
-  let { listOffset = 5 } = $$props;
-  let listStyle;
-  function computePlacement() {
-    const { height, width: width2 } = parent.getBoundingClientRect();
-    listStyle = "";
-    listStyle += `min-width:${width2}px;width:${listAutoWidth ? "auto" : "100%"};`;
-    if (listPlacement === "top" || listPlacement === "auto" && isOutOfViewport(parent, container).bottom) {
-      listStyle += `bottom:${height + listOffset}px;`;
-    } else {
-      listStyle += `top:${height + listOffset}px;`;
-    }
-  }
-  if ($$props.container === void 0 && $$bindings.container && container !== void 0)
-    $$bindings.container(container);
-  if ($$props.VirtualList === void 0 && $$bindings.VirtualList && VirtualList2 !== void 0)
-    $$bindings.VirtualList(VirtualList2);
-  if ($$props.Item === void 0 && $$bindings.Item && Item$1 !== void 0)
-    $$bindings.Item(Item$1);
-  if ($$props.isVirtualList === void 0 && $$bindings.isVirtualList && isVirtualList !== void 0)
-    $$bindings.isVirtualList(isVirtualList);
-  if ($$props.items === void 0 && $$bindings.items && items2 !== void 0)
-    $$bindings.items(items2);
-  if ($$props.labelIdentifier === void 0 && $$bindings.labelIdentifier && labelIdentifier !== void 0)
-    $$bindings.labelIdentifier(labelIdentifier);
-  if ($$props.getOptionLabel === void 0 && $$bindings.getOptionLabel && getOptionLabel !== void 0)
-    $$bindings.getOptionLabel(getOptionLabel);
-  if ($$props.getGroupHeaderLabel === void 0 && $$bindings.getGroupHeaderLabel && getGroupHeaderLabel !== void 0)
-    $$bindings.getGroupHeaderLabel(getGroupHeaderLabel);
-  if ($$props.itemHeight === void 0 && $$bindings.itemHeight && itemHeight !== void 0)
-    $$bindings.itemHeight(itemHeight);
-  if ($$props.hoverItemIndex === void 0 && $$bindings.hoverItemIndex && hoverItemIndex !== void 0)
-    $$bindings.hoverItemIndex(hoverItemIndex);
-  if ($$props.value === void 0 && $$bindings.value && value !== void 0)
-    $$bindings.value(value);
-  if ($$props.optionIdentifier === void 0 && $$bindings.optionIdentifier && optionIdentifier !== void 0)
-    $$bindings.optionIdentifier(optionIdentifier);
-  if ($$props.hideEmptyState === void 0 && $$bindings.hideEmptyState && hideEmptyState !== void 0)
-    $$bindings.hideEmptyState(hideEmptyState);
-  if ($$props.noOptionsMessage === void 0 && $$bindings.noOptionsMessage && noOptionsMessage !== void 0)
-    $$bindings.noOptionsMessage(noOptionsMessage);
-  if ($$props.isMulti === void 0 && $$bindings.isMulti && isMulti !== void 0)
-    $$bindings.isMulti(isMulti);
-  if ($$props.activeItemIndex === void 0 && $$bindings.activeItemIndex && activeItemIndex !== void 0)
-    $$bindings.activeItemIndex(activeItemIndex);
-  if ($$props.filterText === void 0 && $$bindings.filterText && filterText !== void 0)
-    $$bindings.filterText(filterText);
-  if ($$props.parent === void 0 && $$bindings.parent && parent !== void 0)
-    $$bindings.parent(parent);
-  if ($$props.listPlacement === void 0 && $$bindings.listPlacement && listPlacement !== void 0)
-    $$bindings.listPlacement(listPlacement);
-  if ($$props.listAutoWidth === void 0 && $$bindings.listAutoWidth && listAutoWidth !== void 0)
-    $$bindings.listAutoWidth(listAutoWidth);
-  if ($$props.listOffset === void 0 && $$bindings.listOffset && listOffset !== void 0)
-    $$bindings.listOffset(listOffset);
-  $$result.css.add(css$6);
-  {
-    {
-      if (parent && container)
-        computePlacement();
-    }
-  }
-  return `
-
-<div class="${["listContainer svelte-1uyqfml", isVirtualList ? "virtualList" : ""].join(" ").trim()}"${add_attribute("style", listStyle, 0)}${add_attribute("this", container, 0)}>${isVirtualList ? `${validate_component(VirtualList2 || missing_component, "svelte:component").$$render($$result, { items: items2, itemHeight }, {}, {
-    default: ({ item, i }) => {
-      return `<div class="${"listItem"}">${validate_component(Item$1 || missing_component, "svelte:component").$$render($$result, {
-        item,
-        filterText,
-        getOptionLabel,
-        isFirst: isItemFirst(i),
-        isActive: isItemActive(item, value, optionIdentifier),
-        isHover: isItemHover(hoverItemIndex, item, i, items2),
-        isSelectable: isItemSelectable(item)
-      }, {}, {})}</div>`;
-    }
-  })}` : `${items2.length ? each(items2, (item, i) => {
-    return `${item.isGroupHeader && !item.isSelectable ? `<div class="${"listGroupTitle svelte-1uyqfml"}">${escape(getGroupHeaderLabel(item))}</div>` : `<div class="${"listItem"}" tabindex="${"-1"}">${validate_component(Item$1 || missing_component, "svelte:component").$$render($$result, {
-      item,
-      filterText,
-      getOptionLabel,
-      isFirst: isItemFirst(i),
-      isActive: isItemActive(item, value, optionIdentifier),
-      isHover: isItemHover(hoverItemIndex, item, i, items2),
-      isSelectable: isItemSelectable(item)
-    }, {}, {})}
-                </div>`}`;
-  }) : `${!hideEmptyState ? `<div class="${"empty svelte-1uyqfml"}">${escape(noOptionsMessage)}</div>` : ``}`}`}</div>`;
-});
-var Selection_svelte_svelte_type_style_lang = "";
-const css$5 = {
-  code: ".selection.svelte-pu1q1n{text-overflow:ellipsis;overflow-x:hidden;white-space:nowrap}",
-  map: null
-};
-const Selection = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let { getSelectionLabel = void 0 } = $$props;
-  let { item = void 0 } = $$props;
-  if ($$props.getSelectionLabel === void 0 && $$bindings.getSelectionLabel && getSelectionLabel !== void 0)
-    $$bindings.getSelectionLabel(getSelectionLabel);
-  if ($$props.item === void 0 && $$bindings.item && item !== void 0)
-    $$bindings.item(item);
-  $$result.css.add(css$5);
-  return `<div class="${"selection svelte-pu1q1n"}"><!-- HTML_TAG_START -->${getSelectionLabel(item)}<!-- HTML_TAG_END --></div>`;
-});
-var MultiSelection_svelte_svelte_type_style_lang = "";
-const css$4 = {
-  code: ".multiSelectItem.svelte-liu9pa.svelte-liu9pa{background:var(--multiItemBG, #ebedef);margin:var(--multiItemMargin, 5px 5px 0 0);border-radius:var(--multiItemBorderRadius, 16px);height:var(--multiItemHeight, 32px);line-height:var(--multiItemHeight, 32px);display:flex;cursor:default;padding:var(--multiItemPadding, 0 10px 0 15px);max-width:100%}.multiSelectItem_label.svelte-liu9pa.svelte-liu9pa{margin:var(--multiLabelMargin, 0 5px 0 0);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.multiSelectItem.svelte-liu9pa.svelte-liu9pa:hover,.multiSelectItem.active.svelte-liu9pa.svelte-liu9pa{background-color:var(--multiItemActiveBG, #006fff);color:var(--multiItemActiveColor, #fff)}.multiSelectItem.disabled.svelte-liu9pa.svelte-liu9pa:hover{background:var(--multiItemDisabledHoverBg, #ebedef);color:var(--multiItemDisabledHoverColor, #c1c6cc)}.multiSelectItem_clear.svelte-liu9pa.svelte-liu9pa{border-radius:var(--multiClearRadius, 50%);background:var(--multiClearBG, #52616f);min-width:var(--multiClearWidth, 16px);max-width:var(--multiClearWidth, 16px);height:var(--multiClearHeight, 16px);position:relative;top:var(--multiClearTop, 8px);text-align:var(--multiClearTextAlign, center);padding:var(--multiClearPadding, 1px)}.multiSelectItem_clear.svelte-liu9pa.svelte-liu9pa:hover,.active.svelte-liu9pa .multiSelectItem_clear.svelte-liu9pa{background:var(--multiClearHoverBG, #fff)}.multiSelectItem_clear.svelte-liu9pa:hover svg.svelte-liu9pa,.active.svelte-liu9pa .multiSelectItem_clear svg.svelte-liu9pa{fill:var(--multiClearHoverFill, #006fff)}.multiSelectItem_clear.svelte-liu9pa svg.svelte-liu9pa{fill:var(--multiClearFill, #ebedef);vertical-align:top}",
-  map: null
-};
-const MultiSelection = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  createEventDispatcher();
-  let { value = [] } = $$props;
-  let { activeValue = void 0 } = $$props;
-  let { isDisabled = false } = $$props;
-  let { multiFullItemClearable = false } = $$props;
-  let { getSelectionLabel = void 0 } = $$props;
-  if ($$props.value === void 0 && $$bindings.value && value !== void 0)
-    $$bindings.value(value);
-  if ($$props.activeValue === void 0 && $$bindings.activeValue && activeValue !== void 0)
-    $$bindings.activeValue(activeValue);
-  if ($$props.isDisabled === void 0 && $$bindings.isDisabled && isDisabled !== void 0)
-    $$bindings.isDisabled(isDisabled);
-  if ($$props.multiFullItemClearable === void 0 && $$bindings.multiFullItemClearable && multiFullItemClearable !== void 0)
-    $$bindings.multiFullItemClearable(multiFullItemClearable);
-  if ($$props.getSelectionLabel === void 0 && $$bindings.getSelectionLabel && getSelectionLabel !== void 0)
-    $$bindings.getSelectionLabel(getSelectionLabel);
-  $$result.css.add(css$4);
-  return `${each(value, (item, i) => {
-    return `<div class="${"multiSelectItem " + escape(activeValue === i ? "active" : "") + " " + escape(isDisabled ? "disabled" : "") + " svelte-liu9pa"}"><div class="${"multiSelectItem_label svelte-liu9pa"}"><!-- HTML_TAG_START -->${getSelectionLabel(item)}<!-- HTML_TAG_END --></div>
-        ${!isDisabled && !multiFullItemClearable ? `<div class="${"multiSelectItem_clear svelte-liu9pa"}"><svg width="${"100%"}" height="${"100%"}" viewBox="${"-2 -2 50 50"}" focusable="${"false"}" aria-hidden="${"true"}" role="${"presentation"}" class="${"svelte-liu9pa"}"><path d="${"M34.923,37.251L24,26.328L13.077,37.251L9.436,33.61l10.923-10.923L9.436,11.765l3.641-3.641L24,19.047L34.923,8.124 l3.641,3.641L27.641,22.688L38.564,33.61L34.923,37.251z"}"></path></svg>
-            </div>` : ``}
-    </div>`;
-  })}`;
-});
-var VirtualList_svelte_svelte_type_style_lang = "";
-const css$3 = {
-  code: "svelte-virtual-list-viewport.svelte-g2cagw{position:relative;overflow-y:auto;-webkit-overflow-scrolling:touch;display:block}svelte-virtual-list-contents.svelte-g2cagw,svelte-virtual-list-row.svelte-g2cagw{display:block}svelte-virtual-list-row.svelte-g2cagw{overflow:hidden}",
-  map: null
-};
-const VirtualList = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let { items: items2 = void 0 } = $$props;
-  let { height = "100%" } = $$props;
-  let { itemHeight = 40 } = $$props;
-  let { hoverItemIndex = 0 } = $$props;
-  let { start = 0 } = $$props;
-  let { end = 0 } = $$props;
-  let viewport;
-  let contents;
-  let visible;
-  let top2 = 0;
-  let bottom2 = 0;
-  if ($$props.items === void 0 && $$bindings.items && items2 !== void 0)
-    $$bindings.items(items2);
-  if ($$props.height === void 0 && $$bindings.height && height !== void 0)
-    $$bindings.height(height);
-  if ($$props.itemHeight === void 0 && $$bindings.itemHeight && itemHeight !== void 0)
-    $$bindings.itemHeight(itemHeight);
-  if ($$props.hoverItemIndex === void 0 && $$bindings.hoverItemIndex && hoverItemIndex !== void 0)
-    $$bindings.hoverItemIndex(hoverItemIndex);
-  if ($$props.start === void 0 && $$bindings.start && start !== void 0)
-    $$bindings.start(start);
-  if ($$props.end === void 0 && $$bindings.end && end !== void 0)
-    $$bindings.end(end);
-  $$result.css.add(css$3);
-  visible = items2.slice(start, end).map((data, i) => {
-    return { index: i + start, data };
-  });
-  return `<svelte-virtual-list-viewport style="${"height: " + escape(height) + ";"}" class="${"svelte-g2cagw"}"${add_attribute("this", viewport, 0)}><svelte-virtual-list-contents style="${"padding-top: " + escape(top2) + "px; padding-bottom: " + escape(bottom2) + "px;"}" class="${"svelte-g2cagw"}"${add_attribute("this", contents, 0)}>${each(visible, (row) => {
-    return `<svelte-virtual-list-row class="${"svelte-g2cagw"}">${slots.default ? slots.default({
-      item: row.data,
-      i: row.index,
-      hoverItemIndex
-    }) : `Missing template`}
-            </svelte-virtual-list-row>`;
-  })}</svelte-virtual-list-contents></svelte-virtual-list-viewport>`;
-});
-const ClearIcon = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  return `<svg width="${"100%"}" height="${"100%"}" viewBox="${"-2 -2 50 50"}" focusable="${"false"}" aria-hidden="${"true"}" role="${"presentation"}"><path fill="${"currentColor"}" d="${"M34.923,37.251L24,26.328L13.077,37.251L9.436,33.61l10.923-10.923L9.436,11.765l3.641-3.641L24,19.047L34.923,8.124\n    l3.641,3.641L27.641,22.688L38.564,33.61L34.923,37.251z"}"></path></svg>`;
-});
-function debounce(func, wait, immediate) {
-  let timeout;
-  return function executedFunction() {
-    let context = this;
-    let args = arguments;
-    let later = function() {
-      timeout = null;
-      if (!immediate)
-        func.apply(context, args);
-    };
-    let callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow)
-      func.apply(context, args);
-  };
-}
-var Select_svelte_svelte_type_style_lang$1 = "";
-const { Object: Object_1 } = globals;
-const css$2 = {
-  code: ".selectContainer.svelte-17l1npl.svelte-17l1npl{--internalPadding:0 16px;border:var(--border, 1px solid #d8dbdf);border-radius:var(--borderRadius, 3px);box-sizing:border-box;height:var(--height, 42px);position:relative;display:flex;align-items:center;padding:var(--padding, var(--internalPadding));background:var(--background, #fff);margin:var(--margin, 0)}.selectContainer.svelte-17l1npl input.svelte-17l1npl{cursor:default;border:none;color:var(--inputColor, #3f4f5f);height:var(--height, 42px);line-height:var(--height, 42px);padding:var(--inputPadding, var(--padding, var(--internalPadding)));width:100%;background:transparent;font-size:var(--inputFontSize, 14px);letter-spacing:var(--inputLetterSpacing, -0.08px);position:absolute;left:var(--inputLeft, 0);margin:var(--inputMargin, 0)}.selectContainer.svelte-17l1npl input.svelte-17l1npl::placeholder{color:var(--placeholderColor, #78848f);opacity:var(--placeholderOpacity, 1)}.selectContainer.svelte-17l1npl input.svelte-17l1npl:focus{outline:none}.selectContainer.svelte-17l1npl.svelte-17l1npl:hover{border-color:var(--borderHoverColor, #b2b8bf)}.selectContainer.focused.svelte-17l1npl.svelte-17l1npl{border-color:var(--borderFocusColor, #006fe8)}.selectContainer.disabled.svelte-17l1npl.svelte-17l1npl{background:var(--disabledBackground, #ebedef);border-color:var(--disabledBorderColor, #ebedef);color:var(--disabledColor, #c1c6cc)}.selectContainer.disabled.svelte-17l1npl input.svelte-17l1npl::placeholder{color:var(--disabledPlaceholderColor, #c1c6cc);opacity:var(--disabledPlaceholderOpacity, 1)}.selectedItem.svelte-17l1npl.svelte-17l1npl{line-height:var(--height, 42px);height:var(--height, 42px);overflow-x:hidden;padding:var(--selectedItemPadding, 0 20px 0 0)}.selectedItem.svelte-17l1npl.svelte-17l1npl:focus{outline:none}.clearSelect.svelte-17l1npl.svelte-17l1npl{position:absolute;right:var(--clearSelectRight, 10px);top:var(--clearSelectTop, 11px);bottom:var(--clearSelectBottom, 11px);width:var(--clearSelectWidth, 20px);color:var(--clearSelectColor, #c5cacf);flex:none !important}.clearSelect.svelte-17l1npl.svelte-17l1npl:hover{color:var(--clearSelectHoverColor, #2c3e50)}.selectContainer.focused.svelte-17l1npl .clearSelect.svelte-17l1npl{color:var(--clearSelectFocusColor, #3f4f5f)}.indicator.svelte-17l1npl.svelte-17l1npl{position:absolute;right:var(--indicatorRight, 10px);top:var(--indicatorTop, 11px);width:var(--indicatorWidth, 20px);height:var(--indicatorHeight, 20px);color:var(--indicatorColor, #c5cacf)}.indicator.svelte-17l1npl svg.svelte-17l1npl{display:inline-block;fill:var(--indicatorFill, currentcolor);line-height:1;stroke:var(--indicatorStroke, currentcolor);stroke-width:0}.spinner.svelte-17l1npl.svelte-17l1npl{position:absolute;right:var(--spinnerRight, 10px);top:var(--spinnerLeft, 11px);width:var(--spinnerWidth, 20px);height:var(--spinnerHeight, 20px);color:var(--spinnerColor, #51ce6c);animation:svelte-17l1npl-rotate 0.75s linear infinite}.spinner_icon.svelte-17l1npl.svelte-17l1npl{display:block;height:100%;transform-origin:center center;width:100%;position:absolute;top:0;bottom:0;left:0;right:0;margin:auto;-webkit-transform:none}.spinner_path.svelte-17l1npl.svelte-17l1npl{stroke-dasharray:90;stroke-linecap:round}.multiSelect.svelte-17l1npl.svelte-17l1npl{display:flex;padding:var(--multiSelectPadding, 0 35px 0 16px);height:auto;flex-wrap:wrap;align-items:stretch}.multiSelect.svelte-17l1npl>.svelte-17l1npl{flex:1 1 50px}.selectContainer.multiSelect.svelte-17l1npl input.svelte-17l1npl{padding:var(--multiSelectInputPadding, 0);position:relative;margin:var(--multiSelectInputMargin, 0)}.hasError.svelte-17l1npl.svelte-17l1npl{border:var(--errorBorder, 1px solid #ff2d55);background:var(--errorBackground, #fff)}.a11yText.svelte-17l1npl.svelte-17l1npl{z-index:9999;border:0px;clip:rect(1px, 1px, 1px, 1px);height:1px;width:1px;position:absolute;overflow:hidden;padding:0px;white-space:nowrap}@keyframes svelte-17l1npl-rotate{100%{transform:rotate(360deg)}}",
-  map: null
-};
-function convertStringItemsToObjects(_items) {
-  return _items.map((item, index) => {
-    return { index, value: item, label: `${item}` };
-  });
-}
-const Select = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let filteredItems;
-  let showSelectedItem;
-  let showClearIcon;
-  let placeholderText;
-  let showMultiSelect;
-  let listProps;
-  let ariaSelection;
-  let ariaContext;
-  const dispatch = createEventDispatcher();
-  let { id = null } = $$props;
-  let { container = void 0 } = $$props;
-  let { input = void 0 } = $$props;
-  let { isMulti = false } = $$props;
-  let { multiFullItemClearable = false } = $$props;
-  let { isDisabled = false } = $$props;
-  let { isCreatable = false } = $$props;
-  let { isFocused = false } = $$props;
-  let { value = null } = $$props;
-  let { filterText = "" } = $$props;
-  let { placeholder = "Select..." } = $$props;
-  let { placeholderAlwaysShow = false } = $$props;
-  let { items: items2 = null } = $$props;
-  let { itemFilter = (label, filterText2, option) => `${label}`.toLowerCase().includes(filterText2.toLowerCase()) } = $$props;
-  let { groupBy = void 0 } = $$props;
-  let { groupFilter = (groups) => groups } = $$props;
-  let { isGroupHeaderSelectable = false } = $$props;
-  let { getGroupHeaderLabel = (option) => {
-    return option[labelIdentifier] || option.id;
-  } } = $$props;
-  let { labelIdentifier = "label" } = $$props;
-  let { getOptionLabel = (option, filterText2) => {
-    return option.isCreator ? `Create "${filterText2}"` : option[labelIdentifier];
-  } } = $$props;
-  let { optionIdentifier = "value" } = $$props;
-  let { loadOptions = void 0 } = $$props;
-  let { hasError = false } = $$props;
-  let { containerStyles = "" } = $$props;
-  let { getSelectionLabel = (option) => {
-    if (option)
-      return option[labelIdentifier];
-    else
-      return null;
-  } } = $$props;
-  let { createGroupHeaderItem = (groupValue) => {
-    return { value: groupValue, label: groupValue };
-  } } = $$props;
-  let { createItem = (filterText2) => {
-    return { value: filterText2, label: filterText2 };
-  } } = $$props;
-  const getFilteredItems = () => {
-    return filteredItems;
-  };
-  let { isSearchable = true } = $$props;
-  let { inputStyles = "" } = $$props;
-  let { isClearable = true } = $$props;
-  let { isWaiting = false } = $$props;
-  let { listPlacement = "auto" } = $$props;
-  let { listOpen = false } = $$props;
-  let { isVirtualList = false } = $$props;
-  let { loadOptionsInterval = 300 } = $$props;
-  let { noOptionsMessage = "No options" } = $$props;
-  let { hideEmptyState = false } = $$props;
-  let { inputAttributes = {} } = $$props;
-  let { listAutoWidth = true } = $$props;
-  let { itemHeight = 40 } = $$props;
-  let { Icon = void 0 } = $$props;
-  let { iconProps = {} } = $$props;
-  let { showChevron = false } = $$props;
-  let { showIndicator = false } = $$props;
-  let { containerClasses = "" } = $$props;
-  let { indicatorSvg = void 0 } = $$props;
-  let { listOffset = 5 } = $$props;
-  let { ClearIcon: ClearIcon$1 = ClearIcon } = $$props;
-  let { Item: Item$1 = Item } = $$props;
-  let { List: List$1 = List } = $$props;
-  let { Selection: Selection$1 = Selection } = $$props;
-  let { MultiSelection: MultiSelection$1 = MultiSelection } = $$props;
-  let { VirtualList: VirtualList$1 = VirtualList } = $$props;
-  function filterMethod(args) {
-    if (args.loadOptions && args.filterText.length > 0)
-      return;
-    if (!args.items)
-      return [];
-    if (args.items && args.items.length > 0 && typeof args.items[0] !== "object") {
-      args.items = convertStringItemsToObjects(args.items);
-    }
-    let filterResults = args.items.filter((item) => {
-      let matchesFilter = itemFilter(getOptionLabel(item, args.filterText), args.filterText, item);
-      if (matchesFilter && args.isMulti && args.value && Array.isArray(args.value)) {
-        matchesFilter = !args.value.some((x2) => {
-          return x2[args.optionIdentifier] === item[args.optionIdentifier];
-        });
-      }
-      return matchesFilter;
-    });
-    if (args.groupBy) {
-      filterResults = filterGroupedItems(filterResults);
-    }
-    if (args.isCreatable) {
-      filterResults = addCreatableItem(filterResults, args.filterText);
-    }
-    return filterResults;
-  }
-  function addCreatableItem(_items, _filterText) {
-    if (_filterText.length === 0)
-      return _items;
-    const itemToCreate = createItem(_filterText);
-    if (_items[0] && _filterText === _items[0][labelIdentifier])
-      return _items;
-    itemToCreate.isCreator = true;
-    return [..._items, itemToCreate];
-  }
-  let { selectedValue = null } = $$props;
-  let activeValue;
-  let prev_value;
-  let prev_filterText;
-  let prev_isFocused;
-  let hoverItemIndex;
-  const getItems = debounce(async () => {
-    isWaiting = true;
-    let res = await loadOptions(filterText).catch((err) => {
-      console.warn("svelte-select loadOptions error :>> ", err);
-      dispatch("error", { type: "loadOptions", details: err });
-    });
-    if (res && !res.cancelled) {
-      if (res) {
-        if (res && res.length > 0 && typeof res[0] !== "object") {
-          res = convertStringItemsToObjects(res);
-        }
-        filteredItems = [...res];
-        dispatch("loaded", { items: filteredItems });
-      } else {
-        filteredItems = [];
-      }
-      if (isCreatable) {
-        filteredItems = addCreatableItem(filteredItems, filterText);
-      }
-      isWaiting = false;
-      isFocused = true;
-      listOpen = true;
-    }
-  }, loadOptionsInterval);
-  function setValue() {
-    if (typeof value === "string") {
-      value = { [optionIdentifier]: value, label: value };
-    } else if (isMulti && Array.isArray(value) && value.length > 0) {
-      value = value.map((item) => typeof item === "string" ? { value: item, label: item } : item);
-    }
-  }
-  let _inputAttributes;
-  function assignInputAttributes() {
-    _inputAttributes = Object.assign({
-      autocapitalize: "none",
-      autocomplete: "off",
-      autocorrect: "off",
-      spellcheck: false,
-      tabindex: 0,
-      type: "text",
-      "aria-autocomplete": "list"
-    }, inputAttributes);
-    if (id) {
-      _inputAttributes.id = id;
-    }
-    if (!isSearchable) {
-      _inputAttributes.readonly = true;
-    }
-  }
-  function filterGroupedItems(_items) {
-    const groupValues = [];
-    const groups = {};
-    _items.forEach((item) => {
-      const groupValue = groupBy(item);
-      if (!groupValues.includes(groupValue)) {
-        groupValues.push(groupValue);
-        groups[groupValue] = [];
-        if (groupValue) {
-          groups[groupValue].push(Object.assign(createGroupHeaderItem(groupValue, item), {
-            id: groupValue,
-            isGroupHeader: true,
-            isSelectable: isGroupHeaderSelectable
-          }));
-        }
-      }
-      groups[groupValue].push(Object.assign({ isGroupItem: !!groupValue }, item));
-    });
-    const sortedGroupedItems = [];
-    groupFilter(groupValues).forEach((groupValue) => {
-      sortedGroupedItems.push(...groups[groupValue]);
-    });
-    return sortedGroupedItems;
-  }
-  function dispatchSelectedItem() {
-    if (isMulti) {
-      if (JSON.stringify(value) !== JSON.stringify(prev_value)) {
-        if (checkValueForDuplicates()) {
-          dispatch("select", value);
-        }
-      }
-      return;
-    }
-    {
-      dispatch("select", value);
-    }
-  }
-  function setupFocus() {
-    if (isFocused || listOpen) {
-      handleFocus();
-    } else {
-      if (input)
-        input.blur();
-    }
-  }
-  function setupMulti() {
-    if (value) {
-      if (Array.isArray(value)) {
-        value = [...value];
-      } else {
-        value = [value];
-      }
-    }
-  }
-  function setupFilterText() {
-    if (filterText.length === 0)
-      return;
-    isFocused = true;
-    listOpen = true;
-    if (loadOptions) {
-      getItems();
-    } else {
-      listOpen = true;
-      if (isMulti) {
-        activeValue = void 0;
-      }
-    }
-  }
-  function checkValueForDuplicates() {
-    let noDuplicates = true;
-    if (value) {
-      const ids = [];
-      const uniqueValues = [];
-      value.forEach((val) => {
-        if (!ids.includes(val[optionIdentifier])) {
-          ids.push(val[optionIdentifier]);
-          uniqueValues.push(val);
-        } else {
-          noDuplicates = false;
-        }
-      });
-      if (!noDuplicates)
-        value = uniqueValues;
-    }
-    return noDuplicates;
-  }
-  function findItem(selection) {
-    let matchTo = selection ? selection[optionIdentifier] : value[optionIdentifier];
-    return items2.find((item) => item[optionIdentifier] === matchTo);
-  }
-  function updateValueDisplay(items3) {
-    if (!items3 || items3.length === 0 || items3.some((item) => typeof item !== "object"))
-      return;
-    if (!value || (isMulti ? value.some((selection) => !selection || !selection[optionIdentifier]) : !value[optionIdentifier]))
-      return;
-    if (Array.isArray(value)) {
-      value = value.map((selection) => findItem(selection) || selection);
-    } else {
-      value = findItem() || value;
-    }
-  }
-  function handleFocus() {
-    isFocused = true;
-    if (input)
-      input.focus();
-  }
-  function handleClear() {
-    value = void 0;
-    listOpen = false;
-    dispatch("clear", value);
-    handleFocus();
-  }
-  let { ariaValues = (values) => {
-    return `Option ${values}, selected.`;
-  } } = $$props;
-  let { ariaListOpen = (label, count) => {
-    return `You are currently focused on option ${label}. There are ${count} results available.`;
-  } } = $$props;
-  let { ariaFocused = () => {
-    return `Select is focused, type to refine list, press down to open the menu.`;
-  } } = $$props;
-  function handleAriaSelection() {
-    let selected2 = void 0;
-    if (isMulti && value.length > 0) {
-      selected2 = value.map((v) => getSelectionLabel(v)).join(", ");
-    } else {
-      selected2 = getSelectionLabel(value);
-    }
-    return ariaValues(selected2);
-  }
-  function handleAriaContent() {
-    if (!isFocused || !filteredItems || filteredItems.length === 0)
-      return "";
-    let _item = filteredItems[hoverItemIndex];
-    if (listOpen && _item) {
-      let label = getSelectionLabel(_item);
-      let count = filteredItems ? filteredItems.length : 0;
-      return ariaListOpen(label, count);
-    } else {
-      return ariaFocused();
-    }
-  }
-  if ($$props.id === void 0 && $$bindings.id && id !== void 0)
-    $$bindings.id(id);
-  if ($$props.container === void 0 && $$bindings.container && container !== void 0)
-    $$bindings.container(container);
-  if ($$props.input === void 0 && $$bindings.input && input !== void 0)
-    $$bindings.input(input);
-  if ($$props.isMulti === void 0 && $$bindings.isMulti && isMulti !== void 0)
-    $$bindings.isMulti(isMulti);
-  if ($$props.multiFullItemClearable === void 0 && $$bindings.multiFullItemClearable && multiFullItemClearable !== void 0)
-    $$bindings.multiFullItemClearable(multiFullItemClearable);
-  if ($$props.isDisabled === void 0 && $$bindings.isDisabled && isDisabled !== void 0)
-    $$bindings.isDisabled(isDisabled);
-  if ($$props.isCreatable === void 0 && $$bindings.isCreatable && isCreatable !== void 0)
-    $$bindings.isCreatable(isCreatable);
-  if ($$props.isFocused === void 0 && $$bindings.isFocused && isFocused !== void 0)
-    $$bindings.isFocused(isFocused);
-  if ($$props.value === void 0 && $$bindings.value && value !== void 0)
-    $$bindings.value(value);
-  if ($$props.filterText === void 0 && $$bindings.filterText && filterText !== void 0)
-    $$bindings.filterText(filterText);
-  if ($$props.placeholder === void 0 && $$bindings.placeholder && placeholder !== void 0)
-    $$bindings.placeholder(placeholder);
-  if ($$props.placeholderAlwaysShow === void 0 && $$bindings.placeholderAlwaysShow && placeholderAlwaysShow !== void 0)
-    $$bindings.placeholderAlwaysShow(placeholderAlwaysShow);
-  if ($$props.items === void 0 && $$bindings.items && items2 !== void 0)
-    $$bindings.items(items2);
-  if ($$props.itemFilter === void 0 && $$bindings.itemFilter && itemFilter !== void 0)
-    $$bindings.itemFilter(itemFilter);
-  if ($$props.groupBy === void 0 && $$bindings.groupBy && groupBy !== void 0)
-    $$bindings.groupBy(groupBy);
-  if ($$props.groupFilter === void 0 && $$bindings.groupFilter && groupFilter !== void 0)
-    $$bindings.groupFilter(groupFilter);
-  if ($$props.isGroupHeaderSelectable === void 0 && $$bindings.isGroupHeaderSelectable && isGroupHeaderSelectable !== void 0)
-    $$bindings.isGroupHeaderSelectable(isGroupHeaderSelectable);
-  if ($$props.getGroupHeaderLabel === void 0 && $$bindings.getGroupHeaderLabel && getGroupHeaderLabel !== void 0)
-    $$bindings.getGroupHeaderLabel(getGroupHeaderLabel);
-  if ($$props.labelIdentifier === void 0 && $$bindings.labelIdentifier && labelIdentifier !== void 0)
-    $$bindings.labelIdentifier(labelIdentifier);
-  if ($$props.getOptionLabel === void 0 && $$bindings.getOptionLabel && getOptionLabel !== void 0)
-    $$bindings.getOptionLabel(getOptionLabel);
-  if ($$props.optionIdentifier === void 0 && $$bindings.optionIdentifier && optionIdentifier !== void 0)
-    $$bindings.optionIdentifier(optionIdentifier);
-  if ($$props.loadOptions === void 0 && $$bindings.loadOptions && loadOptions !== void 0)
-    $$bindings.loadOptions(loadOptions);
-  if ($$props.hasError === void 0 && $$bindings.hasError && hasError !== void 0)
-    $$bindings.hasError(hasError);
-  if ($$props.containerStyles === void 0 && $$bindings.containerStyles && containerStyles !== void 0)
-    $$bindings.containerStyles(containerStyles);
-  if ($$props.getSelectionLabel === void 0 && $$bindings.getSelectionLabel && getSelectionLabel !== void 0)
-    $$bindings.getSelectionLabel(getSelectionLabel);
-  if ($$props.createGroupHeaderItem === void 0 && $$bindings.createGroupHeaderItem && createGroupHeaderItem !== void 0)
-    $$bindings.createGroupHeaderItem(createGroupHeaderItem);
-  if ($$props.createItem === void 0 && $$bindings.createItem && createItem !== void 0)
-    $$bindings.createItem(createItem);
-  if ($$props.getFilteredItems === void 0 && $$bindings.getFilteredItems && getFilteredItems !== void 0)
-    $$bindings.getFilteredItems(getFilteredItems);
-  if ($$props.isSearchable === void 0 && $$bindings.isSearchable && isSearchable !== void 0)
-    $$bindings.isSearchable(isSearchable);
-  if ($$props.inputStyles === void 0 && $$bindings.inputStyles && inputStyles !== void 0)
-    $$bindings.inputStyles(inputStyles);
-  if ($$props.isClearable === void 0 && $$bindings.isClearable && isClearable !== void 0)
-    $$bindings.isClearable(isClearable);
-  if ($$props.isWaiting === void 0 && $$bindings.isWaiting && isWaiting !== void 0)
-    $$bindings.isWaiting(isWaiting);
-  if ($$props.listPlacement === void 0 && $$bindings.listPlacement && listPlacement !== void 0)
-    $$bindings.listPlacement(listPlacement);
-  if ($$props.listOpen === void 0 && $$bindings.listOpen && listOpen !== void 0)
-    $$bindings.listOpen(listOpen);
-  if ($$props.isVirtualList === void 0 && $$bindings.isVirtualList && isVirtualList !== void 0)
-    $$bindings.isVirtualList(isVirtualList);
-  if ($$props.loadOptionsInterval === void 0 && $$bindings.loadOptionsInterval && loadOptionsInterval !== void 0)
-    $$bindings.loadOptionsInterval(loadOptionsInterval);
-  if ($$props.noOptionsMessage === void 0 && $$bindings.noOptionsMessage && noOptionsMessage !== void 0)
-    $$bindings.noOptionsMessage(noOptionsMessage);
-  if ($$props.hideEmptyState === void 0 && $$bindings.hideEmptyState && hideEmptyState !== void 0)
-    $$bindings.hideEmptyState(hideEmptyState);
-  if ($$props.inputAttributes === void 0 && $$bindings.inputAttributes && inputAttributes !== void 0)
-    $$bindings.inputAttributes(inputAttributes);
-  if ($$props.listAutoWidth === void 0 && $$bindings.listAutoWidth && listAutoWidth !== void 0)
-    $$bindings.listAutoWidth(listAutoWidth);
-  if ($$props.itemHeight === void 0 && $$bindings.itemHeight && itemHeight !== void 0)
-    $$bindings.itemHeight(itemHeight);
-  if ($$props.Icon === void 0 && $$bindings.Icon && Icon !== void 0)
-    $$bindings.Icon(Icon);
-  if ($$props.iconProps === void 0 && $$bindings.iconProps && iconProps !== void 0)
-    $$bindings.iconProps(iconProps);
-  if ($$props.showChevron === void 0 && $$bindings.showChevron && showChevron !== void 0)
-    $$bindings.showChevron(showChevron);
-  if ($$props.showIndicator === void 0 && $$bindings.showIndicator && showIndicator !== void 0)
-    $$bindings.showIndicator(showIndicator);
-  if ($$props.containerClasses === void 0 && $$bindings.containerClasses && containerClasses !== void 0)
-    $$bindings.containerClasses(containerClasses);
-  if ($$props.indicatorSvg === void 0 && $$bindings.indicatorSvg && indicatorSvg !== void 0)
-    $$bindings.indicatorSvg(indicatorSvg);
-  if ($$props.listOffset === void 0 && $$bindings.listOffset && listOffset !== void 0)
-    $$bindings.listOffset(listOffset);
-  if ($$props.ClearIcon === void 0 && $$bindings.ClearIcon && ClearIcon$1 !== void 0)
-    $$bindings.ClearIcon(ClearIcon$1);
-  if ($$props.Item === void 0 && $$bindings.Item && Item$1 !== void 0)
-    $$bindings.Item(Item$1);
-  if ($$props.List === void 0 && $$bindings.List && List$1 !== void 0)
-    $$bindings.List(List$1);
-  if ($$props.Selection === void 0 && $$bindings.Selection && Selection$1 !== void 0)
-    $$bindings.Selection(Selection$1);
-  if ($$props.MultiSelection === void 0 && $$bindings.MultiSelection && MultiSelection$1 !== void 0)
-    $$bindings.MultiSelection(MultiSelection$1);
-  if ($$props.VirtualList === void 0 && $$bindings.VirtualList && VirtualList$1 !== void 0)
-    $$bindings.VirtualList(VirtualList$1);
-  if ($$props.selectedValue === void 0 && $$bindings.selectedValue && selectedValue !== void 0)
-    $$bindings.selectedValue(selectedValue);
-  if ($$props.handleClear === void 0 && $$bindings.handleClear && handleClear !== void 0)
-    $$bindings.handleClear(handleClear);
-  if ($$props.ariaValues === void 0 && $$bindings.ariaValues && ariaValues !== void 0)
-    $$bindings.ariaValues(ariaValues);
-  if ($$props.ariaListOpen === void 0 && $$bindings.ariaListOpen && ariaListOpen !== void 0)
-    $$bindings.ariaListOpen(ariaListOpen);
-  if ($$props.ariaFocused === void 0 && $$bindings.ariaFocused && ariaFocused !== void 0)
-    $$bindings.ariaFocused(ariaFocused);
-  $$result.css.add(css$2);
-  let $$settled;
-  let $$rendered;
-  do {
-    $$settled = true;
-    filteredItems = filterMethod({
-      loadOptions,
-      filterText,
-      items: items2,
-      value,
-      isMulti,
-      optionIdentifier,
-      groupBy,
-      isCreatable
-    });
-    {
-      {
-        if (selectedValue)
-          console.warn("selectedValue is no longer used. Please use value instead.");
-      }
-    }
-    {
-      updateValueDisplay(items2);
-    }
-    {
-      {
-        if (value)
-          setValue();
-      }
-    }
-    {
-      {
-        if (inputAttributes || !isSearchable)
-          assignInputAttributes();
-      }
-    }
-    {
-      {
-        if (isMulti) {
-          setupMulti();
-        }
-      }
-    }
-    {
-      {
-        if (isMulti && value && value.length > 1) {
-          checkValueForDuplicates();
-        }
-      }
-    }
-    {
-      {
-        if (value)
-          dispatchSelectedItem();
-      }
-    }
-    {
-      {
-        if (!value && isMulti && prev_value) {
-          dispatch("select", value);
-        }
-      }
-    }
-    {
-      {
-        if (isFocused !== prev_isFocused) {
-          setupFocus();
-        }
-      }
-    }
-    {
-      {
-        if (filterText !== prev_filterText) {
-          setupFilterText();
-        }
-      }
-    }
-    showSelectedItem = value && filterText.length === 0;
-    showClearIcon = showSelectedItem && isClearable && !isDisabled && !isWaiting;
-    placeholderText = placeholderAlwaysShow && isMulti ? placeholder : value ? "" : placeholder;
-    showMultiSelect = isMulti && value && value.length > 0;
-    listProps = {
-      Item: Item$1,
-      filterText,
-      optionIdentifier,
-      noOptionsMessage,
-      hideEmptyState,
-      isVirtualList,
-      VirtualList: VirtualList$1,
-      value,
-      isMulti,
-      getGroupHeaderLabel,
-      items: filteredItems,
-      itemHeight,
-      getOptionLabel,
-      listPlacement,
-      parent: container,
-      listAutoWidth,
-      listOffset
-    };
-    ariaSelection = value ? handleAriaSelection() : "";
-    ariaContext = handleAriaContent();
-    $$rendered = `
-
-<div class="${[
-      "selectContainer " + escape(containerClasses) + " svelte-17l1npl",
-      (hasError ? "hasError" : "") + " " + (isMulti ? "multiSelect" : "") + " " + (isDisabled ? "disabled" : "") + " " + (isFocused ? "focused" : "")
-    ].join(" ").trim()}"${add_attribute("style", containerStyles, 0)}${add_attribute("this", container, 0)}><span aria-live="${"polite"}" aria-atomic="${"false"}" aria-relevant="${"additions text"}" class="${"a11yText svelte-17l1npl"}">${isFocused ? `<span id="${"aria-selection"}">${escape(ariaSelection)}</span>
-            <span id="${"aria-context"}">${escape(ariaContext)}</span>` : ``}</span>
-
-    ${Icon ? `${validate_component(Icon || missing_component, "svelte:component").$$render($$result, Object_1.assign(iconProps), {}, {})}` : ``}
-
-    ${showMultiSelect ? `${validate_component(MultiSelection$1 || missing_component, "svelte:component").$$render($$result, {
-      value,
-      getSelectionLabel,
-      activeValue,
-      isDisabled,
-      multiFullItemClearable
-    }, {}, {})}` : ``}
-
-    <input${spread([
-      { readonly: !isSearchable || null },
-      escape_object(_inputAttributes),
-      {
-        placeholder: escape_attribute_value(placeholderText)
-      },
-      {
-        style: escape_attribute_value(inputStyles)
-      },
-      { disabled: isDisabled || null }
-    ], { classes: "svelte-17l1npl" })}${add_attribute("this", input, 0)}${add_attribute("value", filterText, 0)}>
-
-    ${!isMulti && showSelectedItem ? `<div class="${"selectedItem svelte-17l1npl"}">${validate_component(Selection$1 || missing_component, "svelte:component").$$render($$result, { item: value, getSelectionLabel }, {}, {})}</div>` : ``}
-
-    ${showClearIcon ? `<div class="${"clearSelect svelte-17l1npl"}" aria-hidden="${"true"}">${validate_component(ClearIcon$1 || missing_component, "svelte:component").$$render($$result, {}, {}, {})}</div>` : ``}
-
-    ${!showClearIcon && (showIndicator || showChevron && !value || !isSearchable && !isDisabled && !isWaiting && (showSelectedItem && !isClearable || !showSelectedItem)) ? `<div class="${"indicator svelte-17l1npl"}" aria-hidden="${"true"}">${indicatorSvg ? `<!-- HTML_TAG_START -->${indicatorSvg}<!-- HTML_TAG_END -->` : `<svg width="${"100%"}" height="${"100%"}" viewBox="${"0 0 20 20"}" focusable="${"false"}" aria-hidden="${"true"}" class="${"svelte-17l1npl"}"><path d="${"M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747\n          3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0\n          1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502\n          0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0\n          0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"}"></path></svg>`}</div>` : ``}
-
-    ${isWaiting ? `<div class="${"spinner svelte-17l1npl"}"><svg class="${"spinner_icon svelte-17l1npl"}" viewBox="${"25 25 50 50"}"><circle class="${"spinner_path svelte-17l1npl"}" cx="${"50"}" cy="${"50"}" r="${"20"}" fill="${"none"}" stroke="${"currentColor"}" stroke-width="${"5"}" stroke-miterlimit="${"10"}"></circle></svg></div>` : ``}
-
-    ${listOpen ? `${validate_component(List$1 || missing_component, "svelte:component").$$render($$result, Object_1.assign(listProps, { hoverItemIndex }), {
-      hoverItemIndex: ($$value) => {
-        hoverItemIndex = $$value;
-        $$settled = false;
-      }
-    }, {})}` : ``}
-
-    ${!isMulti || isMulti && !showMultiSelect ? `<input${add_attribute("name", inputAttributes.name, 0)} type="${"hidden"}"${add_attribute("value", value ? getSelectionLabel(value) : null, 0)} class="${"svelte-17l1npl"}">` : ``}
-
-    ${isMulti && showMultiSelect ? `${each(value, (item) => {
-      return `<input${add_attribute("name", inputAttributes.name, 0)} type="${"hidden"}"${add_attribute("value", item ? getSelectionLabel(item) : null, 0)} class="${"svelte-17l1npl"}">`;
-    })}` : ``}</div>`;
-  } while (!$$settled);
-  return $$rendered;
-});
-var Select_svelte_svelte_type_style_lang = "";
-const css$1 = {
-  code: ".selectbox.svelte-lfed90{box-sizing:border-box;margin:0;border:0}.selectbox.svelte-lfed90{--border:2px solid #206095;--borderRadius:0;--listBorderRadius:0;--itemFirstBorderRadius:0;--multiItemBorderRadius:0;--padding:0 8px;--multiSelectPadding:0 8px;--clearSelectBottom:auto;--clearSelectRight:8px;--clearSelectTop:auto;--clearSelectWidth:24px;--clearSelectColor:#206095;--borderHoverColor:#206095;--borderFocusColor:#206095;--inputColor:#206095;--itemColor:#206095;--placeholderColor:#206095;--itemIsActiveBG:#206095;--itemHoverBG:#3875d7;--itemHoverColor:white;--clearSelectColor:white;--clearSelectFocusColor:white;--clearSelectHoverColor:white;--indicatorColor:white;--multiItemActiveColor:white;--multiClearFill:white;--multiClearBG:none;--multiClearHoverBG:none;--multiItemBG:grey;--multiItemActiveBG:grey;--spinnerColor:rgba(255,255,255,0)}.selectbox, .selectbox input, .selectbox .item, .selectbox svg{cursor:pointer !important}.selectbox input:focus{cursor:default !important}.selectbox > .selectContainer{box-shadow:inset -40px 0px #206095}.selectbox.multi-selected > .selectContainer{box-shadow:none !important}.selectbox.focused > .selectContainer{outline:4px solid orange}.selectbox.selected > .selectContainer{background-color:#206095 !important}.selectbox.selected .selectedItem{color:white !important;font-weight:bold}.selectbox .selectedItem .group{display:none}.selectbox .item > .group{font-size:smaller;opacity:0.7}.selectbox .selectContainer > .multiSelectItem{color:white !important;font-weight:bold}.selectbox .selectContainer > .multiSelectItem:nth-of-type(1){background-color:var(--firstItem) !important}.selectbox .selectContainer > .multiSelectItem:nth-of-type(2){background-color:var(--secondItem) !important}.selectbox .selectContainer > .multiSelectItem:nth-of-type(3){background-color:var(--thirdItem) !important}.selectbox .selectContainer > .multiSelectItem:nth-of-type(4){background-color:var(--fourthItem) !important}.selectbox .indicator svg{fill:white}.selectbox .clearSelect{height:24px}.selectbox .indicator{width:20px;height:20px}.selectbox .multiSelectItem .group{display:none}",
-  map: null
-};
-const Select_1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let noOptionsMessage;
-  let itemFilter;
-  const searchIcon = `<svg viewBox="0 0 20 20" fill-rule="evenodd"><path d="M0,8a8,8,0,1,0,16,0a8,8,0,1,0,-16,0ZM3,8a5,5,0,1,0,10,0a5,5,0,1,0,-10,0Z"/><path d="M18,20L20,18L14,12L12,14Z"/></svg>`;
-  const chevronIcon = `<svg viewBox="0 0 20 20"><path d="M1,6L19,6L10,15Z"/></svg>`;
-  createEventDispatcher();
-  let { id = "" } = $$props;
-  let { mode = "default" } = $$props;
-  let { items: items2 } = $$props;
-  let { placeholder = "Select one..." } = $$props;
-  let { value = null } = $$props;
-  let { filterText = "" } = $$props;
-  let { isSearchable = true } = $$props;
-  let { autoClear = false } = $$props;
-  let { idKey = "value" } = $$props;
-  let { labelKey = "label" } = $$props;
-  let { groupKey = null } = $$props;
-  let { groupItems = false } = $$props;
-  let { loadOptions = void 0 } = $$props;
-  let { fontSize = "1rem" } = $$props;
-  let { height = 42 } = $$props;
-  let { isMulti = false } = $$props;
-  let { maxSelected = 4 } = $$props;
-  let { colors = ["#206095", "#a8bd3a", "#871a5b", "#27a0cc"] } = $$props;
-  const getOptionLabel = groupKey && !groupItems ? (option) => `${option[labelKey]} <span class="group">${option[groupKey]}</span>` : (option) => option[labelKey];
-  let { getSelectionLabel = (option) => {
-    if (option)
-      return getOptionLabel(option);
-    else
-      return null;
-  } } = $$props;
-  const groupBy = groupItems && groupKey ? (item) => item[groupKey] : void 0;
-  const indicatorSvg = mode == "search" ? searchIcon : chevronIcon;
-  const containerStyles = `--inputFontSize: ${fontSize}; --groupTitleFontSize: ${fontSize}; --height: ${height}px; font-size: ${fontSize};`;
-  const ariaValues = (values) => `${values}, selected.`;
-  const ariaListOpen = (label, count) => `You are currently focused on ${label}. There are ${count} results available.`;
-  const ariaFocused = () => `Select is focused, type to refine list, press down to open the menu.`;
-  let isFocused;
-  let listOpen;
-  let isWaiting;
-  let handleClear;
-  if ($$props.id === void 0 && $$bindings.id && id !== void 0)
-    $$bindings.id(id);
-  if ($$props.mode === void 0 && $$bindings.mode && mode !== void 0)
-    $$bindings.mode(mode);
-  if ($$props.items === void 0 && $$bindings.items && items2 !== void 0)
-    $$bindings.items(items2);
-  if ($$props.placeholder === void 0 && $$bindings.placeholder && placeholder !== void 0)
-    $$bindings.placeholder(placeholder);
-  if ($$props.value === void 0 && $$bindings.value && value !== void 0)
-    $$bindings.value(value);
-  if ($$props.filterText === void 0 && $$bindings.filterText && filterText !== void 0)
-    $$bindings.filterText(filterText);
-  if ($$props.isSearchable === void 0 && $$bindings.isSearchable && isSearchable !== void 0)
-    $$bindings.isSearchable(isSearchable);
-  if ($$props.autoClear === void 0 && $$bindings.autoClear && autoClear !== void 0)
-    $$bindings.autoClear(autoClear);
-  if ($$props.idKey === void 0 && $$bindings.idKey && idKey !== void 0)
-    $$bindings.idKey(idKey);
-  if ($$props.labelKey === void 0 && $$bindings.labelKey && labelKey !== void 0)
-    $$bindings.labelKey(labelKey);
-  if ($$props.groupKey === void 0 && $$bindings.groupKey && groupKey !== void 0)
-    $$bindings.groupKey(groupKey);
-  if ($$props.groupItems === void 0 && $$bindings.groupItems && groupItems !== void 0)
-    $$bindings.groupItems(groupItems);
-  if ($$props.loadOptions === void 0 && $$bindings.loadOptions && loadOptions !== void 0)
-    $$bindings.loadOptions(loadOptions);
-  if ($$props.fontSize === void 0 && $$bindings.fontSize && fontSize !== void 0)
-    $$bindings.fontSize(fontSize);
-  if ($$props.height === void 0 && $$bindings.height && height !== void 0)
-    $$bindings.height(height);
-  if ($$props.isMulti === void 0 && $$bindings.isMulti && isMulti !== void 0)
-    $$bindings.isMulti(isMulti);
-  if ($$props.maxSelected === void 0 && $$bindings.maxSelected && maxSelected !== void 0)
-    $$bindings.maxSelected(maxSelected);
-  if ($$props.colors === void 0 && $$bindings.colors && colors !== void 0)
-    $$bindings.colors(colors);
-  if ($$props.getSelectionLabel === void 0 && $$bindings.getSelectionLabel && getSelectionLabel !== void 0)
-    $$bindings.getSelectionLabel(getSelectionLabel);
-  $$result.css.add(css$1);
-  let $$settled;
-  let $$rendered;
-  do {
-    $$settled = true;
-    noOptionsMessage = isWaiting ? "Loading..." : mode == "search" && filterText < 3 ? "Enter 3 or more characters for suggestions" : `No results match ${filterText}`;
-    itemFilter = Array.isArray(value) && value.length >= maxSelected || mode == "search" && filterText.length < 3 ? (label, filterText2, option) => false : (label, filterText2, option) => `${label}`.split("<")[0].toLowerCase().slice(0, filterText2.length) == filterText2.toLowerCase();
-    $$rendered = `<div class="${[
-      "selectbox svelte-lfed90",
-      (value && isMulti ? "multi-selected" : "") + " " + (isFocused ? "focused" : "") + " " + (value && !listOpen && !isMulti ? "selected" : "")
-    ].join(" ").trim()}">${validate_component(Select, "Select").$$render($$result, {
-      id,
-      items: items2,
-      placeholder,
-      isMulti,
-      isSearchable,
-      groupBy,
-      loadOptions,
-      getSelectionLabel,
-      getOptionLabel,
-      itemFilter,
-      ariaValues,
-      ariaListOpen,
-      ariaFocused,
-      noOptionsMessage,
-      indicatorSvg,
-      containerStyles,
-      optionIdentifier: idKey,
-      showIndicator: true,
-      isClearable: !isMulti,
-      isFocused,
-      value,
-      listOpen,
-      filterText,
-      isWaiting,
-      handleClear
-    }, {
-      isFocused: ($$value) => {
-        isFocused = $$value;
-        $$settled = false;
-      },
-      value: ($$value) => {
-        value = $$value;
-        $$settled = false;
-      },
-      listOpen: ($$value) => {
-        listOpen = $$value;
-        $$settled = false;
-      },
-      filterText: ($$value) => {
-        filterText = $$value;
-        $$settled = false;
-      },
-      isWaiting: ($$value) => {
-        isWaiting = $$value;
-        $$settled = false;
-      },
-      handleClear: ($$value) => {
-        handleClear = $$value;
-        $$settled = false;
-      }
-    }, {})}
-</div>`;
-  } while (!$$settled);
-  return $$rendered;
+    animation: updateStep(animation.section.actions["data-id"]),
+    all_data,
+    selected
+  }, {}, {})}</svg>` : ``}
+<div class="${"tooltip svelte-12dbwcg"}" style="${"opacity:0"}"></div></div>` : ``}`;
 });
 var items = [
   {
@@ -12736,17 +11520,9232 @@ var items = [
     region: "Yorkshire and The Humber"
   }
 ];
+var neighbours = {
+  "E06000001": [
+    [
+      "E06000004",
+      "E06000047",
+      "E06000003"
+    ],
+    "E06000002",
+    "E06000005",
+    "E08000024",
+    "E07000168",
+    "E06000057",
+    "E07000166",
+    "E07000164",
+    "E07000167",
+    "E08000037",
+    "E08000023",
+    "E08000022",
+    "E08000021",
+    "E07000165",
+    "E06000011",
+    "E07000163",
+    "E07000030"
+  ],
+  "E06000002": [
+    [
+      "E06000004",
+      "E06000003",
+      "E07000164"
+    ],
+    "E06000001",
+    "E06000047",
+    "E07000168",
+    "E07000167",
+    "E06000005",
+    "E07000166",
+    "E08000024",
+    "E06000057",
+    "E07000165",
+    "E06000011",
+    "E08000037",
+    "E08000023",
+    "E07000163",
+    "E08000022",
+    "E08000021",
+    "E06000014"
+  ],
+  "E06000003": [
+    [
+      "E07000168",
+      "E06000002",
+      "E07000164",
+      "E06000004",
+      "E06000001"
+    ],
+    "E06000047",
+    "E07000167",
+    "E06000005",
+    "E07000166",
+    "E07000165",
+    "E08000024",
+    "E06000057",
+    "E06000011",
+    "E08000023",
+    "E08000037",
+    "E08000022",
+    "E06000014",
+    "E08000021",
+    "E07000163"
+  ],
+  "E06000004": [
+    [
+      "E07000164",
+      "E06000001",
+      "E06000005",
+      "E06000002",
+      "E06000047",
+      "E06000003"
+    ],
+    "E07000166",
+    "E07000167",
+    "E07000168",
+    "E06000057",
+    "E08000024",
+    "E07000165",
+    "E08000037",
+    "E08000023",
+    "E06000011",
+    "E08000021",
+    "E07000163",
+    "E08000022",
+    "E06000014"
+  ],
+  "E06000005": [
+    [
+      "E06000047",
+      "E07000166",
+      "E06000004",
+      "E07000164"
+    ],
+    "E06000001",
+    "E06000002",
+    "E06000003",
+    "E07000167",
+    "E06000057",
+    "E08000024",
+    "E07000168",
+    "E07000163",
+    "E08000037",
+    "E07000165",
+    "E08000023",
+    "E07000030",
+    "E08000021",
+    "E08000022",
+    "E07000031"
+  ],
+  "E06000006": [
+    [
+      "E06000050",
+      "E06000007",
+      "E08000011",
+      "E08000013",
+      "E08000012"
+    ],
+    "E06000049",
+    "E08000010",
+    "W06000005",
+    "E08000015",
+    "E08000014",
+    "E07000127",
+    "E08000009",
+    "E08000006",
+    "E08000001",
+    "W06000006",
+    "W06000004",
+    "E08000003",
+    "E07000118",
+    "E08000002"
+  ],
+  "E06000007": [
+    [
+      "E08000013",
+      "E06000006",
+      "E06000049",
+      "E08000010",
+      "E08000009",
+      "E06000050",
+      "E08000006"
+    ],
+    "E07000127",
+    "E08000011",
+    "E08000001",
+    "E08000002",
+    "E08000003",
+    "E08000012",
+    "E08000014",
+    "E07000118",
+    "E08000007",
+    "E08000015",
+    "E08000005",
+    "W06000005"
+  ],
+  "E06000008": [
+    [
+      "E07000118",
+      "E08000001",
+      "E07000120",
+      "E07000124",
+      "E07000125",
+      "E08000002",
+      "E07000126"
+    ],
+    "E07000117",
+    "E08000010",
+    "E07000123",
+    "E08000005",
+    "E07000122",
+    "E07000127",
+    "E08000006",
+    "E07000128",
+    "E07000163",
+    "E08000003",
+    "E08000013",
+    "E08000004"
+  ],
+  "E06000009": [
+    [
+      "E07000119",
+      "E07000128"
+    ],
+    "E07000127",
+    "E07000126",
+    "E07000121",
+    "E08000014",
+    "E07000118",
+    "E07000123",
+    "E07000027",
+    "E07000124",
+    "E07000031",
+    "E08000010",
+    "E07000163",
+    "E06000008",
+    "E08000001",
+    "E08000013",
+    "E08000011",
+    "E07000120",
+    "E08000012"
+  ],
+  "E06000010": [
+    [
+      "E06000011"
+    ],
+    "E06000013",
+    "E06000012",
+    "E07000142",
+    "E07000137",
+    "E07000167",
+    "E08000017",
+    "E07000171",
+    "E06000014",
+    "E07000169",
+    "E07000168",
+    "E07000164",
+    "E07000139",
+    "E08000036",
+    "E07000165",
+    "E07000138",
+    "E08000018",
+    "E07000175",
+    "E08000035"
+  ],
+  "E06000011": [
+    [
+      "E07000167",
+      "E07000169",
+      "E06000013",
+      "E06000010",
+      "E07000168",
+      "E06000014",
+      "E08000017"
+    ],
+    "E06000012",
+    "E07000164",
+    "E07000142",
+    "E07000137",
+    "E07000171",
+    "E07000165",
+    "E08000036",
+    "E08000035",
+    "E08000018",
+    "E08000016",
+    "E07000138",
+    "E07000175"
+  ],
+  "E06000012": [
+    [
+      "E07000142",
+      "E07000137",
+      "E06000013"
+    ],
+    "E06000011",
+    "E06000010",
+    "E07000139",
+    "E07000138",
+    "E07000171",
+    "E07000175",
+    "E08000017",
+    "E07000136",
+    "E07000169",
+    "E07000167",
+    "E07000141",
+    "E06000014",
+    "E07000140",
+    "E07000146",
+    "E08000018",
+    "E07000168"
+  ],
+  "E06000013": [
+    [
+      "E07000142",
+      "E06000011",
+      "E08000017",
+      "E07000171",
+      "E06000012"
+    ],
+    "E06000010",
+    "E07000137",
+    "E07000169",
+    "E08000018",
+    "E07000175",
+    "E07000138",
+    "E06000014",
+    "E07000139",
+    "E08000036",
+    "E07000167",
+    "E08000016",
+    "E08000035",
+    "E07000033",
+    "E08000019"
+  ],
+  "E06000014": [
+    [
+      "E07000169",
+      "E07000167",
+      "E07000164",
+      "E06000011",
+      "E07000165"
+    ],
+    "E08000035",
+    "E07000168",
+    "E08000036",
+    "E06000013",
+    "E08000017",
+    "E07000166",
+    "E08000032",
+    "E08000034",
+    "E08000016",
+    "E07000142",
+    "E06000010",
+    "E08000033",
+    "E08000018",
+    "E07000163"
+  ],
+  "E06000015": [
+    [
+      "E07000039",
+      "E07000036",
+      "E07000032"
+    ],
+    "E07000035",
+    "E07000172",
+    "E07000134",
+    "E07000130",
+    "E07000170",
+    "E07000194",
+    "E06000018",
+    "E07000173",
+    "E07000193",
+    "E07000176",
+    "E07000033",
+    "E07000175",
+    "E07000198",
+    "E07000038",
+    "E07000132",
+    "E07000218"
+  ],
+  "E06000016": [
+    [
+      "E07000130",
+      "E07000129",
+      "E07000135",
+      "E07000131"
+    ],
+    "E07000133",
+    "E07000134",
+    "E07000132",
+    "E07000220",
+    "E07000039",
+    "E06000061",
+    "E07000176",
+    "E07000219",
+    "E07000141",
+    "E06000062",
+    "E07000218",
+    "E06000017",
+    "E07000036",
+    "E08000026",
+    "E06000018"
+  ],
+  "E06000017": [
+    [
+      "E07000141",
+      "E06000061",
+      "E07000133",
+      "E07000131"
+    ],
+    "E06000031",
+    "E07000011",
+    "E07000176",
+    "E07000130",
+    "E06000062",
+    "E07000140",
+    "E07000139",
+    "E07000135",
+    "E06000016",
+    "E07000129",
+    "E07000010",
+    "E07000175",
+    "E07000136",
+    "E07000132",
+    "E06000055"
+  ],
+  "E06000018": [
+    [
+      "E07000172",
+      "E07000176",
+      "E07000173",
+      "E07000170"
+    ],
+    "E07000175",
+    "E07000036",
+    "E07000133",
+    "E07000039",
+    "E07000032",
+    "E07000134",
+    "E07000033",
+    "E06000015",
+    "E07000038",
+    "E07000174",
+    "E07000130",
+    "E07000035",
+    "E07000171",
+    "E07000141",
+    "E07000132"
+  ],
+  "E06000019": [
+    [
+      "E07000235",
+      "W06000023",
+      "E07000080",
+      "E06000051",
+      "W06000021"
+    ],
+    "E07000083",
+    "E07000079",
+    "E07000082",
+    "E07000239",
+    "E07000237",
+    "E07000238",
+    "W06000020",
+    "E07000081",
+    "W06000019",
+    "W06000018",
+    "E07000234",
+    "E07000078",
+    "W06000016",
+    "E07000196"
+  ],
+  "E06000020": [
+    [
+      "E06000051",
+      "E07000197",
+      "E07000196"
+    ],
+    "E07000195",
+    "E08000031",
+    "W06000006",
+    "E08000027",
+    "E07000198",
+    "E08000030",
+    "E06000021",
+    "E06000050",
+    "E07000192",
+    "E06000049",
+    "E07000193",
+    "E07000239",
+    "E08000028",
+    "E08000025",
+    "W06000023",
+    "E07000194"
+  ],
+  "E06000021": [
+    [
+      "E07000198",
+      "E07000195",
+      "E07000197"
+    ],
+    "E06000051",
+    "E07000193",
+    "E06000050",
+    "E06000049",
+    "E07000037",
+    "E06000020",
+    "E07000035",
+    "E07000194",
+    "E07000196",
+    "E07000192",
+    "E07000039",
+    "E08000007",
+    "E08000003",
+    "E06000007",
+    "E08000009",
+    "E07000032"
+  ],
+  "E06000022": [
+    [
+      "E07000187",
+      "E06000024",
+      "E06000025",
+      "E06000054",
+      "E06000023"
+    ],
+    "E07000188",
+    "W06000021",
+    "E07000189",
+    "E07000082",
+    "E07000079",
+    "W06000022",
+    "E07000080",
+    "E07000246",
+    "W06000015",
+    "W06000020",
+    "E06000030",
+    "E06000059",
+    "W06000018",
+    "W06000014"
+  ],
+  "E06000023": [
+    [
+      "E06000024",
+      "E06000025",
+      "E06000022",
+      "W06000021",
+      "W06000015"
+    ],
+    "W06000022",
+    "E07000188",
+    "E07000187",
+    "E07000080",
+    "W06000020",
+    "E07000082",
+    "W06000018",
+    "E07000246",
+    "W06000014",
+    "W06000016",
+    "E07000079",
+    "W06000019",
+    "W06000023",
+    "E06000054"
+  ],
+  "E06000024": [
+    [
+      "E06000023",
+      "E06000022",
+      "E07000188",
+      "E07000187"
+    ],
+    "E06000025",
+    "W06000022",
+    "W06000021",
+    "E07000246",
+    "W06000015",
+    "E07000080",
+    "W06000014",
+    "W06000018",
+    "W06000020",
+    "E07000082",
+    "W06000016",
+    "E07000189",
+    "E06000059",
+    "W06000019",
+    "E07000079"
+  ],
+  "E06000025": [
+    [
+      "E07000082",
+      "E06000023",
+      "E06000054",
+      "E06000022",
+      "E07000080",
+      "W06000021",
+      "E07000079"
+    ],
+    "E06000024",
+    "W06000022",
+    "E07000188",
+    "E07000187",
+    "E07000081",
+    "E07000083",
+    "E06000019",
+    "W06000020",
+    "W06000023",
+    "W06000018",
+    "E07000078",
+    "W06000015"
+  ],
+  "E06000026": [
+    [
+      "E07000044",
+      "E06000052"
+    ],
+    "E07000047",
+    "E07000045",
+    "E07000046",
+    "E06000027",
+    "E07000042",
+    "E07000040",
+    "E07000041",
+    "E07000043",
+    "E07000246",
+    "E06000059",
+    "E07000189",
+    "E07000188",
+    "W06000014",
+    "E07000187",
+    "W06000015",
+    "W06000013",
+    "E06000024"
+  ],
+  "E06000027": [
+    [
+      "E07000044",
+      "E07000045"
+    ],
+    "E07000047",
+    "E07000040",
+    "E07000041",
+    "E07000046",
+    "E06000026",
+    "E07000042",
+    "E06000059",
+    "E07000043",
+    "E07000189",
+    "E07000246",
+    "E07000188",
+    "E06000052",
+    "E07000187",
+    "E06000024",
+    "E06000054",
+    "E06000023",
+    "W06000014"
+  ],
+  "E06000030": [
+    [
+      "E06000054",
+      "E07000180",
+      "E07000079"
+    ],
+    "E06000037",
+    "E07000181",
+    "E07000082",
+    "E07000093",
+    "E07000083",
+    "E07000177",
+    "E07000084",
+    "E07000179",
+    "E07000178",
+    "E07000080",
+    "E07000078",
+    "E06000025",
+    "E07000081",
+    "E06000022",
+    "E06000060",
+    "E07000187"
+  ],
+  "E06000031": [
+    [
+      "E07000141",
+      "E07000011",
+      "E07000010",
+      "E07000140",
+      "E06000061"
+    ],
+    "E06000017",
+    "E07000009",
+    "E07000133",
+    "E07000136",
+    "E07000012",
+    "E07000139",
+    "E06000055",
+    "E07000131",
+    "E07000146",
+    "E06000062",
+    "E07000176",
+    "E07000245",
+    "E07000137",
+    "E07000008"
+  ],
+  "E06000032": [
+    [
+      "E06000056",
+      "E07000099"
+    ],
+    "E07000096",
+    "E07000240",
+    "E07000241",
+    "E07000243",
+    "E06000042",
+    "E07000098",
+    "E07000102",
+    "E07000012",
+    "E07000242",
+    "E06000060",
+    "E06000062",
+    "E07000103",
+    "E06000055",
+    "E07000095",
+    "E09000003",
+    "E09000010",
+    "E09000015"
+  ],
+  "E06000033": [
+    [
+      "E07000075",
+      "E07000069"
+    ],
+    "E06000035",
+    "E07000070",
+    "E07000066",
+    "E06000034",
+    "E07000074",
+    "E07000113",
+    "E07000109",
+    "E07000068",
+    "E07000106",
+    "E07000110",
+    "E07000115",
+    "E07000067",
+    "E07000071",
+    "E07000107",
+    "E07000072",
+    "E09000016",
+    "E07000076"
+  ],
+  "E06000034": [
+    [
+      "E09000016",
+      "E07000066",
+      "E07000109",
+      "E06000035",
+      "E07000107",
+      "E07000068",
+      "E07000069",
+      "E09000004"
+    ],
+    "E07000111",
+    "E07000072",
+    "E07000075",
+    "E07000070",
+    "E09000002",
+    "E09000026",
+    "E09000006",
+    "E07000113",
+    "E09000011",
+    "E06000033",
+    "E07000110"
+  ],
+  "E06000035": [
+    [
+      "E07000113",
+      "E07000109",
+      "E07000115",
+      "E07000069",
+      "E06000034",
+      "E07000110"
+    ],
+    "E07000075",
+    "E06000033",
+    "E07000066",
+    "E07000111",
+    "E07000107",
+    "E07000105",
+    "E09000016",
+    "E07000068",
+    "E07000074",
+    "E07000070",
+    "E09000004",
+    "E07000072",
+    "E07000116"
+  ],
+  "E06000036": [
+    [
+      "E06000040",
+      "E06000041",
+      "E07000214",
+      "E07000089"
+    ],
+    "E07000209",
+    "E06000039",
+    "E07000217",
+    "E07000212",
+    "E07000092",
+    "E07000179",
+    "E06000038",
+    "E07000213",
+    "E07000084",
+    "E09000017",
+    "E07000207",
+    "E06000037",
+    "E09000018",
+    "E07000216",
+    "E06000060"
+  ],
+  "E06000037": [
+    [
+      "E07000084",
+      "E07000180",
+      "E06000054",
+      "E07000179",
+      "E06000038",
+      "E06000041",
+      "E07000093"
+    ],
+    "E06000060",
+    "E06000030",
+    "E07000089",
+    "E07000079",
+    "E07000181",
+    "E07000085",
+    "E07000178",
+    "E07000094",
+    "E06000040",
+    "E06000036",
+    "E07000214",
+    "E07000092"
+  ],
+  "E06000038": [
+    [
+      "E07000179",
+      "E06000041",
+      "E06000037"
+    ],
+    "E07000084",
+    "E07000089",
+    "E06000036",
+    "E06000060",
+    "E06000040",
+    "E07000214",
+    "E07000180",
+    "E07000092",
+    "E07000209",
+    "E06000039",
+    "E07000216",
+    "E07000212",
+    "E07000093",
+    "E07000217",
+    "E07000085",
+    "E07000094"
+  ],
+  "E06000039": [
+    [
+      "E06000060",
+      "E06000040",
+      "E09000017",
+      "E07000213"
+    ],
+    "E06000036",
+    "E07000212",
+    "E09000018",
+    "E07000102",
+    "E09000009",
+    "E07000207",
+    "E07000214",
+    "E09000027",
+    "E09000015",
+    "E06000041",
+    "E09000005",
+    "E07000103",
+    "E07000217",
+    "E07000098",
+    "E09000021"
+  ],
+  "E06000040": [
+    [
+      "E06000036",
+      "E06000060",
+      "E06000041",
+      "E06000039",
+      "E07000212",
+      "E07000214",
+      "E07000213"
+    ],
+    "E07000179",
+    "E09000017",
+    "E07000089",
+    "E07000217",
+    "E06000038",
+    "E09000018",
+    "E07000102",
+    "E07000207",
+    "E07000209",
+    "E07000092",
+    "E09000009",
+    "E09000027"
+  ],
+  "E06000041": [
+    [
+      "E06000040",
+      "E07000179",
+      "E07000089",
+      "E06000038",
+      "E06000036",
+      "E06000037",
+      "E06000060",
+      "E07000084"
+    ],
+    "E07000214",
+    "E07000092",
+    "E07000209",
+    "E06000039",
+    "E07000212",
+    "E07000217",
+    "E07000216",
+    "E07000180",
+    "E07000213",
+    "E07000085",
+    "E09000017"
+  ],
+  "E06000042": [
+    [
+      "E06000062",
+      "E06000060",
+      "E06000056",
+      "E06000055",
+      "E06000061"
+    ],
+    "E07000011",
+    "E07000099",
+    "E06000032",
+    "E07000177",
+    "E07000096",
+    "E07000179",
+    "E07000240",
+    "E07000131",
+    "E07000012",
+    "E07000220",
+    "E07000221",
+    "E07000243",
+    "E07000242",
+    "E07000181"
+  ],
+  "E06000043": [
+    [
+      "E07000063",
+      "E07000228",
+      "E07000223",
+      "E07000227"
+    ],
+    "E07000065",
+    "E07000229",
+    "E07000224",
+    "E07000061",
+    "E07000116",
+    "E07000226",
+    "E07000225",
+    "E07000210",
+    "E07000216",
+    "E07000064",
+    "E07000215",
+    "E07000111",
+    "E07000211",
+    "E07000209",
+    "E07000085"
+  ],
+  "E06000044": [
+    [
+      "E07000090",
+      "E07000088",
+      "E07000087",
+      "E07000094"
+    ],
+    "E06000046",
+    "E07000085",
+    "E07000086",
+    "E07000225",
+    "E06000045",
+    "E07000093",
+    "E07000091",
+    "E07000224",
+    "E06000054",
+    "E07000216",
+    "E07000084",
+    "E07000227",
+    "E07000089",
+    "E06000058",
+    "E07000229"
+  ],
+  "E06000045": [
+    [
+      "E07000086",
+      "E07000093",
+      "E07000091"
+    ],
+    "E07000087",
+    "E06000054",
+    "E07000094",
+    "E07000088",
+    "E06000044",
+    "E07000085",
+    "E06000046",
+    "E06000058",
+    "E07000090",
+    "E07000084",
+    "E06000059",
+    "E07000225",
+    "E07000089",
+    "E07000216",
+    "E07000224",
+    "E06000037"
+  ],
+  "E06000046": [
+    null,
+    "E07000091",
+    "E06000044",
+    "E07000088",
+    "E07000087",
+    "E07000086",
+    "E07000090",
+    "E06000045",
+    "E07000094",
+    "E07000085",
+    "E07000225",
+    "E06000058",
+    "E07000093",
+    "E06000054",
+    "E07000224",
+    "E06000059",
+    "E07000084",
+    "E07000216",
+    "E07000227",
+    "E07000089"
+  ],
+  "E06000047": [
+    [
+      "E06000057",
+      "E07000166",
+      "E07000030",
+      "E06000005",
+      "E08000024",
+      "E08000037",
+      "E06000001",
+      "E06000004"
+    ],
+    "E07000164",
+    "E08000021",
+    "E08000023",
+    "E08000022",
+    "E07000031",
+    "E06000002",
+    "E06000003",
+    "E07000028",
+    "E07000167",
+    "E07000163"
+  ],
+  "E06000049": [
+    [
+      "E06000050",
+      "E06000051",
+      "E08000007",
+      "E07000198",
+      "E07000195",
+      "E07000037",
+      "E08000009",
+      "E06000007",
+      "E08000003"
+    ],
+    "E06000021",
+    "E06000006",
+    "E07000197",
+    "E07000193",
+    "W06000006",
+    "E08000006",
+    "E08000013",
+    "E08000008",
+    "E08000010",
+    "E08000011"
+  ],
+  "E06000050": [
+    [
+      "E06000049",
+      "W06000006",
+      "W06000005",
+      "E06000006",
+      "E08000015",
+      "E08000012",
+      "E06000007",
+      "E06000051"
+    ],
+    "E08000011",
+    "E07000195",
+    "E08000013",
+    "E08000009",
+    "E08000010",
+    "E08000014",
+    "E08000006",
+    "W06000004",
+    "E07000127",
+    "E08000003",
+    "E07000197",
+    "E07000198"
+  ],
+  "E06000051": [
+    [
+      "W06000023",
+      "E06000020",
+      "E06000019",
+      "W06000006",
+      "E07000196",
+      "E06000049",
+      "E07000195",
+      "E07000235",
+      "E07000239",
+      "E07000197",
+      "E06000050"
+    ],
+    "W06000004",
+    "E08000031",
+    "E08000027",
+    "E07000238",
+    "E08000028",
+    "E07000234",
+    "E08000030",
+    "E07000192",
+    "E07000198"
+  ],
+  "E06000052": [
+    [
+      "E07000046",
+      "E07000047",
+      "E06000026",
+      "E07000044"
+    ],
+    "E07000043",
+    "E07000045",
+    "E07000042",
+    "E06000027",
+    "E07000246",
+    "E07000040",
+    "E07000041",
+    "W06000011",
+    "E07000189",
+    "E06000059",
+    "E07000188",
+    "W06000009",
+    "W06000014",
+    "W06000010"
+  ],
+  "E06000053": [
+    null,
+    "E06000052",
+    "E07000046",
+    "E07000047",
+    "E07000044",
+    "E06000026",
+    "E07000043",
+    "E07000045",
+    "W06000009",
+    "E07000042",
+    "E06000027",
+    "E07000246",
+    "E07000040",
+    "E07000041",
+    "W06000010",
+    "W06000011",
+    "W06000012",
+    "W06000014",
+    "W06000013",
+    "E06000059"
+  ],
+  "E06000054": [
+    [
+      "E07000093",
+      "E07000079",
+      "E06000030",
+      "E06000059",
+      "E07000091",
+      "E06000037",
+      "E07000187",
+      "E06000025",
+      "E06000022",
+      "E07000189",
+      "E07000180"
+    ],
+    "E07000082",
+    "E07000084",
+    "E07000094",
+    "E06000023",
+    "E07000080",
+    "E06000024",
+    "E07000181",
+    "E07000179"
+  ],
+  "E06000055": [
+    [
+      "E06000056",
+      "E07000011",
+      "E06000061",
+      "E06000042"
+    ],
+    "E06000060",
+    "E07000099",
+    "E07000012",
+    "E07000131",
+    "E06000062",
+    "E07000010",
+    "E06000032",
+    "E07000242",
+    "E07000243",
+    "E07000009",
+    "E06000031",
+    "E07000096",
+    "E06000017",
+    "E07000008",
+    "E07000240"
+  ],
+  "E06000056": [
+    [
+      "E07000099",
+      "E06000055",
+      "E06000032",
+      "E06000060",
+      "E06000042",
+      "E07000096",
+      "E07000012",
+      "E07000240",
+      "E07000011"
+    ],
+    "E07000243",
+    "E07000242",
+    "E06000062",
+    "E07000241",
+    "E06000061",
+    "E07000102",
+    "E07000098",
+    "E07000095",
+    "E07000103",
+    "E07000072"
+  ],
+  "E06000057": [
+    [
+      "S12000026",
+      "E07000028",
+      "E06000047",
+      "E07000030",
+      "E08000021",
+      "E08000022",
+      "E08000037"
+    ],
+    "E08000023",
+    "E08000024",
+    "E07000026",
+    "E06000001",
+    "E06000005",
+    "E06000004",
+    "E07000166",
+    "E07000031",
+    "E07000164"
+  ],
+  "E06000058": [
+    [
+      "E06000059",
+      "E07000091"
+    ],
+    "E06000046",
+    "E07000093",
+    "E06000045",
+    "E07000189",
+    "E07000094",
+    "E06000054",
+    "E07000086",
+    "E07000087",
+    "E07000187",
+    "E07000088",
+    "E06000044",
+    "E07000084",
+    "E07000085",
+    "E07000090",
+    "E06000022",
+    "E07000225",
+    "E07000188"
+  ],
+  "E06000059": [
+    [
+      "E07000189",
+      "E06000058",
+      "E07000091",
+      "E06000054",
+      "E07000040"
+    ],
+    "E07000187",
+    "E07000188",
+    "E07000246",
+    "E07000093",
+    "E06000022",
+    "E06000046",
+    "E06000024",
+    "E07000042",
+    "E06000045",
+    "E06000023",
+    "E07000094",
+    "E07000086",
+    "E06000025",
+    "E07000084"
+  ],
+  "E06000060": [
+    [
+      "E07000179",
+      "E07000096",
+      "E07000177",
+      "E06000062",
+      "E06000056",
+      "E06000040",
+      "E06000039",
+      "E06000042",
+      "E07000102",
+      "E09000017",
+      "E06000041"
+    ],
+    "E06000032",
+    "E07000178",
+    "E07000240",
+    "E07000180",
+    "E06000037",
+    "E07000103",
+    "E07000099",
+    "E07000098",
+    "E06000055"
+  ],
+  "E06000061": [
+    [
+      "E07000011",
+      "E06000062",
+      "E06000017",
+      "E07000131",
+      "E06000055",
+      "E06000031",
+      "E06000042",
+      "E07000141"
+    ],
+    "E07000133",
+    "E06000056",
+    "E07000012",
+    "E07000010",
+    "E07000129",
+    "E07000135",
+    "E07000140",
+    "E06000016",
+    "E07000130",
+    "E07000220",
+    "E06000060"
+  ],
+  "E06000062": [
+    [
+      "E07000177",
+      "E06000061",
+      "E07000131",
+      "E06000042",
+      "E06000060",
+      "E07000220",
+      "E07000221"
+    ],
+    "E06000056",
+    "E07000222",
+    "E06000055",
+    "E07000129",
+    "E07000181",
+    "E08000026",
+    "E07000132",
+    "E07000219",
+    "E06000017",
+    "E07000135",
+    "E07000218",
+    "E07000011"
+  ],
+  "E07000008": [
+    [
+      "E07000012"
+    ],
+    "E07000011",
+    "E07000009",
+    "E07000077",
+    "E07000099",
+    "E06000056",
+    "E07000067",
+    "E07000245",
+    "E07000010",
+    "E07000242",
+    "E07000146",
+    "E06000055",
+    "E06000061",
+    "E07000143",
+    "E07000200",
+    "E07000243",
+    "E06000031",
+    "E07000070",
+    "E07000241"
+  ],
+  "E07000009": [
+    [
+      "E07000245",
+      "E07000012",
+      "E07000010",
+      "E07000146",
+      "E07000011"
+    ],
+    "E07000008",
+    "E07000143",
+    "E06000031",
+    "E07000200",
+    "E07000067",
+    "E07000077",
+    "E07000099",
+    "E07000140",
+    "E06000056",
+    "E07000203",
+    "E06000055",
+    "E07000242",
+    "E07000149",
+    "E06000061"
+  ],
+  "E07000010": [
+    [
+      "E07000146",
+      "E07000011",
+      "E07000009",
+      "E06000031",
+      "E07000140"
+    ],
+    "E07000141",
+    "E07000245",
+    "E06000061",
+    "E07000012",
+    "E06000017",
+    "E06000055",
+    "E07000136",
+    "E07000008",
+    "E07000143",
+    "E07000139",
+    "E06000056",
+    "E07000147",
+    "E07000133",
+    "E07000077"
+  ],
+  "E07000011": [
+    [
+      "E07000012",
+      "E06000061",
+      "E06000055",
+      "E07000010",
+      "E06000031",
+      "E06000056",
+      "E07000009"
+    ],
+    "E06000017",
+    "E07000008",
+    "E07000146",
+    "E07000141",
+    "E07000140",
+    "E06000042",
+    "E07000131",
+    "E06000062",
+    "E07000099",
+    "E06000060",
+    "E07000077",
+    "E07000245"
+  ],
+  "E07000012": [
+    [
+      "E07000011",
+      "E07000009",
+      "E07000077",
+      "E07000008",
+      "E07000099",
+      "E06000056",
+      "E07000245",
+      "E07000067"
+    ],
+    "E07000242",
+    "E06000055",
+    "E07000010",
+    "E06000061",
+    "E07000146",
+    "E07000243",
+    "E07000241",
+    "E07000200",
+    "E06000031",
+    "E07000143",
+    "E07000070"
+  ],
+  "E07000026": [
+    [
+      "E07000030",
+      "E07000029",
+      "E07000028",
+      "E07000031",
+      "S12000006"
+    ],
+    "E06000057",
+    "E07000027",
+    "E07000121",
+    "E07000166",
+    "E06000047",
+    "E07000163",
+    "E07000128",
+    "E07000124",
+    "E08000037",
+    "E06000009"
+  ],
+  "E07000027": [
+    [
+      "E07000031",
+      "E07000029"
+    ],
+    "E07000128",
+    "E07000121",
+    "E07000030",
+    "E06000009",
+    "E07000119",
+    "E07000123",
+    "E07000124",
+    "E07000026",
+    "E07000127",
+    "E07000126",
+    "E07000163",
+    "E08000014",
+    "E07000118",
+    "E07000166",
+    "E06000008",
+    "E07000120",
+    "E07000122"
+  ],
+  "E07000028": [
+    [
+      "E06000057",
+      "S12000006",
+      "E07000030",
+      "E07000026",
+      "S12000026"
+    ],
+    "E06000047",
+    "E07000029",
+    "E07000166",
+    "E07000031",
+    "E08000037",
+    "E08000021",
+    "E08000022",
+    "E08000024",
+    "E06000005",
+    "E07000163",
+    "E08000023",
+    "E07000121"
+  ],
+  "E07000029": [
+    [
+      "E07000031",
+      "E07000026",
+      "E07000027"
+    ],
+    "E07000030",
+    "E07000121",
+    "E07000028",
+    "E07000128",
+    "E07000163",
+    "E06000057",
+    "E07000124",
+    "E06000009",
+    "E07000119",
+    "E06000047",
+    "E07000166",
+    "E07000123",
+    "E07000126",
+    "E07000127"
+  ],
+  "E07000030": [
+    [
+      "E07000031",
+      "E07000026",
+      "E06000047",
+      "E07000028",
+      "E06000057",
+      "E07000166"
+    ],
+    "E07000029",
+    "E07000163",
+    "E07000121",
+    "E07000027",
+    "E07000165",
+    "E08000037",
+    "E06000005",
+    "E07000164",
+    "E07000124",
+    "E08000021",
+    "E07000128"
+  ],
+  "E07000031": [
+    [
+      "E07000030",
+      "E07000121",
+      "E07000029",
+      "E07000027",
+      "E07000026",
+      "E07000163",
+      "E07000166"
+    ],
+    "E07000124",
+    "E06000047",
+    "E07000128",
+    "E07000123",
+    "E06000009",
+    "E07000119",
+    "E07000122",
+    "E07000165",
+    "E06000057",
+    "E07000126",
+    "E07000028"
+  ],
+  "E07000032": [
+    [
+      "E07000035",
+      "E07000036",
+      "E07000038",
+      "E06000015",
+      "E07000039",
+      "E07000172",
+      "E07000033",
+      "E07000170"
+    ],
+    "E07000193",
+    "E07000176",
+    "E06000018",
+    "E07000174",
+    "E07000173",
+    "E07000134",
+    "E07000034",
+    "E07000175",
+    "E07000037",
+    "E07000198",
+    "E07000130"
+  ],
+  "E07000033": [
+    [
+      "E07000038",
+      "E07000170",
+      "E07000171",
+      "E07000174",
+      "E08000018",
+      "E07000034",
+      "E07000032"
+    ],
+    "E07000175",
+    "E08000019",
+    "E07000173",
+    "E07000172",
+    "E07000176",
+    "E08000017",
+    "E06000018",
+    "E07000036",
+    "E07000035",
+    "E08000016",
+    "E07000037",
+    "E07000193"
+  ],
+  "E07000034": [
+    [
+      "E07000038",
+      "E07000033"
+    ],
+    "E08000018",
+    "E08000019",
+    "E07000174",
+    "E07000170",
+    "E07000171",
+    "E07000175",
+    "E07000032",
+    "E07000035",
+    "E08000017",
+    "E07000037",
+    "E07000173",
+    "E08000016",
+    "E07000172",
+    "E07000198",
+    "E07000176",
+    "E07000193",
+    "E06000018"
+  ],
+  "E07000035": [
+    [
+      "E07000037",
+      "E07000032",
+      "E07000193",
+      "E07000038",
+      "E07000198",
+      "E07000039",
+      "E08000019"
+    ],
+    "E07000034",
+    "E07000036",
+    "E06000015",
+    "E07000033",
+    "E07000197",
+    "E07000170",
+    "E08000018",
+    "E07000172",
+    "E06000021",
+    "E06000049",
+    "E07000134",
+    "E07000174",
+    "E08000007"
+  ],
+  "E07000036": [
+    [
+      "E07000032",
+      "E07000172",
+      "E06000015",
+      "E07000039",
+      "E07000134",
+      "E07000176"
+    ],
+    "E07000173",
+    "E07000170",
+    "E06000018",
+    "E07000175",
+    "E07000130",
+    "E07000035",
+    "E07000033",
+    "E07000038",
+    "E07000193",
+    "E07000133",
+    "E07000174",
+    "E07000194",
+    "E07000132"
+  ],
+  "E07000037": [
+    [
+      "E07000035",
+      "E06000049",
+      "E08000019",
+      "E08000008",
+      "E08000007",
+      "E07000198",
+      "E08000034",
+      "E08000004",
+      "E08000016"
+    ],
+    "E08000003",
+    "E07000038",
+    "E08000005",
+    "E08000006",
+    "E08000009",
+    "E07000034",
+    "E08000036",
+    "E08000002",
+    "E08000033",
+    "E08000018"
+  ],
+  "E07000038": [
+    [
+      "E07000034",
+      "E08000019",
+      "E07000035",
+      "E07000033",
+      "E07000032",
+      "E08000018"
+    ],
+    "E07000170",
+    "E07000174",
+    "E07000037",
+    "E07000171",
+    "E07000175",
+    "E07000173",
+    "E07000172",
+    "E08000017",
+    "E07000198",
+    "E07000193",
+    "E07000176",
+    "E07000036",
+    "E08000016"
+  ],
+  "E07000039": [
+    [
+      "E07000134",
+      "E07000193",
+      "E06000015",
+      "E07000035",
+      "E07000194",
+      "E07000036",
+      "E07000032"
+    ],
+    "E07000132",
+    "E07000130",
+    "E07000172",
+    "E07000218",
+    "E07000198",
+    "E07000176",
+    "E07000199",
+    "E06000018",
+    "E07000131",
+    "E07000129",
+    "E07000170",
+    "E07000192"
+  ],
+  "E07000040": [
+    [
+      "E07000042",
+      "E06000059",
+      "E07000041",
+      "E07000189",
+      "E07000246",
+      "E07000045"
+    ],
+    "E07000043",
+    "E07000188",
+    "E07000044",
+    "E06000027",
+    "E07000047",
+    "E07000187",
+    "E07000046",
+    "E06000024",
+    "E06000054",
+    "E06000023",
+    "E06000026",
+    "E06000022",
+    "W06000015"
+  ],
+  "E07000041": [
+    [
+      "E07000040",
+      "E07000045"
+    ],
+    "E07000043",
+    "E07000044",
+    "E06000027",
+    "E07000047",
+    "E07000042",
+    "E07000046",
+    "E07000246",
+    "E07000189",
+    "E07000188",
+    "E06000059",
+    "E06000026",
+    "E06000052",
+    "E07000187",
+    "E06000024",
+    "W06000015",
+    "W06000014",
+    "E06000023"
+  ],
+  "E07000042": [
+    [
+      "E07000040",
+      "E07000246",
+      "E07000043",
+      "E07000047",
+      "E07000045",
+      "E07000046"
+    ],
+    "E07000041",
+    "E07000188",
+    "E07000189",
+    "E07000044",
+    "E06000027",
+    "E06000052",
+    "E06000059",
+    "E07000187",
+    "E06000024",
+    "W06000014",
+    "W06000015",
+    "E06000026",
+    "E06000023"
+  ],
+  "E07000043": [
+    [
+      "E07000046",
+      "E07000042",
+      "E07000246"
+    ],
+    "E06000052",
+    "E07000047",
+    "E07000040",
+    "E07000045",
+    "W06000014",
+    "E07000041",
+    "W06000013",
+    "E07000188",
+    "W06000012",
+    "W06000011",
+    "W06000015",
+    "W06000016",
+    "E07000189",
+    "E06000024",
+    "E07000044",
+    "E06000023"
+  ],
+  "E07000044": [
+    [
+      "E07000045",
+      "E07000047",
+      "E06000026",
+      "E06000027",
+      "E06000052"
+    ],
+    "E07000046",
+    "E07000040",
+    "E07000042",
+    "E07000041",
+    "E07000246",
+    "E07000043",
+    "E06000059",
+    "E07000189",
+    "E07000188",
+    "E07000187",
+    "W06000014",
+    "E06000024",
+    "W06000015",
+    "E06000023"
+  ],
+  "E07000045": [
+    [
+      "E07000044",
+      "E07000047",
+      "E07000042",
+      "E07000041",
+      "E06000027",
+      "E07000040"
+    ],
+    "E07000046",
+    "E07000043",
+    "E06000026",
+    "E07000246",
+    "E07000189",
+    "E06000059",
+    "E06000052",
+    "E07000188",
+    "E07000187",
+    "E06000024",
+    "W06000014",
+    "W06000015",
+    "E06000023"
+  ],
+  "E07000046": [
+    [
+      "E07000047",
+      "E06000052",
+      "E07000043",
+      "E07000042"
+    ],
+    "E07000246",
+    "E07000045",
+    "E07000044",
+    "E07000040",
+    "E06000026",
+    "E07000041",
+    "E06000027",
+    "W06000014",
+    "W06000011",
+    "W06000013",
+    "W06000012",
+    "E07000188",
+    "W06000009",
+    "E07000189",
+    "W06000016"
+  ],
+  "E07000047": [
+    [
+      "E07000046",
+      "E06000052",
+      "E07000044",
+      "E07000042",
+      "E07000045"
+    ],
+    "E06000026",
+    "E07000043",
+    "E07000246",
+    "E07000040",
+    "E06000027",
+    "E07000041",
+    "E07000189",
+    "E07000188",
+    "E06000059",
+    "W06000014",
+    "W06000013",
+    "W06000015",
+    "E07000187",
+    "E06000024"
+  ],
+  "E07000061": [
+    [
+      "E07000065"
+    ],
+    "E07000064",
+    "E07000063",
+    "E07000062",
+    "E07000228",
+    "E06000043",
+    "E07000116",
+    "E07000105",
+    "E07000227",
+    "E07000223",
+    "E07000112",
+    "E07000111",
+    "E07000110",
+    "E07000229",
+    "E07000215",
+    "E07000226",
+    "E07000224",
+    "E07000115",
+    "E07000210"
+  ],
+  "E07000062": [
+    [
+      "E07000064"
+    ],
+    "E07000105",
+    "E07000112",
+    "E07000116",
+    "E07000065",
+    "E07000061",
+    "E07000063",
+    "E07000110",
+    "E07000111",
+    "E07000115",
+    "E07000228",
+    "E07000113",
+    "E06000043",
+    "E07000106",
+    "E07000215",
+    "E07000108",
+    "E07000109",
+    "E06000035",
+    "E07000227"
+  ],
+  "E07000063": [
+    [
+      "E07000065",
+      "E07000228",
+      "E06000043"
+    ],
+    "E07000227",
+    "E07000223",
+    "E07000061",
+    "E07000116",
+    "E07000064",
+    "E07000229",
+    "E07000226",
+    "E07000224",
+    "E07000111",
+    "E07000210",
+    "E07000215",
+    "E07000211",
+    "E07000062",
+    "E07000115",
+    "E07000216",
+    "E07000225"
+  ],
+  "E07000064": [
+    [
+      "E07000065",
+      "E07000116",
+      "E07000062",
+      "E07000105",
+      "E07000112"
+    ],
+    "E07000061",
+    "E07000110",
+    "E07000111",
+    "E07000115",
+    "E07000063",
+    "E07000113",
+    "E07000228",
+    "E07000106",
+    "E07000215",
+    "E06000043",
+    "E07000109",
+    "E06000035",
+    "E07000108",
+    "E09000006"
+  ],
+  "E07000065": [
+    [
+      "E07000064",
+      "E07000063",
+      "E07000116",
+      "E07000228",
+      "E07000061",
+      "E07000111",
+      "E07000215"
+    ],
+    "E06000043",
+    "E07000110",
+    "E07000062",
+    "E07000115",
+    "E07000226",
+    "E07000105",
+    "E07000227",
+    "E07000210",
+    "E07000223",
+    "E07000211",
+    "E09000006",
+    "E09000008"
+  ],
+  "E07000066": [
+    [
+      "E07000070",
+      "E06000034",
+      "E07000068",
+      "E07000069",
+      "E07000075"
+    ],
+    "E07000072",
+    "E07000074",
+    "E09000016",
+    "E06000035",
+    "E06000033",
+    "E07000109",
+    "E07000107",
+    "E07000113",
+    "E09000004",
+    "E07000067",
+    "E09000002",
+    "E07000077",
+    "E07000111",
+    "E09000026"
+  ],
+  "E07000067": [
+    [
+      "E07000077",
+      "E07000071",
+      "E07000245",
+      "E07000200",
+      "E07000074",
+      "E07000070",
+      "E07000012"
+    ],
+    "E07000203",
+    "E07000072",
+    "E07000076",
+    "E07000009",
+    "E07000242",
+    "E07000068",
+    "E07000075",
+    "E07000066",
+    "E07000073",
+    "E07000202",
+    "E07000008",
+    "E07000099"
+  ],
+  "E07000068": [
+    [
+      "E07000072",
+      "E09000016",
+      "E07000070",
+      "E07000066",
+      "E06000034"
+    ],
+    "E09000002",
+    "E09000026",
+    "E07000242",
+    "E07000067",
+    "E07000073",
+    "E09000004",
+    "E07000069",
+    "E06000035",
+    "E07000075",
+    "E09000025",
+    "E07000107",
+    "E07000109",
+    "E09000011",
+    "E07000074"
+  ],
+  "E07000069": [
+    [
+      "E06000033",
+      "E06000035",
+      "E07000066",
+      "E07000075",
+      "E06000034"
+    ],
+    "E07000074",
+    "E07000070",
+    "E07000113",
+    "E07000109",
+    "E07000068",
+    "E07000107",
+    "E07000072",
+    "E09000016",
+    "E07000115",
+    "E07000111",
+    "E09000004",
+    "E07000110",
+    "E07000077",
+    "E07000071"
+  ],
+  "E07000070": [
+    [
+      "E07000077",
+      "E07000066",
+      "E07000067",
+      "E07000074",
+      "E07000068",
+      "E07000075",
+      "E07000072"
+    ],
+    "E09000016",
+    "E07000069",
+    "E07000071",
+    "E06000034",
+    "E06000033",
+    "E07000242",
+    "E07000073",
+    "E09000002",
+    "E09000026",
+    "E06000035",
+    "E07000200",
+    "E07000109"
+  ],
+  "E07000071": [
+    [
+      "E07000067",
+      "E07000076",
+      "E07000200",
+      "E07000074"
+    ],
+    "E07000070",
+    "E07000245",
+    "E07000244",
+    "E07000203",
+    "E07000202",
+    "E07000077",
+    "E07000075",
+    "E07000066",
+    "E06000033",
+    "E07000069",
+    "E07000012",
+    "E07000068",
+    "E07000072",
+    "E07000009",
+    "E06000034"
+  ],
+  "E07000072": [
+    [
+      "E07000068",
+      "E07000077",
+      "E07000073",
+      "E09000026",
+      "E07000095",
+      "E07000242",
+      "E09000016",
+      "E07000070",
+      "E09000031",
+      "E09000010"
+    ],
+    "E09000002",
+    "E07000099",
+    "E06000034",
+    "E09000025",
+    "E07000067",
+    "E07000241",
+    "E07000066",
+    "E09000014",
+    "E09000012"
+  ],
+  "E07000073": [
+    [
+      "E07000072",
+      "E07000242"
+    ],
+    "E07000077",
+    "E07000095",
+    "E07000068",
+    "E07000099",
+    "E09000010",
+    "E09000031",
+    "E09000016",
+    "E09000026",
+    "E07000241",
+    "E06000056",
+    "E07000070",
+    "E07000067",
+    "E09000002",
+    "E07000098",
+    "E09000003",
+    "E09000014",
+    "E07000243"
+  ],
+  "E07000074": [
+    [
+      "E07000071",
+      "E07000075",
+      "E07000067",
+      "E07000070"
+    ],
+    "E07000076",
+    "E07000069",
+    "E06000033",
+    "E07000066",
+    "E07000077",
+    "E06000034",
+    "E06000035",
+    "E07000068",
+    "E07000200",
+    "E07000113",
+    "E09000016",
+    "E07000072",
+    "E07000109",
+    "E07000244",
+    "E07000106"
+  ],
+  "E07000075": [
+    [
+      "E07000074",
+      "E06000033",
+      "E07000070",
+      "E07000069",
+      "E07000066"
+    ],
+    "E06000035",
+    "E07000067",
+    "E06000034",
+    "E07000071",
+    "E07000076",
+    "E07000113",
+    "E07000106",
+    "E07000109",
+    "E07000068",
+    "E07000077",
+    "E07000110",
+    "E07000115",
+    "E07000072",
+    "E09000016"
+  ],
+  "E07000076": [
+    [
+      "E07000071",
+      "E07000200"
+    ],
+    "E07000244",
+    "E07000074",
+    "E07000202",
+    "E07000245",
+    "E07000075",
+    "E07000067",
+    "E07000203",
+    "E07000070",
+    "E06000033",
+    "E07000069",
+    "E07000077",
+    "E07000066",
+    "E07000113",
+    "E06000035",
+    "E07000012",
+    "E07000068",
+    "E06000034"
+  ],
+  "E07000077": [
+    [
+      "E07000012",
+      "E07000067",
+      "E07000070",
+      "E07000242",
+      "E07000072",
+      "E07000099"
+    ],
+    "E07000245",
+    "E07000073",
+    "E07000200",
+    "E07000074",
+    "E07000095",
+    "E07000068",
+    "E07000008",
+    "E07000241",
+    "E07000071",
+    "E07000243",
+    "E07000011",
+    "E07000009",
+    "E07000066"
+  ],
+  "E07000078": [
+    [
+      "E07000083",
+      "E07000079"
+    ],
+    "E07000082",
+    "E07000081",
+    "E07000235",
+    "E07000221",
+    "E07000238",
+    "E07000080",
+    "E06000019",
+    "E07000181",
+    "E06000025",
+    "E06000030",
+    "E07000180",
+    "E06000054",
+    "E07000237",
+    "E07000236",
+    "E07000177",
+    "E07000222",
+    "W06000021"
+  ],
+  "E07000079": [
+    [
+      "E06000054",
+      "E07000082",
+      "E07000083",
+      "E07000181",
+      "E07000221",
+      "E07000238",
+      "E06000030",
+      "E07000078",
+      "E06000025",
+      "E07000180"
+    ],
+    "E07000081",
+    "E07000235",
+    "E07000177",
+    "E06000019",
+    "E07000080",
+    "E06000037",
+    "E07000178",
+    "E07000179",
+    "E07000237"
+  ],
+  "E07000080": [
+    [
+      "E06000019",
+      "E07000082",
+      "W06000021",
+      "E07000083",
+      "E06000025",
+      "E07000235"
+    ],
+    "E07000081",
+    "E06000054",
+    "E07000238",
+    "E07000078",
+    "W06000022",
+    "E07000079",
+    "E06000023",
+    "W06000020",
+    "W06000023",
+    "E06000024",
+    "E07000221",
+    "W06000018",
+    "E07000237"
+  ],
+  "E07000081": [
+    [
+      "E07000083",
+      "E07000082"
+    ],
+    "E07000078",
+    "E06000019",
+    "E07000235",
+    "E07000238",
+    "E06000054",
+    "E06000025",
+    "E07000080",
+    "E07000221",
+    "E07000079",
+    "E06000030",
+    "W06000021",
+    "E07000237",
+    "E07000180",
+    "E06000023",
+    "E07000181",
+    "W06000022",
+    "E06000024"
+  ],
+  "E07000082": [
+    [
+      "E07000079",
+      "E07000080",
+      "E06000025",
+      "E07000081",
+      "E07000083"
+    ],
+    "E06000054",
+    "E06000019",
+    "E07000078",
+    "E06000023",
+    "E07000235",
+    "E07000238",
+    "E06000030",
+    "E06000024",
+    "E06000022",
+    "W06000021",
+    "E07000221",
+    "W06000022",
+    "E07000181",
+    "E07000180"
+  ],
+  "E07000083": [
+    [
+      "E07000079",
+      "E07000238",
+      "E07000078",
+      "E07000080",
+      "E07000235",
+      "E07000081",
+      "E07000082"
+    ],
+    "E07000221",
+    "E06000019",
+    "E07000237",
+    "E07000181",
+    "E06000025",
+    "E07000180",
+    "E06000030",
+    "E07000236",
+    "E06000054",
+    "E07000222",
+    "E07000234",
+    "W06000021"
+  ],
+  "E07000084": [
+    [
+      "E06000037",
+      "E07000093",
+      "E07000094",
+      "E07000089",
+      "E07000085",
+      "E06000041"
+    ],
+    "E06000038",
+    "E07000179",
+    "E06000060",
+    "E07000216",
+    "E06000036",
+    "E07000225",
+    "E06000040",
+    "E07000180",
+    "E07000092",
+    "E07000214",
+    "E07000091",
+    "E07000086",
+    "E07000209"
+  ],
+  "E07000085": [
+    [
+      "E07000094",
+      "E07000225",
+      "E07000216",
+      "E07000084",
+      "E07000089",
+      "E07000090"
+    ],
+    "E07000209",
+    "E07000092",
+    "E07000087",
+    "E07000086",
+    "E07000224",
+    "E06000044",
+    "E07000091",
+    "E07000214",
+    "E07000227",
+    "E07000088",
+    "E06000037",
+    "E06000045",
+    "E07000093"
+  ],
+  "E07000086": [
+    [
+      "E07000094",
+      "E06000045",
+      "E07000093",
+      "E07000087",
+      "E07000091"
+    ],
+    "E06000054",
+    "E07000088",
+    "E06000044",
+    "E07000085",
+    "E07000090",
+    "E07000084",
+    "E06000046",
+    "E06000058",
+    "E07000225",
+    "E07000089",
+    "E06000059",
+    "E07000216",
+    "E07000224",
+    "E06000037"
+  ],
+  "E07000087": [
+    [
+      "E07000094",
+      "E06000044",
+      "E07000086",
+      "E07000088"
+    ],
+    "E07000085",
+    "E06000045",
+    "E07000093",
+    "E07000090",
+    "E06000046",
+    "E07000091",
+    "E06000054",
+    "E07000225",
+    "E06000058",
+    "E07000224",
+    "E07000084",
+    "E07000216",
+    "E07000089",
+    "E07000227",
+    "E06000059"
+  ],
+  "E07000088": [
+    [
+      "E06000044",
+      "E07000087"
+    ],
+    "E07000085",
+    "E06000046",
+    "E07000086",
+    "E07000090",
+    "E07000094",
+    "E06000045",
+    "E07000091",
+    "E07000225",
+    "E07000093",
+    "E06000054",
+    "E07000224",
+    "E07000216",
+    "E06000058",
+    "E07000084",
+    "E07000227",
+    "E07000089",
+    "E07000209"
+  ],
+  "E07000089": [
+    [
+      "E07000084",
+      "E06000041",
+      "E07000085",
+      "E07000092",
+      "E06000036",
+      "E07000216",
+      "E07000214"
+    ],
+    "E06000037",
+    "E06000040",
+    "E07000209",
+    "E07000094",
+    "E06000038",
+    "E07000217",
+    "E07000179",
+    "E07000212",
+    "E07000225",
+    "E06000039",
+    "E07000213",
+    "E07000227"
+  ],
+  "E07000090": [
+    [
+      "E07000085",
+      "E07000225",
+      "E06000044",
+      "E07000094"
+    ],
+    "E07000088",
+    "E07000087",
+    "E06000046",
+    "E07000224",
+    "E07000086",
+    "E06000045",
+    "E07000093",
+    "E07000091",
+    "E07000216",
+    "E07000227",
+    "E07000084",
+    "E06000054",
+    "E07000229",
+    "E07000089",
+    "E07000209"
+  ],
+  "E07000091": [
+    [
+      "E06000059",
+      "E06000054",
+      "E06000058",
+      "E07000093",
+      "E06000045",
+      "E07000086"
+    ],
+    "E06000046",
+    "E07000094",
+    "E07000087",
+    "E07000088",
+    "E06000044",
+    "E07000084",
+    "E07000085",
+    "E07000090",
+    "E07000187",
+    "E07000225",
+    "E07000189",
+    "E06000037",
+    "E07000089"
+  ],
+  "E07000092": [
+    [
+      "E07000089",
+      "E07000209",
+      "E07000214",
+      "E07000216"
+    ],
+    "E07000085",
+    "E06000036",
+    "E07000217",
+    "E06000041",
+    "E07000212",
+    "E06000040",
+    "E06000037",
+    "E06000038",
+    "E07000084",
+    "E07000213",
+    "E07000227",
+    "E07000207",
+    "E07000094",
+    "E07000179",
+    "E06000039"
+  ],
+  "E07000093": [
+    [
+      "E06000054",
+      "E07000094",
+      "E07000084",
+      "E07000091",
+      "E06000045",
+      "E07000086",
+      "E06000037"
+    ],
+    "E06000059",
+    "E07000085",
+    "E07000087",
+    "E07000089",
+    "E06000058",
+    "E06000044",
+    "E07000088",
+    "E07000225",
+    "E07000179",
+    "E06000030",
+    "E07000090",
+    "E06000046"
+  ],
+  "E07000094": [
+    [
+      "E07000085",
+      "E07000093",
+      "E07000086",
+      "E07000084",
+      "E07000087",
+      "E07000090",
+      "E06000044"
+    ],
+    "E07000091",
+    "E06000045",
+    "E07000225",
+    "E06000054",
+    "E07000088",
+    "E07000089",
+    "E07000216",
+    "E06000046",
+    "E07000224",
+    "E07000092",
+    "E07000209",
+    "E06000037"
+  ],
+  "E07000095": [
+    [
+      "E07000242",
+      "E07000072",
+      "E09000010",
+      "E07000241"
+    ],
+    "E07000073",
+    "E07000098",
+    "E09000003",
+    "E09000031",
+    "E07000077",
+    "E06000056",
+    "E09000026",
+    "E09000014",
+    "E07000240",
+    "E07000099",
+    "E07000068",
+    "E09000002",
+    "E09000016",
+    "E09000012",
+    "E09000019"
+  ],
+  "E07000096": [
+    [
+      "E06000060",
+      "E06000056",
+      "E07000240",
+      "E07000102"
+    ],
+    "E06000032",
+    "E07000103",
+    "E07000099",
+    "E07000098",
+    "E09000017",
+    "E09000015",
+    "E09000003",
+    "E07000241",
+    "E06000042",
+    "E06000040",
+    "E07000179",
+    "E07000243",
+    "E09000005",
+    "E06000062",
+    "E07000242",
+    "E09000009"
+  ],
+  "E07000098": [
+    [
+      "E07000240",
+      "E09000003",
+      "E07000241",
+      "E07000103",
+      "E09000015",
+      "E09000010",
+      "E07000102"
+    ],
+    "E09000017",
+    "E07000096",
+    "E07000242",
+    "E09000005",
+    "E09000014",
+    "E07000095",
+    "E09000007",
+    "E09000009",
+    "E09000019",
+    "E09000031",
+    "E09000033",
+    "E09000013"
+  ],
+  "E07000099": [
+    [
+      "E06000056",
+      "E07000242",
+      "E07000012",
+      "E07000241",
+      "E07000243",
+      "E07000240",
+      "E06000032",
+      "E07000077"
+    ],
+    "E06000055",
+    "E07000096",
+    "E07000072",
+    "E07000095",
+    "E06000060",
+    "E07000098",
+    "E07000073",
+    "E07000009",
+    "E07000102",
+    "E06000042",
+    "E07000011"
+  ],
+  "E07000102": [
+    [
+      "E07000103",
+      "E07000096",
+      "E06000060",
+      "E09000017",
+      "E07000240",
+      "E09000015",
+      "E07000098"
+    ],
+    "E06000040",
+    "E09000003",
+    "E09000005",
+    "E09000009",
+    "E07000241",
+    "E06000039",
+    "E09000018",
+    "E09000010",
+    "E07000099",
+    "E09000027",
+    "E09000007",
+    "E09000013"
+  ],
+  "E07000103": [
+    [
+      "E07000102",
+      "E07000098",
+      "E07000240"
+    ],
+    "E07000096",
+    "E09000015",
+    "E09000017",
+    "E09000003",
+    "E09000005",
+    "E07000241",
+    "E09000009",
+    "E06000040",
+    "E09000010",
+    "E06000039",
+    "E09000007",
+    "E07000242",
+    "E09000014",
+    "E09000013",
+    "E07000099",
+    "E09000018"
+  ],
+  "E07000105": [
+    [
+      "E07000112",
+      "E07000116",
+      "E07000110",
+      "E07000113",
+      "E07000064",
+      "E07000106"
+    ],
+    "E07000115",
+    "E06000035",
+    "E07000108",
+    "E07000065",
+    "E07000062",
+    "E07000109",
+    "E07000111",
+    "E07000114",
+    "E06000034",
+    "E06000033",
+    "E07000069",
+    "E07000107",
+    "E07000075"
+  ],
+  "E07000106": [
+    [
+      "E07000108",
+      "E07000113",
+      "E07000112",
+      "E07000105",
+      "E07000114"
+    ],
+    "E07000110",
+    "E07000075",
+    "E06000035",
+    "E07000064",
+    "E06000033",
+    "E07000116",
+    "E07000069",
+    "E07000074",
+    "E07000115",
+    "E06000034",
+    "E07000109",
+    "E07000066",
+    "E07000065",
+    "E07000070"
+  ],
+  "E07000107": [
+    [
+      "E07000111",
+      "E09000004",
+      "E07000109",
+      "E06000034"
+    ],
+    "E09000006",
+    "E07000115",
+    "E09000016",
+    "E09000011",
+    "E09000002",
+    "E06000035",
+    "E09000025",
+    "E07000110",
+    "E07000066",
+    "E09000026",
+    "E09000023",
+    "E07000068",
+    "E07000215",
+    "E09000008",
+    "E09000030"
+  ],
+  "E07000108": [
+    [
+      "E07000106",
+      "E07000112",
+      "E07000114"
+    ],
+    "E07000113",
+    "E07000105",
+    "E07000064",
+    "E07000110",
+    "E07000075",
+    "E06000035",
+    "E06000033",
+    "E07000116",
+    "E07000074",
+    "E07000069",
+    "E07000115",
+    "E07000062",
+    "E07000109",
+    "E06000034",
+    "E07000065",
+    "E07000066"
+  ],
+  "E07000109": [
+    [
+      "E06000035",
+      "E06000034",
+      "E07000107",
+      "E07000115",
+      "E07000111"
+    ],
+    "E07000110",
+    "E09000016",
+    "E09000004",
+    "E07000069",
+    "E07000066",
+    "E07000113",
+    "E07000075",
+    "E09000006",
+    "E07000068",
+    "E09000002",
+    "E09000011",
+    "E06000033",
+    "E07000105",
+    "E07000072"
+  ],
+  "E07000110": [
+    [
+      "E07000116",
+      "E07000113",
+      "E07000115",
+      "E07000105",
+      "E06000035"
+    ],
+    "E07000109",
+    "E07000065",
+    "E07000112",
+    "E07000111",
+    "E07000107",
+    "E06000034",
+    "E07000064",
+    "E07000106",
+    "E09000006",
+    "E07000069",
+    "E06000033",
+    "E07000075",
+    "E09000004",
+    "E09000016"
+  ],
+  "E07000111": [
+    [
+      "E07000115",
+      "E09000006",
+      "E07000107",
+      "E07000215",
+      "E07000116",
+      "E07000065",
+      "E07000109",
+      "E09000004"
+    ],
+    "E09000008",
+    "E07000110",
+    "E06000035",
+    "E09000011",
+    "E07000228",
+    "E09000023",
+    "E06000034",
+    "E09000029",
+    "E09000028",
+    "E07000211",
+    "E09000022"
+  ],
+  "E07000112": [
+    [
+      "E07000105",
+      "E07000108",
+      "E07000106",
+      "E07000064"
+    ],
+    "E07000110",
+    "E07000113",
+    "E07000116",
+    "E07000062",
+    "E07000114",
+    "E06000035",
+    "E07000115",
+    "E07000065",
+    "E07000111",
+    "E07000109",
+    "E07000075",
+    "E06000033",
+    "E07000061",
+    "E07000069",
+    "E06000034"
+  ],
+  "E07000113": [
+    [
+      "E07000110",
+      "E07000105",
+      "E06000035",
+      "E07000106"
+    ],
+    "E07000112",
+    "E06000033",
+    "E07000069",
+    "E07000116",
+    "E07000115",
+    "E06000034",
+    "E07000109",
+    "E07000108",
+    "E07000075",
+    "E07000066",
+    "E07000114",
+    "E07000064",
+    "E07000070",
+    "E07000074",
+    "E07000107"
+  ],
+  "E07000114": [
+    [
+      "E07000108",
+      "E07000106"
+    ],
+    "E07000112",
+    "E07000105",
+    "E07000075",
+    "E07000113",
+    "E07000110",
+    "E06000033",
+    "E07000074",
+    "E06000035",
+    "E07000064",
+    "E07000076",
+    "E07000069",
+    "E07000071",
+    "E07000116",
+    "E06000034",
+    "E07000070",
+    "E07000115",
+    "E07000066"
+  ],
+  "E07000115": [
+    [
+      "E07000111",
+      "E07000110",
+      "E07000116",
+      "E06000035",
+      "E07000109"
+    ],
+    "E07000107",
+    "E09000006",
+    "E07000065",
+    "E07000105",
+    "E09000004",
+    "E07000113",
+    "E07000064",
+    "E06000034",
+    "E07000215",
+    "E09000011",
+    "E09000016",
+    "E09000008",
+    "E07000228",
+    "E09000023"
+  ],
+  "E07000116": [
+    [
+      "E07000065",
+      "E07000110",
+      "E07000105",
+      "E07000064",
+      "E07000115",
+      "E07000111"
+    ],
+    "E07000113",
+    "E07000063",
+    "E07000109",
+    "E06000035",
+    "E07000062",
+    "E07000215",
+    "E07000112",
+    "E09000006",
+    "E07000228",
+    "E07000107",
+    "E07000061",
+    "E09000008",
+    "E09000004"
+  ],
+  "E07000117": [
+    [
+      "E07000122",
+      "E07000125",
+      "E08000033",
+      "E07000120",
+      "E07000124"
+    ],
+    "E06000008",
+    "E08000005",
+    "E08000032",
+    "E08000002",
+    "E08000034",
+    "E08000001",
+    "E08000004",
+    "E07000165",
+    "E07000118",
+    "E07000126",
+    "E07000121",
+    "E08000010",
+    "E07000163",
+    "E07000123"
+  ],
+  "E07000118": [
+    [
+      "E07000126",
+      "E07000127",
+      "E06000008",
+      "E08000001",
+      "E08000010"
+    ],
+    "E07000123",
+    "E07000124",
+    "E07000119",
+    "E07000120",
+    "E08000013",
+    "E08000014",
+    "E07000125",
+    "E08000006",
+    "E08000002",
+    "E07000128",
+    "E08000011",
+    "E06000007",
+    "E07000117",
+    "E07000163"
+  ],
+  "E07000119": [
+    [
+      "E07000128",
+      "E07000127",
+      "E06000009",
+      "E07000123",
+      "E07000126"
+    ],
+    "E07000118",
+    "E08000014",
+    "E07000121",
+    "E07000124",
+    "E08000010",
+    "E06000008",
+    "E07000163",
+    "E08000001",
+    "E08000013",
+    "E07000120",
+    "E08000011",
+    "E07000027",
+    "E07000125",
+    "E08000012"
+  ],
+  "E07000120": [
+    [
+      "E07000124",
+      "E07000125",
+      "E06000008",
+      "E07000117"
+    ],
+    "E07000122",
+    "E07000118",
+    "E08000002",
+    "E07000126",
+    "E08000005",
+    "E08000001",
+    "E07000123",
+    "E07000163",
+    "E08000033",
+    "E07000128",
+    "E08000010",
+    "E07000121",
+    "E07000127",
+    "E08000004",
+    "E08000032"
+  ],
+  "E07000121": [
+    [
+      "E07000031",
+      "E07000128",
+      "E07000163",
+      "E07000124"
+    ],
+    "E07000123",
+    "E07000119",
+    "E07000166",
+    "E07000027",
+    "E06000009",
+    "E07000122",
+    "E07000029",
+    "E07000120",
+    "E06000008",
+    "E07000126",
+    "E07000118",
+    "E07000117",
+    "E07000127",
+    "E07000125",
+    "E07000030"
+  ],
+  "E07000122": [
+    [
+      "E07000124",
+      "E07000117",
+      "E07000163",
+      "E08000033",
+      "E08000032"
+    ],
+    "E07000120",
+    "E07000165",
+    "E07000125",
+    "E06000008",
+    "E08000034",
+    "E07000121",
+    "E08000005",
+    "E07000031",
+    "E08000002",
+    "E07000118",
+    "E07000126",
+    "E08000001",
+    "E08000035",
+    "E08000004"
+  ],
+  "E07000123": [
+    [
+      "E07000128",
+      "E07000126",
+      "E07000124",
+      "E07000119"
+    ],
+    "E07000127",
+    "E06000008",
+    "E07000163",
+    "E07000118",
+    "E07000120",
+    "E08000014",
+    "E08000001",
+    "E06000009",
+    "E07000121",
+    "E07000125",
+    "E08000010",
+    "E07000117",
+    "E07000122",
+    "E08000002",
+    "E08000005"
+  ],
+  "E07000124": [
+    [
+      "E07000163",
+      "E07000122",
+      "E07000121",
+      "E07000123",
+      "E07000120",
+      "E07000128",
+      "E07000126",
+      "E06000008",
+      "E07000117"
+    ],
+    "E07000125",
+    "E07000031",
+    "E07000118",
+    "E08000033",
+    "E07000119",
+    "E07000127",
+    "E08000032",
+    "E08000005",
+    "E08000002",
+    "E07000165"
+  ],
+  "E07000125": [
+    [
+      "E08000005",
+      "E07000117",
+      "E08000002",
+      "E07000120",
+      "E06000008",
+      "E08000033"
+    ],
+    "E08000001",
+    "E07000124",
+    "E08000004",
+    "E07000122",
+    "E08000010",
+    "E08000032",
+    "E08000006",
+    "E08000003",
+    "E07000118",
+    "E07000126",
+    "E08000034",
+    "E08000008",
+    "E07000123"
+  ],
+  "E07000126": [
+    [
+      "E07000118",
+      "E07000123",
+      "E07000124",
+      "E07000127",
+      "E07000119",
+      "E06000008"
+    ],
+    "E08000001",
+    "E08000014",
+    "E07000128",
+    "E08000010",
+    "E07000120",
+    "E07000163",
+    "E06000009",
+    "E07000125",
+    "E08000002",
+    "E08000013",
+    "E07000117",
+    "E08000011",
+    "E08000006"
+  ],
+  "E07000127": [
+    [
+      "E08000014",
+      "E07000118",
+      "E07000119",
+      "E08000010",
+      "E08000013",
+      "E07000126",
+      "E08000011"
+    ],
+    "E08000012",
+    "E07000123",
+    "E08000001",
+    "E08000015",
+    "E06000007",
+    "E06000009",
+    "E06000008",
+    "E07000124",
+    "E06000006",
+    "E06000049",
+    "E07000128",
+    "E08000006"
+  ],
+  "E07000128": [
+    [
+      "E07000121",
+      "E07000119",
+      "E07000123",
+      "E06000009",
+      "E07000124"
+    ],
+    "E07000126",
+    "E07000118",
+    "E07000163",
+    "E07000127",
+    "E08000014",
+    "E06000008",
+    "E07000027",
+    "E07000120",
+    "E07000031",
+    "E08000001",
+    "E07000125",
+    "E08000010",
+    "E07000029",
+    "E07000122"
+  ],
+  "E07000129": [
+    [
+      "E07000132",
+      "E07000131",
+      "E06000016",
+      "E07000135",
+      "E07000220",
+      "E07000130"
+    ],
+    "E07000134",
+    "E07000219",
+    "E06000062",
+    "E07000133",
+    "E07000039",
+    "E08000026",
+    "E07000218",
+    "E07000221",
+    "E06000061",
+    "E07000222",
+    "E07000176",
+    "E07000194",
+    "E08000029"
+  ],
+  "E07000130": [
+    [
+      "E07000176",
+      "E07000134",
+      "E07000133",
+      "E06000016",
+      "E07000132",
+      "E07000131",
+      "E07000129"
+    ],
+    "E07000039",
+    "E07000135",
+    "E07000036",
+    "E06000018",
+    "E07000172",
+    "E06000061",
+    "E06000015",
+    "E07000218",
+    "E06000017",
+    "E07000220",
+    "E07000032",
+    "E07000173"
+  ],
+  "E07000131": [
+    [
+      "E06000062",
+      "E06000061",
+      "E07000129",
+      "E06000017",
+      "E07000133",
+      "E07000220",
+      "E07000130",
+      "E07000135",
+      "E06000016"
+    ],
+    "E07000132",
+    "E07000141",
+    "E07000134",
+    "E07000221",
+    "E07000219",
+    "E07000039",
+    "E08000026",
+    "E07000176",
+    "E07000222",
+    "E07000218"
+  ],
+  "E07000132": [
+    [
+      "E07000129",
+      "E07000134",
+      "E07000218",
+      "E07000130",
+      "E07000220",
+      "E07000219"
+    ],
+    "E07000131",
+    "E07000039",
+    "E06000016",
+    "E07000194",
+    "E06000062",
+    "E07000199",
+    "E07000135",
+    "E08000026",
+    "E08000029",
+    "E07000193",
+    "E07000176",
+    "E08000025",
+    "E07000133"
+  ],
+  "E07000133": [
+    [
+      "E07000176",
+      "E06000017",
+      "E07000141",
+      "E07000130",
+      "E07000131",
+      "E07000175"
+    ],
+    "E07000139",
+    "E06000061",
+    "E06000016",
+    "E06000018",
+    "E07000173",
+    "E07000129",
+    "E07000135",
+    "E07000172",
+    "E07000132",
+    "E07000036",
+    "E06000031",
+    "E07000134",
+    "E07000170"
+  ],
+  "E07000134": [
+    [
+      "E07000039",
+      "E07000132",
+      "E07000130",
+      "E07000176",
+      "E07000036",
+      "E07000218",
+      "E07000194"
+    ],
+    "E07000131",
+    "E07000129",
+    "E06000015",
+    "E07000193",
+    "E07000035",
+    "E06000016",
+    "E07000172",
+    "E06000018",
+    "E07000199",
+    "E07000032",
+    "E07000219",
+    "E07000135"
+  ],
+  "E07000135": [
+    [
+      "E07000129",
+      "E07000131",
+      "E06000016"
+    ],
+    "E07000133",
+    "E07000220",
+    "E07000132",
+    "E07000130",
+    "E07000134",
+    "E06000061",
+    "E07000039",
+    "E06000017",
+    "E06000062",
+    "E07000141",
+    "E07000219",
+    "E07000176",
+    "E07000221",
+    "E08000026",
+    "E07000218",
+    "E07000222"
+  ],
+  "E07000136": [
+    [
+      "E07000137",
+      "E07000140",
+      "E07000139"
+    ],
+    "E07000146",
+    "E07000141",
+    "E07000142",
+    "E07000010",
+    "E06000031",
+    "E06000017",
+    "E07000138",
+    "E07000143",
+    "E06000061",
+    "E07000133",
+    "E07000175",
+    "E07000011",
+    "E07000147",
+    "E06000012",
+    "E07000009",
+    "E07000176"
+  ],
+  "E07000137": [
+    [
+      "E07000142",
+      "E07000136",
+      "E06000012",
+      "E07000139"
+    ],
+    "E07000141",
+    "E06000013",
+    "E07000146",
+    "E07000140",
+    "E07000138",
+    "E06000011",
+    "E07000175",
+    "E07000171",
+    "E07000147",
+    "E06000010",
+    "E07000133",
+    "E07000010",
+    "E07000143",
+    "E07000176",
+    "E08000017"
+  ],
+  "E07000138": [
+    [
+      "E07000139",
+      "E07000142"
+    ],
+    "E07000175",
+    "E07000171",
+    "E07000141",
+    "E07000136",
+    "E07000176",
+    "E07000133",
+    "E08000017",
+    "E06000012",
+    "E07000137",
+    "E07000140",
+    "E07000173",
+    "E06000013",
+    "E07000174",
+    "E08000018",
+    "E07000170",
+    "E07000033",
+    "E06000018"
+  ],
+  "E07000139": [
+    [
+      "E07000141",
+      "E07000175",
+      "E07000142",
+      "E07000138",
+      "E07000136",
+      "E07000137",
+      "E07000140"
+    ],
+    "E07000133",
+    "E07000171",
+    "E07000176",
+    "E06000017",
+    "E07000173",
+    "E06000012",
+    "E07000010",
+    "E07000146",
+    "E06000018",
+    "E07000174",
+    "E07000130",
+    "E06000013"
+  ],
+  "E07000140": [
+    [
+      "E07000136",
+      "E07000141",
+      "E07000146",
+      "E07000010",
+      "E06000031",
+      "E07000139"
+    ],
+    "E07000011",
+    "E06000061",
+    "E06000017",
+    "E07000137",
+    "E07000009",
+    "E07000143",
+    "E07000142",
+    "E07000245",
+    "E07000133",
+    "E07000175",
+    "E07000131",
+    "E07000012",
+    "E07000147"
+  ],
+  "E07000141": [
+    [
+      "E07000139",
+      "E06000017",
+      "E07000140",
+      "E06000031",
+      "E07000133",
+      "E07000175",
+      "E06000061"
+    ],
+    "E07000136",
+    "E07000137",
+    "E07000176",
+    "E07000131",
+    "E07000010",
+    "E07000130",
+    "E07000011",
+    "E07000173",
+    "E07000138",
+    "E06000018",
+    "E06000016",
+    "E07000171"
+  ],
+  "E07000142": [
+    [
+      "E06000013",
+      "E07000137",
+      "E06000012",
+      "E07000171",
+      "E07000139",
+      "E07000138",
+      "E07000175"
+    ],
+    "E08000017",
+    "E06000010",
+    "E07000136",
+    "E07000169",
+    "E07000141",
+    "E08000018",
+    "E07000174",
+    "E07000176",
+    "E06000011",
+    "E07000033",
+    "E07000173",
+    "E07000133"
+  ],
+  "E07000143": [
+    [
+      "E07000149",
+      "E07000146",
+      "E07000245",
+      "E07000147",
+      "E07000144",
+      "E07000203"
+    ],
+    "E07000244",
+    "E07000009",
+    "E07000148",
+    "E07000012",
+    "E07000140",
+    "E07000010",
+    "E07000200",
+    "E07000145",
+    "E07000136",
+    "E07000011",
+    "E07000067",
+    "E07000137",
+    "E07000202"
+  ],
+  "E07000144": [
+    [
+      "E07000147",
+      "E07000148",
+      "E07000149",
+      "E07000145",
+      "E07000143"
+    ],
+    "E07000244",
+    "E07000203",
+    "E07000245",
+    "E07000146",
+    "E07000009",
+    "E07000200",
+    "E07000202",
+    "E07000140",
+    "E07000012",
+    "E07000137",
+    "E07000010",
+    "E07000136",
+    "E07000067",
+    "E07000076"
+  ],
+  "E07000145": [
+    [
+      "E07000144",
+      "E07000147",
+      "E07000244",
+      "E07000149"
+    ],
+    "E07000148",
+    "E07000203",
+    "E07000143",
+    "E07000245",
+    "E07000200",
+    "E07000146",
+    "E07000202",
+    "E07000009",
+    "E07000076",
+    "E07000071",
+    "E07000067",
+    "E07000012",
+    "E07000140",
+    "E07000137",
+    "E07000010"
+  ],
+  "E07000146": [
+    [
+      "E07000143",
+      "E07000010",
+      "E07000147",
+      "E07000140",
+      "E07000009",
+      "E07000245"
+    ],
+    "E07000136",
+    "E07000137",
+    "E07000011",
+    "E07000149",
+    "E06000031",
+    "E07000144",
+    "E07000012",
+    "E07000203",
+    "E07000141",
+    "E07000139",
+    "E07000148",
+    "E07000244",
+    "E06000061"
+  ],
+  "E07000147": [
+    [
+      "E07000144",
+      "E07000146",
+      "E07000143",
+      "E07000145"
+    ],
+    "E07000148",
+    "E07000149",
+    "E07000244",
+    "E07000245",
+    "E07000203",
+    "E07000137",
+    "E07000009",
+    "E07000140",
+    "E07000136",
+    "E07000010",
+    "E07000200",
+    "E07000012",
+    "E07000011",
+    "E06000031",
+    "E07000202"
+  ],
+  "E07000148": [
+    [
+      "E07000144",
+      "E07000149"
+    ],
+    "E07000244",
+    "E07000145",
+    "E07000143",
+    "E07000203",
+    "E07000147",
+    "E07000245",
+    "E07000146",
+    "E07000200",
+    "E07000009",
+    "E07000202",
+    "E07000012",
+    "E07000140",
+    "E07000067",
+    "E07000010",
+    "E07000137",
+    "E07000076",
+    "E07000071"
+  ],
+  "E07000149": [
+    [
+      "E07000143",
+      "E07000244",
+      "E07000148",
+      "E07000144",
+      "E07000203",
+      "E07000145"
+    ],
+    "E07000245",
+    "E07000146",
+    "E07000147",
+    "E07000200",
+    "E07000202",
+    "E07000009",
+    "E07000067",
+    "E07000012",
+    "E07000076",
+    "E07000071",
+    "E07000140",
+    "E07000077",
+    "E07000010"
+  ],
+  "E07000163": [
+    [
+      "E07000165",
+      "E07000124",
+      "E07000166",
+      "E07000121",
+      "E08000032",
+      "E07000122",
+      "E07000031"
+    ],
+    "E08000033",
+    "E07000117",
+    "E08000035",
+    "E07000030",
+    "E07000120",
+    "E07000128",
+    "E07000164",
+    "E07000123",
+    "E06000008",
+    "E07000125",
+    "E08000034",
+    "E07000126"
+  ],
+  "E07000164": [
+    [
+      "E07000167",
+      "E07000165",
+      "E07000166",
+      "E06000004",
+      "E07000168",
+      "E06000014",
+      "E06000005",
+      "E06000003",
+      "E06000002"
+    ],
+    "E06000011",
+    "E06000047",
+    "E07000163",
+    "E06000001",
+    "E08000035",
+    "E07000169",
+    "E08000032",
+    "E07000030",
+    "E06000057",
+    "E08000024"
+  ],
+  "E07000165": [
+    [
+      "E07000164",
+      "E08000035",
+      "E07000163",
+      "E07000166",
+      "E08000032",
+      "E07000169",
+      "E06000014"
+    ],
+    "E07000167",
+    "E08000033",
+    "E07000122",
+    "E08000034",
+    "E06000011",
+    "E07000168",
+    "E08000036",
+    "E07000124",
+    "E07000117",
+    "E06000005",
+    "E06000004",
+    "E07000031"
+  ],
+  "E07000166": [
+    [
+      "E06000047",
+      "E07000164",
+      "E06000005",
+      "E07000163",
+      "E07000165",
+      "E07000030",
+      "E07000031"
+    ],
+    "E06000004",
+    "E07000121",
+    "E07000124",
+    "E07000167",
+    "E06000002",
+    "E08000032",
+    "E06000001",
+    "E07000122",
+    "E08000035",
+    "E06000003",
+    "E08000024",
+    "E06000057"
+  ],
+  "E07000167": [
+    [
+      "E07000168",
+      "E07000164",
+      "E06000011",
+      "E06000014"
+    ],
+    "E07000165",
+    "E07000169",
+    "E06000003",
+    "E06000004",
+    "E06000047",
+    "E06000002",
+    "E07000166",
+    "E08000035",
+    "E06000005",
+    "E06000001",
+    "E06000010",
+    "E06000013",
+    "E08000036",
+    "E08000032",
+    "E08000017"
+  ],
+  "E07000168": [
+    [
+      "E07000167",
+      "E06000003",
+      "E06000011",
+      "E07000164"
+    ],
+    "E06000004",
+    "E06000002",
+    "E07000165",
+    "E06000014",
+    "E06000047",
+    "E06000001",
+    "E06000005",
+    "E07000169",
+    "E07000166",
+    "E06000010",
+    "E08000035",
+    "E08000024",
+    "E06000057",
+    "E06000013",
+    "E08000023"
+  ],
+  "E07000169": [
+    [
+      "E06000011",
+      "E08000035",
+      "E06000014",
+      "E08000036",
+      "E08000017",
+      "E07000165"
+    ],
+    "E06000013",
+    "E08000016",
+    "E07000167",
+    "E07000164",
+    "E07000142",
+    "E08000034",
+    "E08000018",
+    "E07000171",
+    "E08000019",
+    "E08000032",
+    "E07000168",
+    "E08000033",
+    "E07000037"
+  ],
+  "E07000170": [
+    [
+      "E07000033",
+      "E07000173",
+      "E07000172",
+      "E07000174",
+      "E07000032",
+      "E06000018",
+      "E07000175"
+    ],
+    "E07000038",
+    "E07000176",
+    "E07000036",
+    "E07000171",
+    "E07000034",
+    "E06000015",
+    "E07000039",
+    "E07000133",
+    "E07000193",
+    "E07000134",
+    "E08000019",
+    "E08000018"
+  ],
+  "E07000171": [
+    [
+      "E07000175",
+      "E07000142",
+      "E08000017",
+      "E08000018",
+      "E06000013",
+      "E07000033",
+      "E07000174"
+    ],
+    "E07000139",
+    "E07000038",
+    "E07000170",
+    "E07000034",
+    "E07000138",
+    "E08000016",
+    "E08000019",
+    "E07000173",
+    "E06000011",
+    "E08000036",
+    "E07000141",
+    "E07000032"
+  ],
+  "E07000172": [
+    [
+      "E06000018",
+      "E07000036",
+      "E07000170",
+      "E07000032",
+      "E07000176"
+    ],
+    "E07000173",
+    "E07000039",
+    "E07000175",
+    "E06000015",
+    "E07000134",
+    "E07000033",
+    "E07000038",
+    "E07000133",
+    "E07000174",
+    "E07000130",
+    "E07000035",
+    "E07000193",
+    "E07000171",
+    "E07000034"
+  ],
+  "E07000173": [
+    [
+      "E07000175",
+      "E07000170",
+      "E06000018",
+      "E07000176"
+    ],
+    "E07000172",
+    "E07000033",
+    "E07000133",
+    "E07000036",
+    "E07000174",
+    "E07000038",
+    "E07000039",
+    "E07000032",
+    "E07000134",
+    "E06000015",
+    "E07000171",
+    "E07000141",
+    "E07000034",
+    "E07000130",
+    "E07000142"
+  ],
+  "E07000174": [
+    [
+      "E07000175",
+      "E07000033",
+      "E07000171",
+      "E07000170"
+    ],
+    "E07000173",
+    "E07000034",
+    "E07000032",
+    "E07000038",
+    "E07000172",
+    "E08000018",
+    "E07000176",
+    "E06000018",
+    "E08000019",
+    "E07000036",
+    "E07000133",
+    "E07000142",
+    "E06000015",
+    "E07000039",
+    "E07000141"
+  ],
+  "E07000175": [
+    [
+      "E07000171",
+      "E07000139",
+      "E07000173",
+      "E07000176",
+      "E07000174",
+      "E07000141",
+      "E07000142",
+      "E07000133",
+      "E07000170"
+    ],
+    "E06000018",
+    "E07000033",
+    "E07000172",
+    "E07000138",
+    "E08000018",
+    "E07000038",
+    "E07000036",
+    "E07000032",
+    "E07000034",
+    "E08000017"
+  ],
+  "E07000176": [
+    [
+      "E07000133",
+      "E07000130",
+      "E07000175",
+      "E06000018",
+      "E07000173",
+      "E07000134",
+      "E07000036",
+      "E07000172"
+    ],
+    "E07000170",
+    "E07000032",
+    "E07000139",
+    "E07000039",
+    "E06000017",
+    "E07000033",
+    "E06000016",
+    "E07000132",
+    "E07000141",
+    "E06000015",
+    "E07000174"
+  ],
+  "E07000177": [
+    [
+      "E06000062",
+      "E06000060",
+      "E07000181",
+      "E07000221",
+      "E07000179",
+      "E07000178",
+      "E07000180"
+    ],
+    "E06000042",
+    "E07000079",
+    "E07000222",
+    "E06000054",
+    "E07000238",
+    "E07000220",
+    "E06000061",
+    "E06000030",
+    "E07000083",
+    "E07000096",
+    "E06000055",
+    "E06000056"
+  ],
+  "E07000178": [
+    [
+      "E07000179",
+      "E07000180",
+      "E07000177"
+    ],
+    "E07000181",
+    "E06000054",
+    "E07000221",
+    "E06000062",
+    "E06000030",
+    "E06000041",
+    "E06000037",
+    "E06000060",
+    "E06000038",
+    "E07000079",
+    "E06000040",
+    "E06000042",
+    "E07000096",
+    "E06000056",
+    "E07000083",
+    "E06000036"
+  ],
+  "E07000179": [
+    [
+      "E06000060",
+      "E07000180",
+      "E06000037",
+      "E07000178",
+      "E07000177",
+      "E06000038",
+      "E06000041"
+    ],
+    "E07000181",
+    "E06000040",
+    "E07000096",
+    "E06000036",
+    "E07000084",
+    "E06000054",
+    "E07000089",
+    "E06000039",
+    "E06000056",
+    "E07000214",
+    "E07000093",
+    "E07000102"
+  ],
+  "E07000180": [
+    [
+      "E07000179",
+      "E07000181",
+      "E06000037",
+      "E06000030",
+      "E07000178",
+      "E07000079",
+      "E07000177",
+      "E06000054"
+    ],
+    "E06000060",
+    "E07000084",
+    "E06000041",
+    "E06000038",
+    "E07000083",
+    "E07000093",
+    "E07000221",
+    "E06000062",
+    "E06000040",
+    "E07000089",
+    "E07000082"
+  ],
+  "E07000181": [
+    [
+      "E07000177",
+      "E07000079",
+      "E07000180",
+      "E07000221"
+    ],
+    "E07000178",
+    "E06000054",
+    "E07000179",
+    "E06000030",
+    "E06000062",
+    "E07000083",
+    "E07000238",
+    "E06000037",
+    "E07000078",
+    "E06000060",
+    "E07000082",
+    "E07000222",
+    "E06000042",
+    "E06000041",
+    "E07000220"
+  ],
+  "E07000187": [
+    [
+      "E07000189",
+      "E07000188",
+      "E06000022",
+      "E06000054",
+      "E06000024"
+    ],
+    "E06000023",
+    "E07000246",
+    "E06000025",
+    "E06000059",
+    "W06000021",
+    "W06000022",
+    "E07000040",
+    "W06000015",
+    "E07000082",
+    "E07000079",
+    "E07000080",
+    "E07000042",
+    "E07000091",
+    "W06000014"
+  ],
+  "E07000188": [
+    [
+      "E07000246",
+      "E07000187",
+      "E06000024",
+      "E07000189"
+    ],
+    "E06000059",
+    "E06000022",
+    "E06000023",
+    "E07000042",
+    "W06000015",
+    "W06000014",
+    "E06000025",
+    "E07000040",
+    "W06000022",
+    "W06000021",
+    "W06000016",
+    "W06000018",
+    "E07000043",
+    "W06000020",
+    "W06000013"
+  ],
+  "E07000189": [
+    [
+      "E06000059",
+      "E07000187",
+      "E07000246",
+      "E07000040",
+      "E06000054",
+      "E07000188"
+    ],
+    "E07000042",
+    "E06000022",
+    "E06000024",
+    "E06000023",
+    "E06000025",
+    "W06000015",
+    "E06000058",
+    "E07000091",
+    "W06000014",
+    "E07000045",
+    "W06000022",
+    "E07000041",
+    "W06000021"
+  ],
+  "E07000192": [
+    [
+      "E07000194",
+      "E07000196",
+      "E07000197",
+      "E08000030"
+    ],
+    "E07000193",
+    "E08000031",
+    "E08000025",
+    "E07000218",
+    "E07000039",
+    "E08000028",
+    "E08000027",
+    "E07000199",
+    "E07000035",
+    "E07000195",
+    "E08000029",
+    "E06000020",
+    "E06000049",
+    "E07000134",
+    "E07000198"
+  ],
+  "E07000193": [
+    [
+      "E07000198",
+      "E07000039",
+      "E07000035",
+      "E07000194",
+      "E07000197"
+    ],
+    "E07000192",
+    "E06000049",
+    "E07000196",
+    "E07000134",
+    "E07000032",
+    "E06000015",
+    "E07000218",
+    "E06000021",
+    "E07000036",
+    "E08000030",
+    "E07000132",
+    "E07000199",
+    "E07000195",
+    "E08000025"
+  ],
+  "E07000194": [
+    [
+      "E07000193",
+      "E07000192",
+      "E07000199",
+      "E08000030",
+      "E07000218",
+      "E07000039",
+      "E08000025",
+      "E07000197",
+      "E07000134"
+    ],
+    "E08000028",
+    "E07000132",
+    "E07000196",
+    "E08000031",
+    "E08000029",
+    "E08000027",
+    "E07000035",
+    "E07000219",
+    "E07000198",
+    "E06000015"
+  ],
+  "E07000195": [
+    [
+      "E06000051",
+      "E06000049",
+      "E07000197",
+      "E06000021",
+      "E07000198"
+    ],
+    "E06000050",
+    "E06000020",
+    "E07000193",
+    "E07000196",
+    "E07000037",
+    "E07000192",
+    "E07000035",
+    "W06000006",
+    "E07000194",
+    "E06000007",
+    "E08000007",
+    "E07000039",
+    "E08000003",
+    "E06000006"
+  ],
+  "E07000196": [
+    [
+      "E06000051",
+      "E07000197",
+      "E08000031",
+      "E08000027",
+      "E07000192",
+      "E07000239",
+      "E08000030",
+      "E06000020",
+      "E07000234"
+    ],
+    "E08000028",
+    "E08000025",
+    "E07000193",
+    "E07000194",
+    "E08000029",
+    "E07000218",
+    "E07000195",
+    "E06000019",
+    "E07000235",
+    "E07000039",
+    "E07000199"
+  ],
+  "E07000197": [
+    [
+      "E07000196",
+      "E07000195",
+      "E07000193",
+      "E06000020",
+      "E06000021",
+      "E07000198",
+      "E07000192",
+      "E06000051",
+      "E07000194"
+    ],
+    "E06000049",
+    "E07000035",
+    "E06000050",
+    "E08000030",
+    "E08000031",
+    "E08000025",
+    "E07000039",
+    "E08000028",
+    "E07000218",
+    "E08000027"
+  ],
+  "E07000198": [
+    [
+      "E07000193",
+      "E06000049",
+      "E07000035",
+      "E06000021",
+      "E07000197",
+      "E07000037",
+      "E07000195"
+    ],
+    "E06000051",
+    "E07000039",
+    "E07000032",
+    "E07000038",
+    "E06000050",
+    "E08000007",
+    "E08000019",
+    "E07000194",
+    "E06000015",
+    "E08000003",
+    "E07000196",
+    "E07000134"
+  ],
+  "E07000199": [
+    [
+      "E07000194",
+      "E07000218"
+    ],
+    "E08000025",
+    "E07000134",
+    "E07000039",
+    "E07000219",
+    "E07000132",
+    "E07000193",
+    "E08000029",
+    "E08000030",
+    "E07000192",
+    "E08000028",
+    "E07000220",
+    "E08000026",
+    "E07000197",
+    "E07000234",
+    "E07000129",
+    "E07000130",
+    "E08000027"
+  ],
+  "E07000200": [
+    [
+      "E07000203",
+      "E07000245",
+      "E07000067",
+      "E07000071",
+      "E07000076",
+      "E07000244",
+      "E07000202"
+    ],
+    "E07000074",
+    "E07000077",
+    "E07000070",
+    "E07000009",
+    "E07000149",
+    "E07000012",
+    "E07000143",
+    "E07000146",
+    "E07000075",
+    "E07000072",
+    "E07000242",
+    "E07000066"
+  ],
+  "E07000202": [
+    [
+      "E07000244",
+      "E07000200",
+      "E07000203"
+    ],
+    "E07000071",
+    "E07000245",
+    "E07000076",
+    "E07000067",
+    "E07000074",
+    "E07000143",
+    "E07000149",
+    "E07000070",
+    "E07000077",
+    "E07000075",
+    "E07000009",
+    "E07000146",
+    "E07000012",
+    "E07000148",
+    "E07000144",
+    "E06000033"
+  ],
+  "E07000203": [
+    [
+      "E07000244",
+      "E07000245",
+      "E07000200",
+      "E07000149",
+      "E07000202",
+      "E07000143"
+    ],
+    "E07000067",
+    "E07000146",
+    "E07000071",
+    "E07000076",
+    "E07000144",
+    "E07000148",
+    "E07000009",
+    "E07000077",
+    "E07000145",
+    "E07000074",
+    "E07000012",
+    "E07000070",
+    "E07000147"
+  ],
+  "E07000207": [
+    [
+      "E07000209",
+      "E07000213",
+      "E07000210",
+      "E09000021",
+      "E07000212",
+      "E09000027",
+      "E07000217"
+    ],
+    "E07000208",
+    "E07000211",
+    "E09000018",
+    "E06000040",
+    "E09000024",
+    "E09000017",
+    "E09000029",
+    "E09000032",
+    "E07000214",
+    "E07000216",
+    "E06000039",
+    "E09000009"
+  ],
+  "E07000208": [
+    [
+      "E09000021",
+      "E07000211",
+      "E09000029",
+      "E07000210"
+    ],
+    "E09000024",
+    "E07000207",
+    "E09000027",
+    "E07000215",
+    "E09000032",
+    "E07000209",
+    "E09000008",
+    "E09000018",
+    "E07000213",
+    "E09000022",
+    "E07000212",
+    "E09000006",
+    "E09000028",
+    "E09000013",
+    "E07000217"
+  ],
+  "E07000209": [
+    [
+      "E07000216",
+      "E07000217",
+      "E07000210",
+      "E07000207",
+      "E07000214",
+      "E07000092"
+    ],
+    "E06000036",
+    "E07000212",
+    "E07000227",
+    "E07000085",
+    "E07000213",
+    "E06000040",
+    "E07000089",
+    "E07000225",
+    "E09000021",
+    "E07000208",
+    "E06000041",
+    "E09000027",
+    "E09000018"
+  ],
+  "E07000210": [
+    [
+      "E07000211",
+      "E07000209",
+      "E07000227",
+      "E07000226",
+      "E07000207",
+      "E07000216",
+      "E07000208",
+      "E09000021"
+    ],
+    "E07000228",
+    "E07000217",
+    "E09000029",
+    "E09000008",
+    "E07000215",
+    "E07000225",
+    "E07000212",
+    "E07000214",
+    "E07000213",
+    "E09000006",
+    "E09000024"
+  ],
+  "E07000211": [
+    [
+      "E07000210",
+      "E07000215",
+      "E09000029",
+      "E07000208",
+      "E09000008",
+      "E07000226"
+    ],
+    "E09000006",
+    "E09000021",
+    "E07000207",
+    "E07000227",
+    "E07000228",
+    "E09000024",
+    "E07000216",
+    "E09000027",
+    "E07000065",
+    "E07000209",
+    "E09000022",
+    "E07000217",
+    "E09000032"
+  ],
+  "E07000212": [
+    [
+      "E06000040",
+      "E07000213",
+      "E07000214",
+      "E07000217",
+      "E07000207"
+    ],
+    "E09000018",
+    "E09000017",
+    "E06000039",
+    "E06000036",
+    "E07000210",
+    "E09000027",
+    "E06000060",
+    "E07000209",
+    "E09000009",
+    "E09000021",
+    "E07000092",
+    "E07000089",
+    "E07000208",
+    "E06000041"
+  ],
+  "E07000213": [
+    [
+      "E07000212",
+      "E09000018",
+      "E07000207",
+      "E06000040",
+      "E09000017",
+      "E09000027",
+      "E06000039"
+    ],
+    "E07000214",
+    "E06000060",
+    "E09000009",
+    "E07000217",
+    "E09000021",
+    "E07000210",
+    "E07000209",
+    "E07000208",
+    "E06000036",
+    "E09000032",
+    "E09000005",
+    "E09000015"
+  ],
+  "E07000214": [
+    [
+      "E07000217",
+      "E06000036",
+      "E07000209",
+      "E07000212",
+      "E07000092",
+      "E06000040",
+      "E07000089"
+    ],
+    "E06000041",
+    "E07000213",
+    "E06000039",
+    "E07000207",
+    "E07000085",
+    "E07000210",
+    "E07000216",
+    "E09000017",
+    "E09000018",
+    "E07000179",
+    "E06000038",
+    "E09000027"
+  ],
+  "E07000215": [
+    [
+      "E07000111",
+      "E07000211",
+      "E09000008",
+      "E07000228",
+      "E09000006",
+      "E07000226",
+      "E07000065"
+    ],
+    "E09000029",
+    "E07000116",
+    "E07000208",
+    "E07000227",
+    "E07000210",
+    "E09000021",
+    "E09000024",
+    "E07000115",
+    "E07000207",
+    "E09000022",
+    "E09000023",
+    "E09000028"
+  ],
+  "E07000216": [
+    [
+      "E07000209",
+      "E07000225",
+      "E07000085",
+      "E07000227",
+      "E07000210",
+      "E07000092",
+      "E07000089"
+    ],
+    "E07000217",
+    "E07000214",
+    "E07000207",
+    "E06000036",
+    "E07000212",
+    "E07000084",
+    "E06000041",
+    "E07000211",
+    "E07000213",
+    "E07000226",
+    "E07000228",
+    "E06000040"
+  ],
+  "E07000217": [
+    [
+      "E07000209",
+      "E07000214",
+      "E07000212",
+      "E07000207"
+    ],
+    "E06000036",
+    "E07000213",
+    "E06000040",
+    "E07000210",
+    "E07000092",
+    "E07000216",
+    "E09000018",
+    "E09000027",
+    "E07000089",
+    "E09000017",
+    "E09000021",
+    "E06000041",
+    "E07000085",
+    "E06000039",
+    "E07000208"
+  ],
+  "E07000218": [
+    [
+      "E07000219",
+      "E07000132",
+      "E08000029",
+      "E08000025",
+      "E07000194",
+      "E07000199",
+      "E08000026",
+      "E07000134"
+    ],
+    "E07000220",
+    "E08000030",
+    "E07000039",
+    "E07000234",
+    "E08000028",
+    "E07000222",
+    "E07000193",
+    "E07000129",
+    "E06000062",
+    "E07000192",
+    "E07000238"
+  ],
+  "E07000219": [
+    [
+      "E07000218",
+      "E07000220",
+      "E08000026",
+      "E07000132"
+    ],
+    "E08000029",
+    "E07000129",
+    "E06000062",
+    "E07000194",
+    "E07000222",
+    "E07000199",
+    "E07000131",
+    "E07000130",
+    "E06000016",
+    "E07000134",
+    "E08000025",
+    "E07000221",
+    "E07000135",
+    "E07000039",
+    "E07000238"
+  ],
+  "E07000220": [
+    [
+      "E06000062",
+      "E07000221",
+      "E07000219",
+      "E07000222",
+      "E08000026",
+      "E07000131",
+      "E07000132",
+      "E07000129"
+    ],
+    "E07000218",
+    "E08000029",
+    "E07000135",
+    "E06000016",
+    "E08000025",
+    "E07000177",
+    "E07000194",
+    "E07000238",
+    "E07000130",
+    "E07000199",
+    "E07000134"
+  ],
+  "E07000221": [
+    [
+      "E07000222",
+      "E07000238",
+      "E07000177",
+      "E07000079",
+      "E07000220",
+      "E06000062",
+      "E07000181",
+      "E07000236",
+      "E08000029",
+      "E07000234"
+    ],
+    "E07000083",
+    "E08000026",
+    "E08000025",
+    "E07000219",
+    "E07000218",
+    "E07000131",
+    "E06000060",
+    "E07000132",
+    "E07000237"
+  ],
+  "E07000222": [
+    [
+      "E07000221",
+      "E08000029",
+      "E08000026",
+      "E07000220"
+    ],
+    "E08000025",
+    "E07000238",
+    "E07000219",
+    "E07000177",
+    "E07000218",
+    "E07000234",
+    "E07000236",
+    "E07000131",
+    "E07000132",
+    "E07000079",
+    "E06000062",
+    "E07000129",
+    "E08000028",
+    "E07000196",
+    "E07000194"
+  ],
+  "E07000223": [
+    [
+      "E07000227",
+      "E07000229",
+      "E06000043",
+      "E07000224"
+    ],
+    "E07000228",
+    "E07000063",
+    "E07000225",
+    "E07000065",
+    "E07000216",
+    "E07000226",
+    "E07000210",
+    "E07000085",
+    "E07000215",
+    "E07000211",
+    "E07000061",
+    "E07000116",
+    "E07000209",
+    "E07000111",
+    "E07000064"
+  ],
+  "E07000224": [
+    [
+      "E07000225",
+      "E07000227",
+      "E07000229",
+      "E07000223"
+    ],
+    "E07000085",
+    "E07000228",
+    "E06000043",
+    "E07000090",
+    "E07000216",
+    "E07000210",
+    "E06000044",
+    "E07000063",
+    "E07000094",
+    "E07000226",
+    "E06000046",
+    "E07000088",
+    "E07000087",
+    "E07000209",
+    "E07000065"
+  ],
+  "E07000225": [
+    [
+      "E07000227",
+      "E07000224",
+      "E07000085",
+      "E07000216",
+      "E07000090"
+    ],
+    "E06000044",
+    "E07000229",
+    "E07000094",
+    "E07000209",
+    "E07000087",
+    "E07000223",
+    "E07000084",
+    "E07000089",
+    "E07000088",
+    "E07000210",
+    "E06000046",
+    "E07000092",
+    "E06000043",
+    "E07000228"
+  ],
+  "E07000226": [
+    [
+      "E07000227",
+      "E07000228",
+      "E07000210",
+      "E07000211",
+      "E07000215"
+    ],
+    "E07000065",
+    "E07000063",
+    "E07000111",
+    "E07000209",
+    "E07000216",
+    "E09000008",
+    "E07000208",
+    "E09000006",
+    "E07000225",
+    "E07000207",
+    "E09000029",
+    "E09000021",
+    "E07000116",
+    "E07000217"
+  ],
+  "E07000227": [
+    [
+      "E07000225",
+      "E07000228",
+      "E07000224",
+      "E07000210",
+      "E07000226",
+      "E07000223",
+      "E07000216",
+      "E06000043"
+    ],
+    "E07000229",
+    "E07000063",
+    "E07000211",
+    "E07000209",
+    "E07000215",
+    "E07000065",
+    "E07000085",
+    "E07000217",
+    "E07000111",
+    "E07000208",
+    "E07000207"
+  ],
+  "E07000228": [
+    [
+      "E07000227",
+      "E07000065",
+      "E07000063",
+      "E07000215",
+      "E06000043",
+      "E07000226"
+    ],
+    "E07000210",
+    "E07000211",
+    "E07000111",
+    "E07000223",
+    "E07000116",
+    "E07000216",
+    "E07000224",
+    "E07000229",
+    "E07000209",
+    "E07000225",
+    "E07000115",
+    "E09000008",
+    "E09000006"
+  ],
+  "E07000229": [
+    [
+      "E07000224",
+      "E07000223"
+    ],
+    "E06000043",
+    "E07000228",
+    "E07000227",
+    "E07000225",
+    "E07000063",
+    "E07000085",
+    "E07000216",
+    "E07000065",
+    "E07000226",
+    "E07000210",
+    "E07000211",
+    "E07000090",
+    "E07000215",
+    "E07000209",
+    "E07000061",
+    "E07000116",
+    "E06000044"
+  ],
+  "E07000234": [
+    [
+      "E08000025",
+      "E07000238",
+      "E08000027",
+      "E07000236",
+      "E07000239",
+      "E07000221",
+      "E08000029",
+      "E07000196"
+    ],
+    "E07000235",
+    "E08000028",
+    "E06000051",
+    "E07000222",
+    "E07000237",
+    "E07000218",
+    "E08000031",
+    "E08000030",
+    "E06000019",
+    "E07000194",
+    "E08000026"
+  ],
+  "E07000235": [
+    [
+      "E06000019",
+      "E07000238",
+      "E06000051",
+      "E07000239",
+      "E07000083",
+      "E07000237",
+      "E07000080"
+    ],
+    "E07000079",
+    "E07000234",
+    "E07000236",
+    "E07000196",
+    "E08000027",
+    "E07000078",
+    "W06000021",
+    "E08000025",
+    "E07000081",
+    "E07000221",
+    "E08000028",
+    "E08000029"
+  ],
+  "E07000236": [
+    [
+      "E07000234",
+      "E07000238",
+      "E07000221"
+    ],
+    "E08000029",
+    "E07000239",
+    "E08000025",
+    "E07000222",
+    "E07000237",
+    "E07000196",
+    "E08000027",
+    "E07000235",
+    "E06000051",
+    "E08000028",
+    "E07000218",
+    "E08000026",
+    "E07000083",
+    "E06000019",
+    "E07000079",
+    "E08000031"
+  ],
+  "E07000237": [
+    [
+      "E07000235",
+      "E07000238"
+    ],
+    "E07000234",
+    "E07000079",
+    "E06000051",
+    "E07000236",
+    "E07000239",
+    "E07000083",
+    "E07000080",
+    "E06000019",
+    "E08000025",
+    "E08000027",
+    "E07000221",
+    "E07000196",
+    "E08000029",
+    "E07000078",
+    "E07000222",
+    "E08000028",
+    "E07000081"
+  ],
+  "E07000238": [
+    [
+      "E07000083",
+      "E07000221",
+      "E07000235",
+      "E07000239",
+      "E07000234",
+      "E07000079",
+      "E07000237",
+      "E07000236"
+    ],
+    "E07000222",
+    "E06000051",
+    "E07000080",
+    "E08000029",
+    "E08000025",
+    "E07000078",
+    "E07000196",
+    "E08000027",
+    "E07000181",
+    "E07000081",
+    "E06000019"
+  ],
+  "E07000239": [
+    [
+      "E07000235",
+      "E06000051",
+      "E07000238",
+      "E07000196",
+      "E07000234"
+    ],
+    "E06000019",
+    "E08000027",
+    "E08000028",
+    "E08000025",
+    "E07000237",
+    "E07000236",
+    "E08000031",
+    "E07000221",
+    "E08000030",
+    "E06000020",
+    "E08000029",
+    "E07000079",
+    "E07000194",
+    "E07000192"
+  ],
+  "E07000240": [
+    [
+      "E07000098",
+      "E07000241",
+      "E07000096",
+      "E07000102",
+      "E06000056",
+      "E07000099",
+      "E07000103"
+    ],
+    "E06000032",
+    "E09000003",
+    "E07000242",
+    "E07000243",
+    "E09000010",
+    "E09000015",
+    "E09000017",
+    "E07000095",
+    "E09000005",
+    "E09000014",
+    "E07000072",
+    "E09000031"
+  ],
+  "E07000241": [
+    [
+      "E07000242",
+      "E07000099",
+      "E07000240",
+      "E07000098",
+      "E07000095",
+      "E09000010"
+    ],
+    "E06000056",
+    "E09000003",
+    "E07000243",
+    "E07000102",
+    "E07000072",
+    "E07000103",
+    "E06000032",
+    "E09000015",
+    "E09000031",
+    "E09000014",
+    "E07000073",
+    "E07000096",
+    "E07000077"
+  ],
+  "E07000242": [
+    [
+      "E07000099",
+      "E07000077",
+      "E07000241",
+      "E07000095",
+      "E07000243",
+      "E07000072",
+      "E07000073"
+    ],
+    "E06000056",
+    "E07000240",
+    "E07000098",
+    "E09000010",
+    "E07000068",
+    "E07000012",
+    "E09000003",
+    "E07000070",
+    "E06000032",
+    "E09000031",
+    "E09000026",
+    "E06000055"
+  ],
+  "E07000243": [
+    [
+      "E07000099",
+      "E07000242"
+    ],
+    "E07000240",
+    "E07000241",
+    "E06000032",
+    "E06000056",
+    "E07000012",
+    "E07000095",
+    "E07000072",
+    "E07000096",
+    "E06000055",
+    "E07000098",
+    "E07000073",
+    "E07000102",
+    "E07000077",
+    "E09000010",
+    "E07000103",
+    "E09000003",
+    "E06000060"
+  ],
+  "E07000244": [
+    [
+      "E07000203",
+      "E07000149",
+      "E07000202",
+      "E07000145",
+      "E07000200"
+    ],
+    "E07000143",
+    "E07000076",
+    "E07000148",
+    "E07000144",
+    "E07000245",
+    "E07000071",
+    "E07000146",
+    "E07000067",
+    "E07000147",
+    "E07000074",
+    "E07000009",
+    "E07000077",
+    "E07000075",
+    "E07000070"
+  ],
+  "E07000245": [
+    [
+      "E07000009",
+      "E07000143",
+      "E07000203",
+      "E07000200",
+      "E07000067",
+      "E07000012",
+      "E07000146"
+    ],
+    "E07000077",
+    "E07000149",
+    "E07000010",
+    "E07000008",
+    "E07000071",
+    "E07000202",
+    "E07000144",
+    "E07000011",
+    "E07000076",
+    "E07000242",
+    "E07000099",
+    "E07000147"
+  ],
+  "E07000246": [
+    [
+      "E07000188",
+      "E07000042",
+      "E07000043",
+      "E07000189",
+      "E07000040"
+    ],
+    "E06000059",
+    "E06000024",
+    "W06000015",
+    "E06000023",
+    "E07000047",
+    "W06000014",
+    "E07000045",
+    "E07000187",
+    "E07000041",
+    "E07000046",
+    "W06000013",
+    "W06000016",
+    "W06000022",
+    "W06000021"
+  ],
+  "E08000001": [
+    [
+      "E08000010",
+      "E08000002",
+      "E06000008",
+      "E07000118",
+      "E08000006"
+    ],
+    "E07000125",
+    "E08000013",
+    "E08000003",
+    "E08000009",
+    "E06000007",
+    "E07000126",
+    "E08000005",
+    "E07000120",
+    "E07000117",
+    "E07000127",
+    "E08000004",
+    "E08000033",
+    "E08000007",
+    "E08000011"
+  ],
+  "E08000002": [
+    [
+      "E08000001",
+      "E08000005",
+      "E07000125",
+      "E08000006",
+      "E08000003",
+      "E06000008"
+    ],
+    "E08000010",
+    "E08000004",
+    "E08000033",
+    "E08000008",
+    "E08000009",
+    "E07000120",
+    "E07000118",
+    "E06000007",
+    "E07000117",
+    "E08000007",
+    "E07000126",
+    "E08000013",
+    "E07000037"
+  ],
+  "E08000003": [
+    [
+      "E08000009",
+      "E08000007",
+      "E06000049",
+      "E08000004",
+      "E08000002",
+      "E08000006",
+      "E08000008",
+      "E08000005"
+    ],
+    "E08000001",
+    "E08000010",
+    "E06000007",
+    "E06000050",
+    "E07000037",
+    "E08000034",
+    "E08000033",
+    "E07000125",
+    "E06000008",
+    "E07000035",
+    "E08000013"
+  ],
+  "E08000004": [
+    [
+      "E08000005",
+      "E08000008",
+      "E08000034",
+      "E08000003",
+      "E07000037",
+      "E08000033"
+    ],
+    "E07000125",
+    "E08000007",
+    "E08000006",
+    "E08000002",
+    "E08000009",
+    "E08000016",
+    "E08000019",
+    "E06000049",
+    "E08000032",
+    "E08000001",
+    "E07000117",
+    "E07000035",
+    "E06000008"
+  ],
+  "E08000005": [
+    [
+      "E07000125",
+      "E08000004",
+      "E08000033",
+      "E08000002",
+      "E08000003"
+    ],
+    "E08000008",
+    "E08000006",
+    "E07000037",
+    "E07000117",
+    "E08000001",
+    "E06000008",
+    "E08000032",
+    "E07000120",
+    "E08000034",
+    "E07000124",
+    "E08000009",
+    "E08000010",
+    "E08000007",
+    "E08000016"
+  ],
+  "E08000006": [
+    [
+      "E08000009",
+      "E08000010",
+      "E08000001",
+      "E08000002",
+      "E08000003",
+      "E06000007"
+    ],
+    "E08000005",
+    "E08000007",
+    "E08000004",
+    "E08000008",
+    "E06000008",
+    "E07000125",
+    "E08000013",
+    "E07000118",
+    "E06000050",
+    "E06000006",
+    "E08000033",
+    "E07000127",
+    "E07000037"
+  ],
+  "E08000007": [
+    [
+      "E06000049",
+      "E08000003",
+      "E08000008",
+      "E07000037"
+    ],
+    "E08000006",
+    "E08000009",
+    "E08000004",
+    "E07000035",
+    "E08000002",
+    "E06000050",
+    "E08000034",
+    "E08000005",
+    "E07000198",
+    "E08000010",
+    "E08000001",
+    "E08000016",
+    "E06000007",
+    "E08000019",
+    "E07000125"
+  ],
+  "E08000008": [
+    [
+      "E08000004",
+      "E08000007",
+      "E07000037",
+      "E08000003"
+    ],
+    "E08000034",
+    "E08000005",
+    "E06000049",
+    "E08000002",
+    "E08000009",
+    "E07000035",
+    "E08000006",
+    "E07000125",
+    "E08000016",
+    "E08000033",
+    "E08000019",
+    "E08000001",
+    "E08000010",
+    "E06000050",
+    "E06000007"
+  ],
+  "E08000009": [
+    [
+      "E08000003",
+      "E08000006",
+      "E06000049",
+      "E06000007"
+    ],
+    "E08000010",
+    "E08000007",
+    "E06000050",
+    "E08000002",
+    "E08000001",
+    "E08000008",
+    "E08000005",
+    "E08000004",
+    "E08000013",
+    "E06000006",
+    "E06000008",
+    "E07000118",
+    "E07000125",
+    "E07000127",
+    "E07000198",
+    "E08000033"
+  ],
+  "E08000010": [
+    [
+      "E08000001",
+      "E08000013",
+      "E08000006",
+      "E07000127",
+      "E06000007",
+      "E07000118"
+    ],
+    "E08000009",
+    "E06000008",
+    "E08000011",
+    "E06000006",
+    "E08000002",
+    "E07000125",
+    "E08000012",
+    "E07000126",
+    "E08000003",
+    "E06000049",
+    "E08000005",
+    "E07000120",
+    "E08000014"
+  ],
+  "E08000011": [
+    [
+      "E08000012",
+      "E08000013",
+      "E06000006",
+      "E07000127",
+      "E08000014"
+    ],
+    "E08000015",
+    "E06000049",
+    "E08000010",
+    "W06000005",
+    "E06000007",
+    "E08000001",
+    "W06000004",
+    "E07000118",
+    "E06000050",
+    "E08000006",
+    "E08000009",
+    "E07000126",
+    "E06000008",
+    "E08000002"
+  ],
+  "E08000012": [
+    [
+      "E08000011",
+      "E08000015",
+      "E08000014",
+      "E06000050",
+      "E06000006"
+    ],
+    "W06000005",
+    "E08000013",
+    "E06000049",
+    "W06000004",
+    "E08000010",
+    "E07000127",
+    "E06000007",
+    "E07000118",
+    "E08000001",
+    "E08000006",
+    "E08000009",
+    "E07000126",
+    "W06000006",
+    "E06000008"
+  ],
+  "E08000013": [
+    [
+      "E06000007",
+      "E08000010",
+      "E08000011",
+      "E07000127",
+      "E06000006"
+    ],
+    "E08000012",
+    "E06000049",
+    "E08000001",
+    "E08000014",
+    "E08000015",
+    "E08000006",
+    "E07000118",
+    "E08000009",
+    "W06000005",
+    "E06000008",
+    "E08000002",
+    "E07000126",
+    "W06000004",
+    "E07000125"
+  ],
+  "E08000014": [
+    [
+      "E07000127",
+      "E08000012",
+      "E08000011",
+      "E08000015"
+    ],
+    "E07000118",
+    "E08000013",
+    "E07000126",
+    "E07000119",
+    "E08000010",
+    "E06000006",
+    "E06000007",
+    "E06000009",
+    "W06000005",
+    "W06000004",
+    "E07000123",
+    "E06000050",
+    "E08000001",
+    "E06000049",
+    "E07000128"
+  ],
+  "E08000015": [
+    [
+      "E06000050",
+      "E08000012",
+      "W06000005",
+      "E08000014"
+    ],
+    "W06000004",
+    "E08000011",
+    "E07000127",
+    "E06000006",
+    "E08000013",
+    "E06000049",
+    "W06000003",
+    "W06000002",
+    "E08000010",
+    "E06000007",
+    "E07000118",
+    "W06000006",
+    "E08000001",
+    "E07000126",
+    "E07000119"
+  ],
+  "E08000016": [
+    [
+      "E08000019",
+      "E08000034",
+      "E08000036",
+      "E08000018",
+      "E08000017",
+      "E07000037"
+    ],
+    "E07000169",
+    "E08000033",
+    "E07000035",
+    "E07000171",
+    "E07000038",
+    "E08000032",
+    "E08000035",
+    "E08000004",
+    "E07000034",
+    "E07000033",
+    "E08000008",
+    "E06000011",
+    "E08000007"
+  ],
+  "E08000017": [
+    [
+      "E08000018",
+      "E07000171",
+      "E06000013",
+      "E07000169",
+      "E08000036",
+      "E06000011",
+      "E08000016"
+    ],
+    "E08000019",
+    "E07000142",
+    "E08000035",
+    "E07000038",
+    "E07000033",
+    "E07000034",
+    "E07000035",
+    "E08000034",
+    "E07000175",
+    "E07000174",
+    "E07000037",
+    "E06000014"
+  ],
+  "E08000018": [
+    [
+      "E08000017",
+      "E08000019",
+      "E07000171",
+      "E08000016",
+      "E07000033",
+      "E07000038"
+    ],
+    "E07000034",
+    "E07000035",
+    "E07000175",
+    "E07000174",
+    "E08000036",
+    "E06000011",
+    "E08000034",
+    "E06000013",
+    "E07000169",
+    "E07000170",
+    "E07000037",
+    "E07000032",
+    "E08000035"
+  ],
+  "E08000019": [
+    [
+      "E08000016",
+      "E07000038",
+      "E08000018",
+      "E07000037",
+      "E07000035"
+    ],
+    "E07000034",
+    "E08000034",
+    "E08000017",
+    "E07000033",
+    "E08000036",
+    "E07000198",
+    "E07000171",
+    "E08000004",
+    "E08000033",
+    "E07000174",
+    "E07000169",
+    "E08000008",
+    "E06000049",
+    "E07000170"
+  ],
+  "E08000021": [
+    [
+      "E06000057",
+      "E08000037",
+      "E08000022",
+      "E08000023"
+    ],
+    "E08000024",
+    "E06000047",
+    "E06000001",
+    "E07000030",
+    "E06000004",
+    "E06000005",
+    "E06000003",
+    "E06000002",
+    "E07000166",
+    "E07000164",
+    "E07000028",
+    "E07000168",
+    "E07000031",
+    "E07000167"
+  ],
+  "E08000022": [
+    [
+      "E08000021",
+      "E06000057",
+      "E08000023"
+    ],
+    "E08000037",
+    "E08000024",
+    "E06000047",
+    "E06000001",
+    "E06000004",
+    "E07000030",
+    "E06000005",
+    "E06000003",
+    "E06000002",
+    "E07000166",
+    "E07000164",
+    "E07000168",
+    "E07000028",
+    "E07000167",
+    "E07000031"
+  ],
+  "E08000023": [
+    [
+      "E08000024",
+      "E08000022",
+      "E08000037",
+      "E08000021"
+    ],
+    "E06000047",
+    "E06000057",
+    "E06000001",
+    "E06000004",
+    "E06000005",
+    "E06000003",
+    "E06000002",
+    "E07000166",
+    "E07000030",
+    "E07000168",
+    "E07000164",
+    "E07000167",
+    "E07000028",
+    "E07000031"
+  ],
+  "E08000024": [
+    [
+      "E06000047",
+      "E08000023",
+      "E08000037"
+    ],
+    "E08000021",
+    "E06000057",
+    "E08000022",
+    "E06000001",
+    "E06000004",
+    "E06000005",
+    "E06000003",
+    "E06000002",
+    "E07000166",
+    "E07000168",
+    "E07000164",
+    "E07000030",
+    "E07000167",
+    "E07000028",
+    "E07000031"
+  ],
+  "E08000025": [
+    [
+      "E08000029",
+      "E07000234",
+      "E08000028",
+      "E07000218",
+      "E07000194",
+      "E08000030",
+      "E08000027"
+    ],
+    "E07000196",
+    "E07000222",
+    "E08000031",
+    "E07000199",
+    "E07000221",
+    "E07000238",
+    "E07000192",
+    "E07000239",
+    "E08000026",
+    "E07000236",
+    "E07000132",
+    "E07000219"
+  ],
+  "E08000026": [
+    [
+      "E07000222",
+      "E07000220",
+      "E08000029",
+      "E07000219",
+      "E07000218"
+    ],
+    "E07000132",
+    "E06000062",
+    "E08000025",
+    "E07000131",
+    "E07000129",
+    "E07000238",
+    "E07000194",
+    "E07000221",
+    "E07000199",
+    "E07000234",
+    "E07000236",
+    "E06000016",
+    "E08000028",
+    "E07000177"
+  ],
+  "E08000027": [
+    [
+      "E08000028",
+      "E07000234",
+      "E07000196",
+      "E08000031",
+      "E08000025"
+    ],
+    "E07000239",
+    "E08000030",
+    "E07000235",
+    "E07000194",
+    "E07000221",
+    "E08000029",
+    "E07000238",
+    "E07000192",
+    "E06000019",
+    "E07000236",
+    "E06000020",
+    "E06000051",
+    "E07000218",
+    "E07000222"
+  ],
+  "E08000028": [
+    [
+      "E08000027",
+      "E08000025",
+      "E08000030",
+      "E08000031"
+    ],
+    "E07000194",
+    "E08000029",
+    "E07000239",
+    "E07000196",
+    "E07000234",
+    "E07000192",
+    "E07000221",
+    "E07000218",
+    "E07000235",
+    "E07000199",
+    "E07000222",
+    "E07000236",
+    "E07000197",
+    "E06000020",
+    "E07000193"
+  ],
+  "E08000029": [
+    [
+      "E08000025",
+      "E07000222",
+      "E07000218",
+      "E08000026",
+      "E07000221",
+      "E07000234"
+    ],
+    "E07000238",
+    "E07000219",
+    "E08000028",
+    "E07000236",
+    "E07000132",
+    "E07000196",
+    "E08000030",
+    "E08000027",
+    "E07000199",
+    "E07000194",
+    "E07000220",
+    "E08000031",
+    "E07000239"
+  ],
+  "E08000030": [
+    [
+      "E07000194",
+      "E08000028",
+      "E08000031",
+      "E07000196",
+      "E07000192",
+      "E08000025"
+    ],
+    "E08000027",
+    "E08000029",
+    "E07000197",
+    "E07000193",
+    "E07000218",
+    "E07000199",
+    "E07000039",
+    "E07000234",
+    "E07000239",
+    "E06000020",
+    "E07000221",
+    "E07000134",
+    "E07000222"
+  ],
+  "E08000031": [
+    [
+      "E07000196",
+      "E08000030",
+      "E08000027",
+      "E08000028"
+    ],
+    "E08000025",
+    "E07000192",
+    "E07000194",
+    "E06000020",
+    "E07000239",
+    "E07000234",
+    "E07000193",
+    "E08000029",
+    "E07000197",
+    "E07000235",
+    "E07000218",
+    "E07000199",
+    "E06000019",
+    "E07000221",
+    "E07000238"
+  ],
+  "E08000032": [
+    [
+      "E08000035",
+      "E08000033",
+      "E07000163",
+      "E07000165",
+      "E08000034",
+      "E07000122"
+    ],
+    "E07000117",
+    "E07000164",
+    "E08000036",
+    "E08000005",
+    "E07000125",
+    "E07000124",
+    "E08000004",
+    "E08000016",
+    "E07000120",
+    "E08000002",
+    "E06000008",
+    "E07000169",
+    "E08000008"
+  ],
+  "E08000033": [
+    [
+      "E08000034",
+      "E08000032",
+      "E08000005",
+      "E07000117",
+      "E07000125",
+      "E07000122",
+      "E08000004"
+    ],
+    "E08000035",
+    "E07000124",
+    "E08000016",
+    "E07000163",
+    "E08000002",
+    "E07000165",
+    "E07000037",
+    "E08000008",
+    "E07000120",
+    "E08000003",
+    "E08000036",
+    "E08000001"
+  ],
+  "E08000034": [
+    [
+      "E08000033",
+      "E08000016",
+      "E08000036",
+      "E08000035",
+      "E08000004",
+      "E08000032",
+      "E07000037"
+    ],
+    "E08000019",
+    "E08000008",
+    "E08000005",
+    "E08000018",
+    "E08000007",
+    "E07000163",
+    "E07000125",
+    "E07000117",
+    "E08000003",
+    "E07000169",
+    "E07000122",
+    "E08000017"
+  ],
+  "E08000035": [
+    [
+      "E07000165",
+      "E08000032",
+      "E07000169",
+      "E08000036",
+      "E08000034"
+    ],
+    "E08000033",
+    "E06000014",
+    "E07000163",
+    "E08000017",
+    "E07000164",
+    "E07000167",
+    "E08000016",
+    "E07000037",
+    "E08000018",
+    "E08000004",
+    "E07000122",
+    "E08000005",
+    "E08000019",
+    "E06000013"
+  ],
+  "E08000036": [
+    [
+      "E08000035",
+      "E08000016",
+      "E07000169",
+      "E08000034",
+      "E08000017"
+    ],
+    "E08000018",
+    "E08000032",
+    "E08000019",
+    "E07000037",
+    "E08000033",
+    "E07000171",
+    "E06000011",
+    "E06000014",
+    "E07000165",
+    "E07000035",
+    "E06000013",
+    "E08000004",
+    "E07000163",
+    "E07000038"
+  ],
+  "E08000037": [
+    [
+      "E06000047",
+      "E08000021",
+      "E06000057",
+      "E08000024",
+      "E08000023"
+    ],
+    "E08000022",
+    "E06000001",
+    "E07000030",
+    "E06000005",
+    "E06000004",
+    "E06000003",
+    "E07000166",
+    "E06000002",
+    "E07000164",
+    "E07000028",
+    "E07000168",
+    "E07000031",
+    "E07000167"
+  ],
+  "E09000001": [
+    [
+      "E09000028",
+      "E09000019",
+      "E09000030",
+      "E09000007",
+      "E09000033",
+      "E09000012",
+      "E09000022"
+    ],
+    "E09000023",
+    "E09000032",
+    "E09000020",
+    "E09000031",
+    "E09000011",
+    "E09000003",
+    "E09000025",
+    "E09000013",
+    "E09000014",
+    "E09000005",
+    "E09000026",
+    "E09000006"
+  ],
+  "E09000002": [
+    [
+      "E09000016",
+      "E09000026",
+      "E09000025",
+      "E09000004",
+      "E09000011"
+    ],
+    "E07000068",
+    "E06000034",
+    "E07000107",
+    "E09000031",
+    "E09000030",
+    "E09000023",
+    "E09000012",
+    "E09000006",
+    "E09000028",
+    "E09000010",
+    "E09000014",
+    "E07000072",
+    "E09000001",
+    "E09000019"
+  ],
+  "E09000003": [
+    [
+      "E07000098",
+      "E09000010",
+      "E09000005",
+      "E09000014",
+      "E09000007",
+      "E09000015"
+    ],
+    "E09000019",
+    "E09000009",
+    "E07000240",
+    "E09000012",
+    "E09000033",
+    "E07000241",
+    "E09000013",
+    "E09000020",
+    "E07000095",
+    "E07000102",
+    "E09000031",
+    "E07000103",
+    "E09000017"
+  ],
+  "E09000004": [
+    [
+      "E09000011",
+      "E07000107",
+      "E09000006",
+      "E09000016",
+      "E09000002",
+      "E06000034",
+      "E07000111"
+    ],
+    "E09000025",
+    "E09000023",
+    "E09000026",
+    "E09000030",
+    "E09000008",
+    "E07000115",
+    "E07000109",
+    "E07000068",
+    "E09000028",
+    "E09000031",
+    "E09000012",
+    "E07000215"
+  ],
+  "E09000005": [
+    [
+      "E09000009",
+      "E09000015",
+      "E09000003",
+      "E09000033",
+      "E09000007",
+      "E09000013",
+      "E09000020"
+    ],
+    "E09000018",
+    "E09000014",
+    "E09000010",
+    "E07000102",
+    "E09000032",
+    "E09000027",
+    "E09000019",
+    "E09000022",
+    "E07000098",
+    "E09000017",
+    "E07000103",
+    "E09000001"
+  ],
+  "E09000006": [
+    [
+      "E07000111",
+      "E09000023",
+      "E09000008",
+      "E07000215",
+      "E09000004",
+      "E09000011",
+      "E09000028",
+      "E09000022"
+    ],
+    "E07000107",
+    "E07000115",
+    "E09000029",
+    "E09000024",
+    "E07000211",
+    "E09000030",
+    "E09000032",
+    "E09000016",
+    "E06000034",
+    "E09000025",
+    "E09000002"
+  ],
+  "E09000007": [
+    [
+      "E09000033",
+      "E09000019",
+      "E09000003",
+      "E09000014",
+      "E09000005",
+      "E09000001"
+    ],
+    "E09000020",
+    "E09000013",
+    "E09000022",
+    "E09000012",
+    "E09000028",
+    "E09000030",
+    "E09000009",
+    "E09000031",
+    "E09000010",
+    "E09000032",
+    "E09000015",
+    "E09000018",
+    "E09000027"
+  ],
+  "E09000008": [
+    [
+      "E07000215",
+      "E09000006",
+      "E09000029",
+      "E07000211",
+      "E09000022",
+      "E09000024"
+    ],
+    "E09000023",
+    "E07000210",
+    "E09000028",
+    "E09000032",
+    "E09000011",
+    "E07000208",
+    "E09000027",
+    "E07000111",
+    "E09000021",
+    "E09000004",
+    "E09000018",
+    "E09000013",
+    "E09000020"
+  ],
+  "E09000009": [
+    [
+      "E09000018",
+      "E09000017",
+      "E09000005",
+      "E09000013",
+      "E09000015"
+    ],
+    "E09000003",
+    "E09000027",
+    "E09000032",
+    "E07000213",
+    "E09000020",
+    "E09000033",
+    "E09000007",
+    "E07000102",
+    "E09000021",
+    "E09000024",
+    "E06000060",
+    "E06000039",
+    "E07000212",
+    "E07000098"
+  ],
+  "E09000010": [
+    [
+      "E09000003",
+      "E09000014",
+      "E07000095",
+      "E07000241",
+      "E09000031",
+      "E07000072",
+      "E07000098"
+    ],
+    "E09000026",
+    "E09000012",
+    "E09000019",
+    "E09000007",
+    "E09000005",
+    "E09000025",
+    "E07000242",
+    "E07000240",
+    "E09000030",
+    "E09000002",
+    "E09000033",
+    "E09000015"
+  ],
+  "E09000011": [
+    [
+      "E09000023",
+      "E09000004",
+      "E09000025",
+      "E09000006",
+      "E09000030",
+      "E09000002"
+    ],
+    "E09000016",
+    "E07000111",
+    "E07000107",
+    "E09000008",
+    "E09000028",
+    "E09000012",
+    "E09000026",
+    "E09000031",
+    "E09000001",
+    "E09000022",
+    "E09000019",
+    "E06000034",
+    "E09000033"
+  ],
+  "E09000012": [
+    [
+      "E09000019",
+      "E09000030",
+      "E09000031",
+      "E09000014",
+      "E09000025",
+      "E09000001"
+    ],
+    "E09000033",
+    "E09000007",
+    "E09000003",
+    "E09000022",
+    "E09000011",
+    "E09000026",
+    "E09000028",
+    "E09000020",
+    "E07000072",
+    "E09000023",
+    "E09000010",
+    "E09000013",
+    "E09000032"
+  ],
+  "E09000013": [
+    [
+      "E09000020",
+      "E09000032",
+      "E09000009",
+      "E09000027",
+      "E09000018",
+      "E09000005"
+    ],
+    "E09000033",
+    "E09000007",
+    "E09000022",
+    "E09000019",
+    "E09000024",
+    "E09000021",
+    "E09000015",
+    "E09000001",
+    "E09000028",
+    "E09000014",
+    "E09000012",
+    "E09000003",
+    "E09000008"
+  ],
+  "E09000014": [
+    [
+      "E09000010",
+      "E09000003",
+      "E09000012",
+      "E09000019",
+      "E09000031",
+      "E09000007"
+    ],
+    "E07000098",
+    "E09000030",
+    "E09000033",
+    "E09000005",
+    "E07000072",
+    "E09000025",
+    "E09000020",
+    "E09000001",
+    "E09000013",
+    "E09000028",
+    "E09000026",
+    "E09000022",
+    "E07000095"
+  ],
+  "E09000015": [
+    [
+      "E09000005",
+      "E09000017",
+      "E07000098",
+      "E09000003",
+      "E09000009",
+      "E07000102"
+    ],
+    "E07000103",
+    "E09000007",
+    "E09000013",
+    "E07000096",
+    "E07000241",
+    "E09000010",
+    "E09000033",
+    "E09000020",
+    "E09000014",
+    "E07000240",
+    "E06000039",
+    "E09000027",
+    "E09000018"
+  ],
+  "E09000016": [
+    [
+      "E06000034",
+      "E07000068",
+      "E09000002",
+      "E07000072",
+      "E09000004",
+      "E09000026"
+    ],
+    "E09000025",
+    "E09000011",
+    "E07000070",
+    "E07000107",
+    "E07000066",
+    "E07000109",
+    "E09000031",
+    "E09000006",
+    "E06000035",
+    "E09000030",
+    "E09000023",
+    "E09000012",
+    "E09000010"
+  ],
+  "E09000017": [
+    [
+      "E06000060",
+      "E09000009",
+      "E07000102",
+      "E09000018",
+      "E09000015",
+      "E07000213",
+      "E06000039"
+    ],
+    "E06000040",
+    "E09000027",
+    "E09000005",
+    "E09000003",
+    "E07000098",
+    "E07000212",
+    "E07000103",
+    "E09000013",
+    "E09000021",
+    "E09000032",
+    "E07000207",
+    "E09000020"
+  ],
+  "E09000018": [
+    [
+      "E09000027",
+      "E09000009",
+      "E07000213",
+      "E09000017",
+      "E09000013"
+    ],
+    "E09000021",
+    "E07000212",
+    "E09000005",
+    "E07000207",
+    "E09000032",
+    "E06000060",
+    "E09000024",
+    "E06000039",
+    "E09000020",
+    "E09000015",
+    "E09000003",
+    "E09000033",
+    "E07000208",
+    "E09000007"
+  ],
+  "E09000019": [
+    [
+      "E09000012",
+      "E09000007",
+      "E09000014",
+      "E09000001"
+    ],
+    "E09000033",
+    "E09000003",
+    "E09000030",
+    "E09000031",
+    "E09000020",
+    "E09000028",
+    "E09000022",
+    "E09000013",
+    "E09000005",
+    "E09000025",
+    "E09000023",
+    "E09000011",
+    "E09000032",
+    "E09000010",
+    "E09000026"
+  ],
+  "E09000020": [
+    [
+      "E09000033",
+      "E09000013",
+      "E09000032",
+      "E09000005"
+    ],
+    "E09000007",
+    "E09000027",
+    "E09000022",
+    "E09000018",
+    "E09000009",
+    "E09000019",
+    "E09000001",
+    "E09000028",
+    "E09000012",
+    "E09000014",
+    "E09000003",
+    "E09000015",
+    "E09000021",
+    "E09000024",
+    "E09000030"
+  ],
+  "E09000021": [
+    [
+      "E09000027",
+      "E07000207",
+      "E07000208",
+      "E09000024",
+      "E07000210",
+      "E09000029",
+      "E09000032"
+    ],
+    "E09000018",
+    "E07000211",
+    "E07000213",
+    "E09000013",
+    "E07000209",
+    "E09000008",
+    "E09000017",
+    "E09000022",
+    "E07000215",
+    "E09000020",
+    "E09000033",
+    "E09000009"
+  ],
+  "E09000022": [
+    [
+      "E09000028",
+      "E09000032",
+      "E09000008",
+      "E09000024",
+      "E09000033",
+      "E09000001",
+      "E09000006"
+    ],
+    "E09000020",
+    "E09000013",
+    "E09000030",
+    "E09000023",
+    "E09000007",
+    "E09000029",
+    "E09000011",
+    "E09000019",
+    "E09000012",
+    "E09000025",
+    "E09000027",
+    "E09000021"
+  ],
+  "E09000023": [
+    [
+      "E09000006",
+      "E09000011",
+      "E09000028",
+      "E09000030"
+    ],
+    "E09000008",
+    "E07000111",
+    "E09000025",
+    "E09000022",
+    "E09000024",
+    "E09000033",
+    "E09000001",
+    "E09000004",
+    "E09000012",
+    "E09000032",
+    "E09000019",
+    "E09000002",
+    "E09000029",
+    "E09000007",
+    "E09000020"
+  ],
+  "E09000024": [
+    [
+      "E09000032",
+      "E09000029",
+      "E09000021",
+      "E09000008",
+      "E09000022"
+    ],
+    "E09000027",
+    "E09000018",
+    "E07000208",
+    "E09000028",
+    "E09000013",
+    "E07000207",
+    "E09000020",
+    "E09000033",
+    "E07000210",
+    "E07000215",
+    "E09000023",
+    "E09000006",
+    "E07000211",
+    "E09000009"
+  ],
+  "E09000025": [
+    [
+      "E09000011",
+      "E09000026",
+      "E09000030",
+      "E09000002",
+      "E09000031",
+      "E09000012"
+    ],
+    "E09000004",
+    "E09000023",
+    "E09000028",
+    "E09000014",
+    "E09000001",
+    "E09000019",
+    "E09000022",
+    "E09000016",
+    "E07000107",
+    "E09000010",
+    "E07000072",
+    "E09000007",
+    "E09000033"
+  ],
+  "E09000026": [
+    [
+      "E07000072",
+      "E09000002",
+      "E09000031",
+      "E09000025",
+      "E09000016"
+    ],
+    "E09000010",
+    "E09000030",
+    "E09000012",
+    "E07000068",
+    "E09000004",
+    "E09000014",
+    "E09000011",
+    "E06000034",
+    "E09000023",
+    "E09000019",
+    "E09000028",
+    "E07000095",
+    "E09000001",
+    "E07000107"
+  ],
+  "E09000027": [
+    [
+      "E09000018",
+      "E09000021",
+      "E09000032",
+      "E07000207",
+      "E09000013",
+      "E07000213"
+    ],
+    "E09000024",
+    "E09000017",
+    "E09000020",
+    "E07000208",
+    "E09000009",
+    "E09000029",
+    "E09000033",
+    "E09000005",
+    "E07000212",
+    "E09000007",
+    "E09000008",
+    "E07000211",
+    "E09000022"
+  ],
+  "E09000028": [
+    [
+      "E09000022",
+      "E09000023",
+      "E09000030",
+      "E09000001",
+      "E09000006"
+    ],
+    "E09000033",
+    "E09000032",
+    "E09000025",
+    "E09000007",
+    "E09000019",
+    "E09000024",
+    "E09000020",
+    "E09000011",
+    "E09000012",
+    "E09000013",
+    "E09000008",
+    "E09000031",
+    "E09000029",
+    "E09000026"
+  ],
+  "E09000029": [
+    [
+      "E09000008",
+      "E09000024",
+      "E07000211",
+      "E07000208",
+      "E09000021"
+    ],
+    "E07000210",
+    "E07000215",
+    "E09000027",
+    "E09000022",
+    "E09000032",
+    "E09000018",
+    "E09000028",
+    "E09000023",
+    "E09000006",
+    "E07000207",
+    "E09000013",
+    "E09000011",
+    "E09000020",
+    "E09000033"
+  ],
+  "E09000030": [
+    [
+      "E09000012",
+      "E09000025",
+      "E09000028",
+      "E09000011",
+      "E09000001",
+      "E09000023"
+    ],
+    "E09000019",
+    "E09000022",
+    "E09000031",
+    "E09000026",
+    "E09000007",
+    "E09000014",
+    "E09000033",
+    "E09000002",
+    "E09000032",
+    "E09000004",
+    "E09000003",
+    "E09000020",
+    "E09000006"
+  ],
+  "E09000031": [
+    [
+      "E09000026",
+      "E09000012",
+      "E07000072",
+      "E09000010",
+      "E09000025",
+      "E09000014"
+    ],
+    "E09000019",
+    "E09000002",
+    "E09000030",
+    "E09000007",
+    "E09000001",
+    "E09000011",
+    "E09000033",
+    "E09000003",
+    "E09000028",
+    "E07000095",
+    "E09000022",
+    "E09000004",
+    "E07000098"
+  ],
+  "E09000032": [
+    [
+      "E09000024",
+      "E09000022",
+      "E09000027",
+      "E09000013",
+      "E09000020",
+      "E09000033",
+      "E09000021"
+    ],
+    "E09000008",
+    "E09000018",
+    "E09000009",
+    "E09000028",
+    "E09000007",
+    "E09000006",
+    "E09000029",
+    "E09000001",
+    "E09000019",
+    "E09000030",
+    "E07000208",
+    "E09000005"
+  ],
+  "E09000033": [
+    [
+      "E09000020",
+      "E09000007",
+      "E09000005",
+      "E09000022",
+      "E09000032",
+      "E09000001"
+    ],
+    "E09000019",
+    "E09000013",
+    "E09000028",
+    "E09000012",
+    "E09000027",
+    "E09000003",
+    "E09000014",
+    "E09000018",
+    "E09000023",
+    "E09000009",
+    "E09000030",
+    "E09000031",
+    "E09000024"
+  ],
+  "N09000001": [
+    [
+      "N09000008",
+      "N09000007",
+      "N09000009",
+      "N09000003",
+      "N09000002"
+    ],
+    "E07000062"
+  ],
+  "N09000002": [
+    [
+      "N09000010",
+      "N09000009",
+      "N09000007",
+      "N09000001"
+    ],
+    "W06000001",
+    "W06000002",
+    "E07000029"
+  ],
+  "N09000003": [
+    [
+      "N09000007",
+      "N09000001",
+      "N09000011"
+    ],
+    "E07000062",
+    "E07000029"
+  ],
+  "N09000004": [
+    [
+      "N09000008",
+      "N09000009",
+      "N09000005"
+    ],
+    "E07000062"
+  ],
+  "N09000005": [
+    [
+      "N09000006",
+      "N09000004",
+      "N09000009"
+    ],
+    "E07000108"
+  ],
+  "N09000006": [
+    [
+      "N09000009",
+      "N09000005"
+    ],
+    "E07000108",
+    "W06000001",
+    "W06000002"
+  ],
+  "N09000007": [
+    [
+      "N09000002",
+      "N09000003",
+      "N09000001",
+      "N09000010",
+      "N09000011"
+    ],
+    "W06000001",
+    "E07000029",
+    "W06000002"
+  ],
+  "N09000008": [
+    [
+      "N09000001",
+      "N09000004",
+      "N09000009"
+    ],
+    "E07000062"
+  ],
+  "N09000009": [
+    [
+      "N09000006",
+      "N09000002",
+      "N09000004",
+      "N09000001",
+      "N09000008",
+      "N09000005"
+    ],
+    "E07000108"
+  ],
+  "N09000010": [
+    [
+      "N09000002",
+      "N09000011",
+      "N09000007"
+    ],
+    "W06000001",
+    "W06000002",
+    "E07000029",
+    "E07000026"
+  ],
+  "N09000011": [
+    [
+      "N09000010",
+      "N09000007",
+      "N09000003"
+    ],
+    "E07000029",
+    "E07000026",
+    "W06000001"
+  ],
+  "S12000005": [
+    [
+      "S12000048",
+      "S12000030",
+      "S12000047",
+      "S12000014"
+    ],
+    "E06000053"
+  ],
+  "S12000006": [
+    [
+      "S12000026",
+      "S12000028",
+      "S12000008",
+      "S12000029",
+      "E07000028",
+      "E07000026"
+    ],
+    "E07000029",
+    "E07000030",
+    "E07000031",
+    "E06000057"
+  ],
+  "S12000008": [
+    [
+      "S12000028",
+      "S12000006",
+      "S12000029",
+      "S12000021",
+      "S12000011"
+    ],
+    "E06000053"
+  ],
+  "S12000010": [
+    [
+      "S12000026",
+      "S12000019",
+      "S12000036"
+    ],
+    "E06000057"
+  ],
+  "S12000011": [
+    [
+      "S12000008",
+      "S12000049",
+      "S12000029",
+      "S12000038",
+      "S12000021"
+    ],
+    "E06000053"
+  ],
+  "S12000013": [
+    null,
+    "E07000062"
+  ],
+  "S12000014": [
+    [
+      "S12000040",
+      "S12000050",
+      "S12000030",
+      "S12000005"
+    ],
+    "E06000053"
+  ],
+  "S12000017": [
+    [
+      "S12000048",
+      "S12000020",
+      "S12000035",
+      "S12000034"
+    ],
+    "E06000053"
+  ],
+  "S12000018": [
+    [
+      "S12000038",
+      "S12000021",
+      "S12000035",
+      "S12000039"
+    ],
+    "E06000053"
+  ],
+  "S12000019": [
+    [
+      "S12000026",
+      "S12000036",
+      "S12000010"
+    ],
+    "E06000057",
+    "E07000028"
+  ],
+  "S12000020": [
+    [
+      "S12000034",
+      "S12000017"
+    ],
+    "E06000053"
+  ],
+  "S12000021": [
+    [
+      "S12000008",
+      "S12000038",
+      "S12000018",
+      "S12000028",
+      "S12000011"
+    ],
+    "E07000062"
+  ],
+  "S12000023": [
+    null,
+    "E06000053"
+  ],
+  "S12000026": [
+    [
+      "E06000057",
+      "S12000006",
+      "S12000019",
+      "S12000010",
+      "S12000029",
+      "E07000028",
+      "S12000040",
+      "S12000036"
+    ],
+    "E07000026",
+    "E06000047",
+    "E07000030"
+  ],
+  "S12000027": [
+    null,
+    "E06000053"
+  ],
+  "S12000028": [
+    [
+      "S12000008",
+      "S12000006",
+      "S12000021"
+    ],
+    "E07000062",
+    "E07000026"
+  ],
+  "S12000029": [
+    [
+      "S12000006",
+      "S12000008",
+      "S12000026",
+      "S12000050",
+      "S12000049",
+      "S12000040",
+      "S12000011"
+    ],
+    "E06000053"
+  ],
+  "S12000030": [
+    [
+      "S12000048",
+      "S12000035",
+      "S12000045",
+      "S12000039",
+      "S12000014",
+      "S12000005",
+      "S12000050"
+    ],
+    "E06000053"
+  ],
+  "S12000033": [
+    [
+      "S12000034"
+    ],
+    "E06000057"
+  ],
+  "S12000034": [
+    [
+      "S12000020",
+      "S12000041",
+      "S12000033",
+      "S12000048",
+      "S12000017"
+    ],
+    "E06000057"
+  ],
+  "S12000035": [
+    [
+      "S12000017",
+      "S12000030",
+      "S12000048",
+      "S12000039",
+      "S12000018"
+    ],
+    "E07000062"
+  ],
+  "S12000036": [
+    [
+      "S12000040",
+      "S12000019",
+      "S12000010",
+      "S12000026"
+    ],
+    "E06000057"
+  ],
+  "S12000038": [
+    [
+      "S12000021",
+      "S12000018",
+      "S12000011",
+      "S12000039",
+      "S12000049"
+    ],
+    "E06000053"
+  ],
+  "S12000039": [
+    [
+      "S12000030",
+      "S12000035",
+      "S12000038",
+      "S12000045",
+      "S12000049",
+      "S12000018"
+    ],
+    "E06000053"
+  ],
+  "S12000040": [
+    [
+      "S12000014",
+      "S12000036",
+      "S12000050",
+      "S12000029",
+      "S12000026"
+    ],
+    "E06000057"
+  ],
+  "S12000041": [
+    [
+      "S12000034",
+      "S12000048",
+      "S12000042"
+    ],
+    "E06000057"
+  ],
+  "S12000042": [
+    [
+      "S12000041",
+      "S12000048"
+    ],
+    "E06000057"
+  ],
+  "S12000045": [
+    [
+      "S12000030",
+      "S12000050",
+      "S12000049",
+      "S12000039"
+    ],
+    "E06000053"
+  ],
+  "S12000047": [
+    [
+      "S12000048",
+      "S12000005"
+    ],
+    "E06000057"
+  ],
+  "S12000048": [
+    [
+      "S12000030",
+      "S12000017",
+      "S12000041",
+      "S12000047",
+      "S12000034",
+      "S12000005",
+      "S12000035",
+      "S12000042"
+    ],
+    "E06000053"
+  ],
+  "S12000049": [
+    [
+      "S12000029",
+      "S12000045",
+      "S12000011",
+      "S12000050",
+      "S12000038",
+      "S12000039"
+    ],
+    "E06000053"
+  ],
+  "S12000050": [
+    [
+      "S12000029",
+      "S12000014",
+      "S12000045",
+      "S12000040",
+      "S12000049",
+      "S12000030"
+    ],
+    "E06000053"
+  ],
+  "W06000001": [
+    null,
+    "W06000003",
+    "W06000002",
+    "W06000004",
+    "W06000023",
+    "W06000005",
+    "W06000006",
+    "E08000015",
+    "E06000051",
+    "E06000050",
+    "W06000008",
+    "E08000014",
+    "E07000127",
+    "E08000012",
+    "E08000011",
+    "E07000119",
+    "E06000009",
+    "E06000006",
+    "E08000013",
+    "E07000128"
+  ],
+  "W06000002": [
+    [
+      "W06000003",
+      "W06000023",
+      "W06000004",
+      "W06000008"
+    ],
+    "W06000001",
+    "W06000006",
+    "W06000005",
+    "E06000051",
+    "E06000050",
+    "E08000015",
+    "E06000019",
+    "E08000012",
+    "E08000014",
+    "E06000049",
+    "W06000010",
+    "E08000011",
+    "E07000127",
+    "E06000020",
+    "W06000009"
+  ],
+  "W06000003": [
+    [
+      "W06000002",
+      "W06000004"
+    ],
+    "W06000001",
+    "W06000005",
+    "W06000006",
+    "W06000023",
+    "E08000015",
+    "E06000051",
+    "E06000050",
+    "E08000012",
+    "E08000014",
+    "E07000127",
+    "E08000011",
+    "E06000006",
+    "W06000008",
+    "E08000013",
+    "E06000049",
+    "E06000007",
+    "E08000010"
+  ],
+  "W06000004": [
+    [
+      "W06000003",
+      "W06000005",
+      "W06000006",
+      "W06000002",
+      "W06000023"
+    ],
+    "E06000051",
+    "E06000050",
+    "E08000015",
+    "E08000012",
+    "E08000011",
+    "E08000014",
+    "E06000006",
+    "E06000049",
+    "W06000001",
+    "E07000127",
+    "E08000013",
+    "E06000007",
+    "E06000020",
+    "E08000010"
+  ],
+  "W06000005": [
+    [
+      "W06000004",
+      "E06000050",
+      "W06000006",
+      "E08000015"
+    ],
+    "E08000012",
+    "W06000002",
+    "E08000011",
+    "W06000003",
+    "E06000006",
+    "E08000014",
+    "E06000051",
+    "E08000013",
+    "E07000127",
+    "E06000007",
+    "E06000049",
+    "W06000023",
+    "E08000010",
+    "E07000118",
+    "E07000195"
+  ],
+  "W06000006": [
+    [
+      "E06000051",
+      "E06000050",
+      "W06000004",
+      "W06000023",
+      "W06000005"
+    ],
+    "E06000049",
+    "E06000020",
+    "W06000003",
+    "E08000015",
+    "E08000012",
+    "E06000006",
+    "E07000195",
+    "E08000011",
+    "E07000197",
+    "E06000007",
+    "W06000002",
+    "E08000013",
+    "E08000014",
+    "E07000196"
+  ],
+  "W06000008": [
+    [
+      "W06000010",
+      "W06000023",
+      "W06000009",
+      "W06000002"
+    ],
+    "W06000012",
+    "W06000011",
+    "E06000051",
+    "W06000016",
+    "W06000024",
+    "E06000019",
+    "W06000021",
+    "W06000019",
+    "W06000013",
+    "W06000018",
+    "W06000004",
+    "W06000003",
+    "W06000020",
+    "W06000006",
+    "W06000014"
+  ],
+  "W06000009": [
+    [
+      "W06000010",
+      "W06000008"
+    ],
+    "W06000011",
+    "W06000012",
+    "W06000023",
+    "E07000046",
+    "W06000002",
+    "E07000043",
+    "W06000013",
+    "W06000016",
+    "W06000014",
+    "W06000024",
+    "E07000246",
+    "W06000018",
+    "W06000019",
+    "W06000015",
+    "E07000042",
+    "E06000052",
+    "E07000047"
+  ],
+  "W06000010": [
+    [
+      "W06000008",
+      "W06000009",
+      "W06000023",
+      "W06000011",
+      "W06000012"
+    ],
+    "W06000013",
+    "W06000016",
+    "W06000024",
+    "W06000014",
+    "W06000018",
+    "W06000019",
+    "W06000015",
+    "W06000021",
+    "E06000019",
+    "W06000020",
+    "E07000043",
+    "W06000022",
+    "E07000246",
+    "E06000051"
+  ],
+  "W06000011": [
+    [
+      "W06000010",
+      "W06000012"
+    ],
+    "W06000023",
+    "W06000013",
+    "W06000009",
+    "W06000014",
+    "W06000016",
+    "W06000024",
+    "E07000043",
+    "E07000246",
+    "E07000046",
+    "W06000015",
+    "W06000008",
+    "W06000018",
+    "W06000019",
+    "W06000020",
+    "W06000021",
+    "W06000022",
+    "E06000023"
+  ],
+  "W06000012": [
+    [
+      "W06000013",
+      "W06000011",
+      "W06000023",
+      "W06000010",
+      "W06000016"
+    ],
+    "W06000014",
+    "W06000024",
+    "W06000019",
+    "W06000015",
+    "W06000018",
+    "W06000008",
+    "W06000020",
+    "W06000022",
+    "W06000021",
+    "E06000019",
+    "E06000023",
+    "E06000024",
+    "E07000043",
+    "E07000246"
+  ],
+  "W06000013": [
+    [
+      "W06000012",
+      "W06000016",
+      "W06000014"
+    ],
+    "W06000010",
+    "W06000024",
+    "W06000011",
+    "W06000015",
+    "W06000018",
+    "W06000019",
+    "W06000021",
+    "W06000023",
+    "W06000020",
+    "E06000023",
+    "W06000022",
+    "E06000024",
+    "E07000043",
+    "E07000188",
+    "E07000246",
+    "E06000019"
+  ],
+  "W06000014": [
+    [
+      "W06000015",
+      "W06000013",
+      "W06000016"
+    ],
+    "W06000018",
+    "W06000012",
+    "E07000188",
+    "W06000021",
+    "W06000022",
+    "E06000024",
+    "E06000023",
+    "W06000024",
+    "W06000020",
+    "E07000043",
+    "W06000019",
+    "W06000010",
+    "W06000011",
+    "E07000246",
+    "E07000189",
+    "E07000187"
+  ],
+  "W06000015": [
+    [
+      "W06000014",
+      "W06000016",
+      "W06000018",
+      "W06000022",
+      "E06000023"
+    ],
+    "W06000021",
+    "E06000024",
+    "W06000020",
+    "W06000024",
+    "W06000013",
+    "E07000188",
+    "W06000019",
+    "W06000012",
+    "E07000187",
+    "W06000023",
+    "W06000010",
+    "E06000022",
+    "E06000025",
+    "E06000019"
+  ],
+  "W06000016": [
+    [
+      "W06000024",
+      "W06000013",
+      "W06000023",
+      "W06000014",
+      "W06000015",
+      "W06000018",
+      "W06000012"
+    ],
+    "W06000019",
+    "W06000010",
+    "W06000020",
+    "W06000022",
+    "W06000021",
+    "E06000023",
+    "E06000024",
+    "E06000019",
+    "W06000011",
+    "E07000188",
+    "W06000008",
+    "E07000043"
+  ],
+  "W06000018": [
+    [
+      "W06000019",
+      "W06000024",
+      "W06000022",
+      "W06000016",
+      "W06000020",
+      "W06000015",
+      "W06000023"
+    ],
+    "E06000023",
+    "W06000021",
+    "W06000014",
+    "E06000024",
+    "W06000013",
+    "E06000019",
+    "W06000012",
+    "W06000010",
+    "E06000025",
+    "E07000188",
+    "E07000080",
+    "E06000022"
+  ],
+  "W06000019": [
+    [
+      "W06000018",
+      "W06000023",
+      "W06000020",
+      "W06000021"
+    ],
+    "E06000019",
+    "W06000016",
+    "W06000024",
+    "W06000022",
+    "W06000013",
+    "W06000015",
+    "E06000023",
+    "W06000012",
+    "W06000014",
+    "E06000024",
+    "W06000010",
+    "E06000025",
+    "E07000080",
+    "E07000235",
+    "W06000008"
+  ],
+  "W06000020": [
+    [
+      "W06000021",
+      "W06000022",
+      "W06000018",
+      "W06000019"
+    ],
+    "W06000023",
+    "W06000015",
+    "E06000019",
+    "W06000024",
+    "E06000023",
+    "W06000016",
+    "W06000014",
+    "E06000024",
+    "E06000025",
+    "E07000080",
+    "W06000013",
+    "W06000012",
+    "E06000022",
+    "E07000082",
+    "E07000235"
+  ],
+  "W06000021": [
+    [
+      "E06000019",
+      "W06000020",
+      "W06000022",
+      "E07000080",
+      "W06000023",
+      "W06000019",
+      "E06000025",
+      "E06000023"
+    ],
+    "W06000018",
+    "E07000082",
+    "W06000015",
+    "W06000016",
+    "E07000235",
+    "W06000024",
+    "E06000024",
+    "W06000014",
+    "E06000054",
+    "E07000083",
+    "E06000022"
+  ],
+  "W06000022": [
+    [
+      "W06000021",
+      "W06000018",
+      "W06000020",
+      "W06000015"
+    ],
+    "E06000023",
+    "E06000024",
+    "W06000014",
+    "W06000019",
+    "E07000080",
+    "W06000023",
+    "W06000016",
+    "E06000025",
+    "W06000024",
+    "E06000022",
+    "E07000187",
+    "E07000082",
+    "E06000019",
+    "E07000188",
+    "W06000013"
+  ],
+  "W06000023": [
+    [
+      "E06000051",
+      "W06000008",
+      "E06000019",
+      "W06000002",
+      "W06000010",
+      "W06000012",
+      "W06000006",
+      "W06000016",
+      "W06000019",
+      "W06000004",
+      "W06000018"
+    ],
+    "W06000021",
+    "E07000235",
+    "W06000024",
+    "E07000080",
+    "E06000020",
+    "W06000020",
+    "E07000239",
+    "W06000011",
+    "W06000003"
+  ],
+  "W06000024": [
+    [
+      "W06000016",
+      "W06000018",
+      "W06000023"
+    ],
+    "W06000019",
+    "W06000013",
+    "W06000012",
+    "W06000020",
+    "E06000019",
+    "W06000022",
+    "W06000015",
+    "W06000010",
+    "E06000023",
+    "W06000021",
+    "W06000014",
+    "E06000024",
+    "W06000011",
+    "W06000008",
+    "E06000025",
+    "E07000188"
+  ]
+};
+function guard(name) {
+  return () => {
+    throw new Error(`Cannot call ${name}(...) on the server`);
+  };
+}
+const goto = guard("goto");
+var Header_svelte_svelte_type_style_lang = "";
+const css$b = {
+  code: ".short.svelte-19u0sv3{min-height:85vh}.v-padded.svelte-19u0sv3{box-sizing:border-box;padding:40px 0}",
+  map: null
+};
+const Header = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let { theme = getContext("theme") } = $$props;
+  let { bgimage = null } = $$props;
+  let { bgcolor = null } = $$props;
+  let { bgfixed = false } = $$props;
+  let { center = true } = $$props;
+  let { short = false } = $$props;
+  let style = "";
+  if (bgimage) {
+    style += `background-image: url(${bgimage});`;
+  } else {
+    style += "background-image: none;";
+  }
+  if (bgfixed) {
+    style += " background-attachment: fixed;";
+  }
+  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0)
+    $$bindings.theme(theme);
+  if ($$props.bgimage === void 0 && $$bindings.bgimage && bgimage !== void 0)
+    $$bindings.bgimage(bgimage);
+  if ($$props.bgcolor === void 0 && $$bindings.bgcolor && bgcolor !== void 0)
+    $$bindings.bgcolor(bgcolor);
+  if ($$props.bgfixed === void 0 && $$bindings.bgfixed && bgfixed !== void 0)
+    $$bindings.bgfixed(bgfixed);
+  if ($$props.center === void 0 && $$bindings.center && center !== void 0)
+    $$bindings.center(center);
+  if ($$props.short === void 0 && $$bindings.short && short !== void 0)
+    $$bindings.short(short);
+  $$result.css.add(css$b);
+  return `<header style="${"color:white; background-color: " + escape(bgcolor ? bgcolor : theme["background"]) + "; " + escape(style)}" class="${["svelte-19u0sv3", short ? "short" : ""].join(" ").trim()}"><div class="${[
+    "v-padded col-wide middle svelte-19u0sv3",
+    (short ? "short" : "") + " " + (!short ? "height-full" : "")
+  ].join(" ").trim()}" style="${"position: relative"}"><div${add_classes((center ? "center" : "").trim())}>${slots.default ? slots.default({}) : ``}</div></div></header>`;
+});
+var Filler_svelte_svelte_type_style_lang = "";
+const css$a = {
+  code: "section.svelte-1odf9sx{padding:36px 0}",
+  map: null
+};
+const Filler = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let { theme = getContext("theme") } = $$props;
+  let { center = true } = $$props;
+  let { wide = true } = $$props;
+  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0)
+    $$bindings.theme(theme);
+  if ($$props.center === void 0 && $$bindings.center && center !== void 0)
+    $$bindings.center(center);
+  if ($$props.wide === void 0 && $$bindings.wide && wide !== void 0)
+    $$bindings.wide(wide);
+  $$result.css.add(css$a);
+  return `<section style="${"color: " + escape(theme["text"]) + "; background-color: " + escape(theme["background"]) + ";"}" class="${"svelte-1odf9sx"}"><div class="${[
+    "middle",
+    (center ? "center" : "") + " " + (!wide ? "col-medium" : "") + " " + (wide ? "col-wide" : "")
+  ].join(" ").trim()}">${slots.default ? slots.default({}) : ``}</div></section>`;
+});
+var Divider_svelte_svelte_type_style_lang = "";
+var Toggle_svelte_svelte_type_style_lang = "";
+var Arrow_svelte_svelte_type_style_lang = "";
+const css$9 = {
+  code: ".arrow.svelte-1prdo3z{width:48px;height:48px}.left.svelte-1prdo3z{margin-right:10px}.bounce.svelte-1prdo3z{-webkit-animation-duration:2s;animation-duration:2s;-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;-webkit-animation-name:svelte-1prdo3z-bounce;animation-name:svelte-1prdo3z-bounce;-webkit-animation-timing-function:ease;animation-timing-function:ease}@-webkit-keyframes svelte-1prdo3z-bounce{0%{-webkit-transform:translateY(10px);transform:translateY(10px)}30%{-webkit-transform:translateY(-10px);transform:translateY(-10px)}50%{-webkit-transform:translateY(10px);transform:translateY(10px)}100%{-webkit-transform:translateY(10px);transform:translateY(10px)}}@keyframes svelte-1prdo3z-bounce{0%{-webkit-transform:translateY(10px);transform:translateY(10px)}30%{-webkit-transform:translateY(-10px);transform:translateY(-10px)}50%{-webkit-transform:translateY(10px);transform:translateY(10px)}100%{-webkit-transform:translateY(10px);transform:translateY(10px)}}",
+  map: null
+};
+const Arrow = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let { color = "black" } = $$props;
+  let { animation = true } = $$props;
+  let { center = true } = $$props;
+  const colors = ["black", "white"];
+  color = colors.includes(color) ? color : "black";
+  if ($$props.color === void 0 && $$bindings.color && color !== void 0)
+    $$bindings.color(color);
+  if ($$props.animation === void 0 && $$bindings.animation && animation !== void 0)
+    $$bindings.animation(animation);
+  if ($$props.center === void 0 && $$bindings.center && center !== void 0)
+    $$bindings.center(center);
+  $$result.css.add(css$9);
+  return `${center ? `${slots.default ? slots.default({}) : ``}<br>
+<img src="${escape(assets) + "/img/scroll-down-" + escape(color) + ".svg"}" class="${["arrow svelte-1prdo3z", animation ? "bounce" : ""].join(" ").trim()}" alt="${""}" aria-hidden="${"true"}">` : `<img src="${escape(assets) + "/img/scroll-down-" + escape(color) + ".svg"}" class="${["arrow left svelte-1prdo3z", animation ? "bounce" : ""].join(" ").trim()}" alt="${""}" aria-hidden="${"true"}">${slots.default ? slots.default({}) : ``}`}`;
+});
+var Scroller_svelte_svelte_type_style_lang = "";
+const css$8 = {
+  code: "svelte-scroller-outer.svelte-6siu2r{display:block;position:relative;max-width:100%}svelte-scroller-background.svelte-6siu2r{display:block;position:relative;width:100%}svelte-scroller-foreground.svelte-6siu2r{display:block;position:relative;z-index:2;pointer-events:none\r\n	}svelte-scroller-foreground.svelte-6siu2r::after{content:' ';display:block;clear:both}svelte-scroller-background-container.svelte-6siu2r{display:block;position:absolute;width:100%;max-width:100%;pointer-events:none;will-change:transform}",
+  map: null
+};
+const handlers = [];
+if (typeof window !== "undefined") {
+  const run_all = () => handlers.forEach((fn) => fn());
+  window.addEventListener("scroll", run_all);
+  window.addEventListener("resize", run_all);
+}
+if (typeof IntersectionObserver !== "undefined") {
+  const map = /* @__PURE__ */ new Map();
+  new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      const update = map.get(entry.target);
+      const index = handlers.indexOf(update);
+      if (entry.isIntersecting) {
+        if (index === -1)
+          handlers.push(update);
+      } else {
+        update();
+        if (index !== -1)
+          handlers.splice(index, 1);
+      }
+    });
+  }, {
+    rootMargin: "400px 0px"
+  });
+}
+const Scroller = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let { top: top2 = 0 } = $$props;
+  let { bottom: bottom2 = 1 } = $$props;
+  let { threshold: threshold2 = 0.5 } = $$props;
+  let { query = "section" } = $$props;
+  let { parallax = false } = $$props;
+  let { index = 0 } = $$props;
+  let { count = 0 } = $$props;
+  let { offset = 0 } = $$props;
+  let { progress = 0 } = $$props;
+  let { visible = false } = $$props;
+  let { splitscreen = false } = $$props;
+  let { id = null } = $$props;
+  let outer;
+  let bgContainer;
+  let foreground;
+  let background;
+  if ($$props.top === void 0 && $$bindings.top && top2 !== void 0)
+    $$bindings.top(top2);
+  if ($$props.bottom === void 0 && $$bindings.bottom && bottom2 !== void 0)
+    $$bindings.bottom(bottom2);
+  if ($$props.threshold === void 0 && $$bindings.threshold && threshold2 !== void 0)
+    $$bindings.threshold(threshold2);
+  if ($$props.query === void 0 && $$bindings.query && query !== void 0)
+    $$bindings.query(query);
+  if ($$props.parallax === void 0 && $$bindings.parallax && parallax !== void 0)
+    $$bindings.parallax(parallax);
+  if ($$props.index === void 0 && $$bindings.index && index !== void 0)
+    $$bindings.index(index);
+  if ($$props.count === void 0 && $$bindings.count && count !== void 0)
+    $$bindings.count(count);
+  if ($$props.offset === void 0 && $$bindings.offset && offset !== void 0)
+    $$bindings.offset(offset);
+  if ($$props.progress === void 0 && $$bindings.progress && progress !== void 0)
+    $$bindings.progress(progress);
+  if ($$props.visible === void 0 && $$bindings.visible && visible !== void 0)
+    $$bindings.visible(visible);
+  if ($$props.splitscreen === void 0 && $$bindings.splitscreen && splitscreen !== void 0)
+    $$bindings.splitscreen(splitscreen);
+  if ($$props.id === void 0 && $$bindings.id && id !== void 0)
+    $$bindings.id(id);
+  $$result.css.add(css$8);
+  return `
+
+<svelte-scroller-outer class="${["svelte-6siu2r", splitscreen ? "splitscreen" : ""].join(" ").trim()}"${add_attribute("this", outer, 0)}><svelte-scroller-background-container class="${"background-container svelte-6siu2r"}"${add_attribute("this", bgContainer, 0)}><svelte-scroller-background class="${"svelte-6siu2r"}"${add_attribute("this", background, 0)}>${slots.background ? slots.background({}) : ``}</svelte-scroller-background></svelte-scroller-background-container>
+
+	<svelte-scroller-foreground class="${"svelte-6siu2r"}"${add_attribute("this", foreground, 0)}>${slots.foreground ? slots.foreground({}) : ``}</svelte-scroller-foreground>
+</svelte-scroller-outer>`;
+});
+function isOutOfViewport(parent, container) {
+  const parentBounding = parent.getBoundingClientRect();
+  const boundingContainer = container.getBoundingClientRect();
+  const out = {};
+  out.top = parentBounding.top < 0;
+  out.left = parentBounding.left < 0;
+  out.bottom = parentBounding.bottom + boundingContainer.height > (window.innerHeight || document.documentElement.clientHeight);
+  out.right = parentBounding.right > (window.innerWidth || document.documentElement.clientWidth);
+  out.any = out.top || out.left || out.bottom || out.right;
+  return out;
+}
+var Item_svelte_svelte_type_style_lang = "";
+const css$7 = {
+  code: ".item.svelte-3e0qet{cursor:default;height:var(--height, 42px);line-height:var(--height, 42px);padding:var(--itemPadding, 0 20px);color:var(--itemColor, inherit);text-overflow:ellipsis;overflow:hidden;white-space:nowrap}.groupHeader.svelte-3e0qet{text-transform:var(--groupTitleTextTransform, uppercase)}.groupItem.svelte-3e0qet{padding-left:var(--groupItemPaddingLeft, 40px)}.item.svelte-3e0qet:active{background:var(--itemActiveBackground, #b9daff)}.item.active.svelte-3e0qet{background:var(--itemIsActiveBG, #007aff);color:var(--itemIsActiveColor, #fff)}.item.notSelectable.svelte-3e0qet{color:var(--itemIsNotSelectableColor, #999)}.item.first.svelte-3e0qet{border-radius:var(--itemFirstBorderRadius, 4px 4px 0 0)}.item.hover.svelte-3e0qet:not(.active){background:var(--itemHoverBG, #e7f2ff);color:var(--itemHoverColor, inherit)}",
+  map: null
+};
+const Item = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let { isActive = false } = $$props;
+  let { isFirst = false } = $$props;
+  let { isHover = false } = $$props;
+  let { isSelectable = false } = $$props;
+  let { getOptionLabel = void 0 } = $$props;
+  let { item = void 0 } = $$props;
+  let { filterText = "" } = $$props;
+  let itemClasses = "";
+  if ($$props.isActive === void 0 && $$bindings.isActive && isActive !== void 0)
+    $$bindings.isActive(isActive);
+  if ($$props.isFirst === void 0 && $$bindings.isFirst && isFirst !== void 0)
+    $$bindings.isFirst(isFirst);
+  if ($$props.isHover === void 0 && $$bindings.isHover && isHover !== void 0)
+    $$bindings.isHover(isHover);
+  if ($$props.isSelectable === void 0 && $$bindings.isSelectable && isSelectable !== void 0)
+    $$bindings.isSelectable(isSelectable);
+  if ($$props.getOptionLabel === void 0 && $$bindings.getOptionLabel && getOptionLabel !== void 0)
+    $$bindings.getOptionLabel(getOptionLabel);
+  if ($$props.item === void 0 && $$bindings.item && item !== void 0)
+    $$bindings.item(item);
+  if ($$props.filterText === void 0 && $$bindings.filterText && filterText !== void 0)
+    $$bindings.filterText(filterText);
+  $$result.css.add(css$7);
+  {
+    {
+      const classes = [];
+      if (isActive) {
+        classes.push("active");
+      }
+      if (isFirst) {
+        classes.push("first");
+      }
+      if (isHover) {
+        classes.push("hover");
+      }
+      if (item.isGroupHeader) {
+        classes.push("groupHeader");
+      }
+      if (item.isGroupItem) {
+        classes.push("groupItem");
+      }
+      if (!isSelectable) {
+        classes.push("notSelectable");
+      }
+      itemClasses = classes.join(" ");
+    }
+  }
+  return `<div class="${"item " + escape(itemClasses) + " svelte-3e0qet"}"><!-- HTML_TAG_START -->${getOptionLabel(item, filterText)}<!-- HTML_TAG_END --></div>`;
+});
+var List_svelte_svelte_type_style_lang = "";
+const css$6 = {
+  code: ".listContainer.svelte-1uyqfml{box-shadow:var(--listShadow, 0 2px 3px 0 rgba(44, 62, 80, 0.24));border-radius:var(--listBorderRadius, 4px);max-height:var(--listMaxHeight, 250px);overflow-y:auto;background:var(--listBackground, #fff);border:var(--listBorder, none);position:var(--listPosition, absolute);z-index:var(--listZIndex, 2);width:100%;left:var(--listLeft, 0);right:var(--listRight, 0)}.virtualList.svelte-1uyqfml{height:var(--virtualListHeight, 200px)}.listGroupTitle.svelte-1uyqfml{color:var(--groupTitleColor, #8f8f8f);cursor:default;font-size:var(--groupTitleFontSize, 12px);font-weight:var(--groupTitleFontWeight, 600);height:var(--height, 42px);line-height:var(--height, 42px);padding:var(--groupTitlePadding, 0 20px);text-overflow:ellipsis;overflow-x:hidden;white-space:nowrap;text-transform:var(--groupTitleTextTransform, uppercase)}.empty.svelte-1uyqfml{text-align:var(--listEmptyTextAlign, center);padding:var(--listEmptyPadding, 20px 0);color:var(--listEmptyColor, #78848f)}",
+  map: null
+};
+function isItemActive(item, value, optionIdentifier) {
+  return value && value[optionIdentifier] === item[optionIdentifier];
+}
+function isItemFirst(itemIndex) {
+  return itemIndex === 0;
+}
+function isItemHover(hoverItemIndex, item, itemIndex, items2) {
+  return isItemSelectable(item) && (hoverItemIndex === itemIndex || items2.length === 1);
+}
+function isItemSelectable(item) {
+  return item.isGroupHeader && item.isSelectable || item.selectable || !item.hasOwnProperty("selectable");
+}
+const List = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  createEventDispatcher();
+  let { container = void 0 } = $$props;
+  let { VirtualList: VirtualList2 = null } = $$props;
+  let { Item: Item$1 = Item } = $$props;
+  let { isVirtualList = false } = $$props;
+  let { items: items2 = [] } = $$props;
+  let { labelIdentifier = "label" } = $$props;
+  let { getOptionLabel = (option, filterText2) => {
+    if (option)
+      return option.isCreator ? `Create "${filterText2}"` : option[labelIdentifier];
+  } } = $$props;
+  let { getGroupHeaderLabel = null } = $$props;
+  let { itemHeight = 40 } = $$props;
+  let { hoverItemIndex = 0 } = $$props;
+  let { value = void 0 } = $$props;
+  let { optionIdentifier = "value" } = $$props;
+  let { hideEmptyState = false } = $$props;
+  let { noOptionsMessage = "No options" } = $$props;
+  let { isMulti = false } = $$props;
+  let { activeItemIndex = 0 } = $$props;
+  let { filterText = "" } = $$props;
+  let { parent = null } = $$props;
+  let { listPlacement = null } = $$props;
+  let { listAutoWidth = null } = $$props;
+  let { listOffset = 5 } = $$props;
+  let listStyle;
+  function computePlacement() {
+    const { height, width: width2 } = parent.getBoundingClientRect();
+    listStyle = "";
+    listStyle += `min-width:${width2}px;width:${listAutoWidth ? "auto" : "100%"};`;
+    if (listPlacement === "top" || listPlacement === "auto" && isOutOfViewport(parent, container).bottom) {
+      listStyle += `bottom:${height + listOffset}px;`;
+    } else {
+      listStyle += `top:${height + listOffset}px;`;
+    }
+  }
+  if ($$props.container === void 0 && $$bindings.container && container !== void 0)
+    $$bindings.container(container);
+  if ($$props.VirtualList === void 0 && $$bindings.VirtualList && VirtualList2 !== void 0)
+    $$bindings.VirtualList(VirtualList2);
+  if ($$props.Item === void 0 && $$bindings.Item && Item$1 !== void 0)
+    $$bindings.Item(Item$1);
+  if ($$props.isVirtualList === void 0 && $$bindings.isVirtualList && isVirtualList !== void 0)
+    $$bindings.isVirtualList(isVirtualList);
+  if ($$props.items === void 0 && $$bindings.items && items2 !== void 0)
+    $$bindings.items(items2);
+  if ($$props.labelIdentifier === void 0 && $$bindings.labelIdentifier && labelIdentifier !== void 0)
+    $$bindings.labelIdentifier(labelIdentifier);
+  if ($$props.getOptionLabel === void 0 && $$bindings.getOptionLabel && getOptionLabel !== void 0)
+    $$bindings.getOptionLabel(getOptionLabel);
+  if ($$props.getGroupHeaderLabel === void 0 && $$bindings.getGroupHeaderLabel && getGroupHeaderLabel !== void 0)
+    $$bindings.getGroupHeaderLabel(getGroupHeaderLabel);
+  if ($$props.itemHeight === void 0 && $$bindings.itemHeight && itemHeight !== void 0)
+    $$bindings.itemHeight(itemHeight);
+  if ($$props.hoverItemIndex === void 0 && $$bindings.hoverItemIndex && hoverItemIndex !== void 0)
+    $$bindings.hoverItemIndex(hoverItemIndex);
+  if ($$props.value === void 0 && $$bindings.value && value !== void 0)
+    $$bindings.value(value);
+  if ($$props.optionIdentifier === void 0 && $$bindings.optionIdentifier && optionIdentifier !== void 0)
+    $$bindings.optionIdentifier(optionIdentifier);
+  if ($$props.hideEmptyState === void 0 && $$bindings.hideEmptyState && hideEmptyState !== void 0)
+    $$bindings.hideEmptyState(hideEmptyState);
+  if ($$props.noOptionsMessage === void 0 && $$bindings.noOptionsMessage && noOptionsMessage !== void 0)
+    $$bindings.noOptionsMessage(noOptionsMessage);
+  if ($$props.isMulti === void 0 && $$bindings.isMulti && isMulti !== void 0)
+    $$bindings.isMulti(isMulti);
+  if ($$props.activeItemIndex === void 0 && $$bindings.activeItemIndex && activeItemIndex !== void 0)
+    $$bindings.activeItemIndex(activeItemIndex);
+  if ($$props.filterText === void 0 && $$bindings.filterText && filterText !== void 0)
+    $$bindings.filterText(filterText);
+  if ($$props.parent === void 0 && $$bindings.parent && parent !== void 0)
+    $$bindings.parent(parent);
+  if ($$props.listPlacement === void 0 && $$bindings.listPlacement && listPlacement !== void 0)
+    $$bindings.listPlacement(listPlacement);
+  if ($$props.listAutoWidth === void 0 && $$bindings.listAutoWidth && listAutoWidth !== void 0)
+    $$bindings.listAutoWidth(listAutoWidth);
+  if ($$props.listOffset === void 0 && $$bindings.listOffset && listOffset !== void 0)
+    $$bindings.listOffset(listOffset);
+  $$result.css.add(css$6);
+  {
+    {
+      if (parent && container)
+        computePlacement();
+    }
+  }
+  return `
+
+<div class="${["listContainer svelte-1uyqfml", isVirtualList ? "virtualList" : ""].join(" ").trim()}"${add_attribute("style", listStyle, 0)}${add_attribute("this", container, 0)}>${isVirtualList ? `${validate_component(VirtualList2 || missing_component, "svelte:component").$$render($$result, { items: items2, itemHeight }, {}, {
+    default: ({ item, i }) => {
+      return `<div class="${"listItem"}">${validate_component(Item$1 || missing_component, "svelte:component").$$render($$result, {
+        item,
+        filterText,
+        getOptionLabel,
+        isFirst: isItemFirst(i),
+        isActive: isItemActive(item, value, optionIdentifier),
+        isHover: isItemHover(hoverItemIndex, item, i, items2),
+        isSelectable: isItemSelectable(item)
+      }, {}, {})}</div>`;
+    }
+  })}` : `${items2.length ? each(items2, (item, i) => {
+    return `${item.isGroupHeader && !item.isSelectable ? `<div class="${"listGroupTitle svelte-1uyqfml"}">${escape(getGroupHeaderLabel(item))}</div>` : `<div class="${"listItem"}" tabindex="${"-1"}">${validate_component(Item$1 || missing_component, "svelte:component").$$render($$result, {
+      item,
+      filterText,
+      getOptionLabel,
+      isFirst: isItemFirst(i),
+      isActive: isItemActive(item, value, optionIdentifier),
+      isHover: isItemHover(hoverItemIndex, item, i, items2),
+      isSelectable: isItemSelectable(item)
+    }, {}, {})}
+                </div>`}`;
+  }) : `${!hideEmptyState ? `<div class="${"empty svelte-1uyqfml"}">${escape(noOptionsMessage)}</div>` : ``}`}`}</div>`;
+});
+var Selection_svelte_svelte_type_style_lang = "";
+const css$5 = {
+  code: ".selection.svelte-pu1q1n{text-overflow:ellipsis;overflow-x:hidden;white-space:nowrap}",
+  map: null
+};
+const Selection = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let { getSelectionLabel = void 0 } = $$props;
+  let { item = void 0 } = $$props;
+  if ($$props.getSelectionLabel === void 0 && $$bindings.getSelectionLabel && getSelectionLabel !== void 0)
+    $$bindings.getSelectionLabel(getSelectionLabel);
+  if ($$props.item === void 0 && $$bindings.item && item !== void 0)
+    $$bindings.item(item);
+  $$result.css.add(css$5);
+  return `<div class="${"selection svelte-pu1q1n"}"><!-- HTML_TAG_START -->${getSelectionLabel(item)}<!-- HTML_TAG_END --></div>`;
+});
+var MultiSelection_svelte_svelte_type_style_lang = "";
+const css$4 = {
+  code: ".multiSelectItem.svelte-liu9pa.svelte-liu9pa{background:var(--multiItemBG, #ebedef);margin:var(--multiItemMargin, 5px 5px 0 0);border-radius:var(--multiItemBorderRadius, 16px);height:var(--multiItemHeight, 32px);line-height:var(--multiItemHeight, 32px);display:flex;cursor:default;padding:var(--multiItemPadding, 0 10px 0 15px);max-width:100%}.multiSelectItem_label.svelte-liu9pa.svelte-liu9pa{margin:var(--multiLabelMargin, 0 5px 0 0);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.multiSelectItem.svelte-liu9pa.svelte-liu9pa:hover,.multiSelectItem.active.svelte-liu9pa.svelte-liu9pa{background-color:var(--multiItemActiveBG, #006fff);color:var(--multiItemActiveColor, #fff)}.multiSelectItem.disabled.svelte-liu9pa.svelte-liu9pa:hover{background:var(--multiItemDisabledHoverBg, #ebedef);color:var(--multiItemDisabledHoverColor, #c1c6cc)}.multiSelectItem_clear.svelte-liu9pa.svelte-liu9pa{border-radius:var(--multiClearRadius, 50%);background:var(--multiClearBG, #52616f);min-width:var(--multiClearWidth, 16px);max-width:var(--multiClearWidth, 16px);height:var(--multiClearHeight, 16px);position:relative;top:var(--multiClearTop, 8px);text-align:var(--multiClearTextAlign, center);padding:var(--multiClearPadding, 1px)}.multiSelectItem_clear.svelte-liu9pa.svelte-liu9pa:hover,.active.svelte-liu9pa .multiSelectItem_clear.svelte-liu9pa{background:var(--multiClearHoverBG, #fff)}.multiSelectItem_clear.svelte-liu9pa:hover svg.svelte-liu9pa,.active.svelte-liu9pa .multiSelectItem_clear svg.svelte-liu9pa{fill:var(--multiClearHoverFill, #006fff)}.multiSelectItem_clear.svelte-liu9pa svg.svelte-liu9pa{fill:var(--multiClearFill, #ebedef);vertical-align:top}",
+  map: null
+};
+const MultiSelection = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  createEventDispatcher();
+  let { value = [] } = $$props;
+  let { activeValue = void 0 } = $$props;
+  let { isDisabled = false } = $$props;
+  let { multiFullItemClearable = false } = $$props;
+  let { getSelectionLabel = void 0 } = $$props;
+  if ($$props.value === void 0 && $$bindings.value && value !== void 0)
+    $$bindings.value(value);
+  if ($$props.activeValue === void 0 && $$bindings.activeValue && activeValue !== void 0)
+    $$bindings.activeValue(activeValue);
+  if ($$props.isDisabled === void 0 && $$bindings.isDisabled && isDisabled !== void 0)
+    $$bindings.isDisabled(isDisabled);
+  if ($$props.multiFullItemClearable === void 0 && $$bindings.multiFullItemClearable && multiFullItemClearable !== void 0)
+    $$bindings.multiFullItemClearable(multiFullItemClearable);
+  if ($$props.getSelectionLabel === void 0 && $$bindings.getSelectionLabel && getSelectionLabel !== void 0)
+    $$bindings.getSelectionLabel(getSelectionLabel);
+  $$result.css.add(css$4);
+  return `${each(value, (item, i) => {
+    return `<div class="${"multiSelectItem " + escape(activeValue === i ? "active" : "") + " " + escape(isDisabled ? "disabled" : "") + " svelte-liu9pa"}"><div class="${"multiSelectItem_label svelte-liu9pa"}"><!-- HTML_TAG_START -->${getSelectionLabel(item)}<!-- HTML_TAG_END --></div>
+        ${!isDisabled && !multiFullItemClearable ? `<div class="${"multiSelectItem_clear svelte-liu9pa"}"><svg width="${"100%"}" height="${"100%"}" viewBox="${"-2 -2 50 50"}" focusable="${"false"}" aria-hidden="${"true"}" role="${"presentation"}" class="${"svelte-liu9pa"}"><path d="${"M34.923,37.251L24,26.328L13.077,37.251L9.436,33.61l10.923-10.923L9.436,11.765l3.641-3.641L24,19.047L34.923,8.124 l3.641,3.641L27.641,22.688L38.564,33.61L34.923,37.251z"}"></path></svg>
+            </div>` : ``}
+    </div>`;
+  })}`;
+});
+var VirtualList_svelte_svelte_type_style_lang = "";
+const css$3 = {
+  code: "svelte-virtual-list-viewport.svelte-g2cagw{position:relative;overflow-y:auto;-webkit-overflow-scrolling:touch;display:block}svelte-virtual-list-contents.svelte-g2cagw,svelte-virtual-list-row.svelte-g2cagw{display:block}svelte-virtual-list-row.svelte-g2cagw{overflow:hidden}",
+  map: null
+};
+const VirtualList = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let { items: items2 = void 0 } = $$props;
+  let { height = "100%" } = $$props;
+  let { itemHeight = 40 } = $$props;
+  let { hoverItemIndex = 0 } = $$props;
+  let { start = 0 } = $$props;
+  let { end = 0 } = $$props;
+  let viewport;
+  let contents;
+  let visible;
+  let top2 = 0;
+  let bottom2 = 0;
+  if ($$props.items === void 0 && $$bindings.items && items2 !== void 0)
+    $$bindings.items(items2);
+  if ($$props.height === void 0 && $$bindings.height && height !== void 0)
+    $$bindings.height(height);
+  if ($$props.itemHeight === void 0 && $$bindings.itemHeight && itemHeight !== void 0)
+    $$bindings.itemHeight(itemHeight);
+  if ($$props.hoverItemIndex === void 0 && $$bindings.hoverItemIndex && hoverItemIndex !== void 0)
+    $$bindings.hoverItemIndex(hoverItemIndex);
+  if ($$props.start === void 0 && $$bindings.start && start !== void 0)
+    $$bindings.start(start);
+  if ($$props.end === void 0 && $$bindings.end && end !== void 0)
+    $$bindings.end(end);
+  $$result.css.add(css$3);
+  visible = items2.slice(start, end).map((data, i) => {
+    return { index: i + start, data };
+  });
+  return `<svelte-virtual-list-viewport style="${"height: " + escape(height) + ";"}" class="${"svelte-g2cagw"}"${add_attribute("this", viewport, 0)}><svelte-virtual-list-contents style="${"padding-top: " + escape(top2) + "px; padding-bottom: " + escape(bottom2) + "px;"}" class="${"svelte-g2cagw"}"${add_attribute("this", contents, 0)}>${each(visible, (row) => {
+    return `<svelte-virtual-list-row class="${"svelte-g2cagw"}">${slots.default ? slots.default({
+      item: row.data,
+      i: row.index,
+      hoverItemIndex
+    }) : `Missing template`}
+            </svelte-virtual-list-row>`;
+  })}</svelte-virtual-list-contents></svelte-virtual-list-viewport>`;
+});
+const ClearIcon = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  return `<svg width="${"100%"}" height="${"100%"}" viewBox="${"-2 -2 50 50"}" focusable="${"false"}" aria-hidden="${"true"}" role="${"presentation"}"><path fill="${"currentColor"}" d="${"M34.923,37.251L24,26.328L13.077,37.251L9.436,33.61l10.923-10.923L9.436,11.765l3.641-3.641L24,19.047L34.923,8.124\n    l3.641,3.641L27.641,22.688L38.564,33.61L34.923,37.251z"}"></path></svg>`;
+});
+function debounce(func, wait, immediate) {
+  let timeout;
+  return function executedFunction() {
+    let context = this;
+    let args = arguments;
+    let later = function() {
+      timeout = null;
+      if (!immediate)
+        func.apply(context, args);
+    };
+    let callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow)
+      func.apply(context, args);
+  };
+}
+var Select_svelte_svelte_type_style_lang$1 = "";
+const { Object: Object_1 } = globals;
+const css$2 = {
+  code: ".selectContainer.svelte-17l1npl.svelte-17l1npl{--internalPadding:0 16px;border:var(--border, 1px solid #d8dbdf);border-radius:var(--borderRadius, 3px);box-sizing:border-box;height:var(--height, 42px);position:relative;display:flex;align-items:center;padding:var(--padding, var(--internalPadding));background:var(--background, #fff);margin:var(--margin, 0)}.selectContainer.svelte-17l1npl input.svelte-17l1npl{cursor:default;border:none;color:var(--inputColor, #3f4f5f);height:var(--height, 42px);line-height:var(--height, 42px);padding:var(--inputPadding, var(--padding, var(--internalPadding)));width:100%;background:transparent;font-size:var(--inputFontSize, 14px);letter-spacing:var(--inputLetterSpacing, -0.08px);position:absolute;left:var(--inputLeft, 0);margin:var(--inputMargin, 0)}.selectContainer.svelte-17l1npl input.svelte-17l1npl::placeholder{color:var(--placeholderColor, #78848f);opacity:var(--placeholderOpacity, 1)}.selectContainer.svelte-17l1npl input.svelte-17l1npl:focus{outline:none}.selectContainer.svelte-17l1npl.svelte-17l1npl:hover{border-color:var(--borderHoverColor, #b2b8bf)}.selectContainer.focused.svelte-17l1npl.svelte-17l1npl{border-color:var(--borderFocusColor, #006fe8)}.selectContainer.disabled.svelte-17l1npl.svelte-17l1npl{background:var(--disabledBackground, #ebedef);border-color:var(--disabledBorderColor, #ebedef);color:var(--disabledColor, #c1c6cc)}.selectContainer.disabled.svelte-17l1npl input.svelte-17l1npl::placeholder{color:var(--disabledPlaceholderColor, #c1c6cc);opacity:var(--disabledPlaceholderOpacity, 1)}.selectedItem.svelte-17l1npl.svelte-17l1npl{line-height:var(--height, 42px);height:var(--height, 42px);overflow-x:hidden;padding:var(--selectedItemPadding, 0 20px 0 0)}.selectedItem.svelte-17l1npl.svelte-17l1npl:focus{outline:none}.clearSelect.svelte-17l1npl.svelte-17l1npl{position:absolute;right:var(--clearSelectRight, 10px);top:var(--clearSelectTop, 11px);bottom:var(--clearSelectBottom, 11px);width:var(--clearSelectWidth, 20px);color:var(--clearSelectColor, #c5cacf);flex:none !important}.clearSelect.svelte-17l1npl.svelte-17l1npl:hover{color:var(--clearSelectHoverColor, #2c3e50)}.selectContainer.focused.svelte-17l1npl .clearSelect.svelte-17l1npl{color:var(--clearSelectFocusColor, #3f4f5f)}.indicator.svelte-17l1npl.svelte-17l1npl{position:absolute;right:var(--indicatorRight, 10px);top:var(--indicatorTop, 11px);width:var(--indicatorWidth, 20px);height:var(--indicatorHeight, 20px);color:var(--indicatorColor, #c5cacf)}.indicator.svelte-17l1npl svg.svelte-17l1npl{display:inline-block;fill:var(--indicatorFill, currentcolor);line-height:1;stroke:var(--indicatorStroke, currentcolor);stroke-width:0}.spinner.svelte-17l1npl.svelte-17l1npl{position:absolute;right:var(--spinnerRight, 10px);top:var(--spinnerLeft, 11px);width:var(--spinnerWidth, 20px);height:var(--spinnerHeight, 20px);color:var(--spinnerColor, #51ce6c);animation:svelte-17l1npl-rotate 0.75s linear infinite}.spinner_icon.svelte-17l1npl.svelte-17l1npl{display:block;height:100%;transform-origin:center center;width:100%;position:absolute;top:0;bottom:0;left:0;right:0;margin:auto;-webkit-transform:none}.spinner_path.svelte-17l1npl.svelte-17l1npl{stroke-dasharray:90;stroke-linecap:round}.multiSelect.svelte-17l1npl.svelte-17l1npl{display:flex;padding:var(--multiSelectPadding, 0 35px 0 16px);height:auto;flex-wrap:wrap;align-items:stretch}.multiSelect.svelte-17l1npl>.svelte-17l1npl{flex:1 1 50px}.selectContainer.multiSelect.svelte-17l1npl input.svelte-17l1npl{padding:var(--multiSelectInputPadding, 0);position:relative;margin:var(--multiSelectInputMargin, 0)}.hasError.svelte-17l1npl.svelte-17l1npl{border:var(--errorBorder, 1px solid #ff2d55);background:var(--errorBackground, #fff)}.a11yText.svelte-17l1npl.svelte-17l1npl{z-index:9999;border:0px;clip:rect(1px, 1px, 1px, 1px);height:1px;width:1px;position:absolute;overflow:hidden;padding:0px;white-space:nowrap}@keyframes svelte-17l1npl-rotate{100%{transform:rotate(360deg)}}",
+  map: null
+};
+function convertStringItemsToObjects(_items) {
+  return _items.map((item, index) => {
+    return { index, value: item, label: `${item}` };
+  });
+}
+const Select = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let filteredItems;
+  let showSelectedItem;
+  let showClearIcon;
+  let placeholderText;
+  let showMultiSelect;
+  let listProps;
+  let ariaSelection;
+  let ariaContext;
+  const dispatch = createEventDispatcher();
+  let { id = null } = $$props;
+  let { container = void 0 } = $$props;
+  let { input = void 0 } = $$props;
+  let { isMulti = false } = $$props;
+  let { multiFullItemClearable = false } = $$props;
+  let { isDisabled = false } = $$props;
+  let { isCreatable = false } = $$props;
+  let { isFocused = false } = $$props;
+  let { value = null } = $$props;
+  let { filterText = "" } = $$props;
+  let { placeholder = "Select..." } = $$props;
+  let { placeholderAlwaysShow = false } = $$props;
+  let { items: items2 = null } = $$props;
+  let { itemFilter = (label, filterText2, option) => `${label}`.toLowerCase().includes(filterText2.toLowerCase()) } = $$props;
+  let { groupBy = void 0 } = $$props;
+  let { groupFilter = (groups) => groups } = $$props;
+  let { isGroupHeaderSelectable = false } = $$props;
+  let { getGroupHeaderLabel = (option) => {
+    return option[labelIdentifier] || option.id;
+  } } = $$props;
+  let { labelIdentifier = "label" } = $$props;
+  let { getOptionLabel = (option, filterText2) => {
+    return option.isCreator ? `Create "${filterText2}"` : option[labelIdentifier];
+  } } = $$props;
+  let { optionIdentifier = "value" } = $$props;
+  let { loadOptions = void 0 } = $$props;
+  let { hasError = false } = $$props;
+  let { containerStyles = "" } = $$props;
+  let { getSelectionLabel = (option) => {
+    if (option)
+      return option[labelIdentifier];
+    else
+      return null;
+  } } = $$props;
+  let { createGroupHeaderItem = (groupValue) => {
+    return { value: groupValue, label: groupValue };
+  } } = $$props;
+  let { createItem = (filterText2) => {
+    return { value: filterText2, label: filterText2 };
+  } } = $$props;
+  const getFilteredItems = () => {
+    return filteredItems;
+  };
+  let { isSearchable = true } = $$props;
+  let { inputStyles = "" } = $$props;
+  let { isClearable = true } = $$props;
+  let { isWaiting = false } = $$props;
+  let { listPlacement = "auto" } = $$props;
+  let { listOpen = false } = $$props;
+  let { isVirtualList = false } = $$props;
+  let { loadOptionsInterval = 300 } = $$props;
+  let { noOptionsMessage = "No options" } = $$props;
+  let { hideEmptyState = false } = $$props;
+  let { inputAttributes = {} } = $$props;
+  let { listAutoWidth = true } = $$props;
+  let { itemHeight = 40 } = $$props;
+  let { Icon = void 0 } = $$props;
+  let { iconProps = {} } = $$props;
+  let { showChevron = false } = $$props;
+  let { showIndicator = false } = $$props;
+  let { containerClasses = "" } = $$props;
+  let { indicatorSvg = void 0 } = $$props;
+  let { listOffset = 5 } = $$props;
+  let { ClearIcon: ClearIcon$1 = ClearIcon } = $$props;
+  let { Item: Item$1 = Item } = $$props;
+  let { List: List$1 = List } = $$props;
+  let { Selection: Selection$1 = Selection } = $$props;
+  let { MultiSelection: MultiSelection$1 = MultiSelection } = $$props;
+  let { VirtualList: VirtualList$1 = VirtualList } = $$props;
+  function filterMethod(args) {
+    if (args.loadOptions && args.filterText.length > 0)
+      return;
+    if (!args.items)
+      return [];
+    if (args.items && args.items.length > 0 && typeof args.items[0] !== "object") {
+      args.items = convertStringItemsToObjects(args.items);
+    }
+    let filterResults = args.items.filter((item) => {
+      let matchesFilter = itemFilter(getOptionLabel(item, args.filterText), args.filterText, item);
+      if (matchesFilter && args.isMulti && args.value && Array.isArray(args.value)) {
+        matchesFilter = !args.value.some((x2) => {
+          return x2[args.optionIdentifier] === item[args.optionIdentifier];
+        });
+      }
+      return matchesFilter;
+    });
+    if (args.groupBy) {
+      filterResults = filterGroupedItems(filterResults);
+    }
+    if (args.isCreatable) {
+      filterResults = addCreatableItem(filterResults, args.filterText);
+    }
+    return filterResults;
+  }
+  function addCreatableItem(_items, _filterText) {
+    if (_filterText.length === 0)
+      return _items;
+    const itemToCreate = createItem(_filterText);
+    if (_items[0] && _filterText === _items[0][labelIdentifier])
+      return _items;
+    itemToCreate.isCreator = true;
+    return [..._items, itemToCreate];
+  }
+  let { selectedValue = null } = $$props;
+  let activeValue;
+  let prev_value;
+  let prev_filterText;
+  let prev_isFocused;
+  let hoverItemIndex;
+  const getItems = debounce(async () => {
+    isWaiting = true;
+    let res = await loadOptions(filterText).catch((err) => {
+      console.warn("svelte-select loadOptions error :>> ", err);
+      dispatch("error", { type: "loadOptions", details: err });
+    });
+    if (res && !res.cancelled) {
+      if (res) {
+        if (res && res.length > 0 && typeof res[0] !== "object") {
+          res = convertStringItemsToObjects(res);
+        }
+        filteredItems = [...res];
+        dispatch("loaded", { items: filteredItems });
+      } else {
+        filteredItems = [];
+      }
+      if (isCreatable) {
+        filteredItems = addCreatableItem(filteredItems, filterText);
+      }
+      isWaiting = false;
+      isFocused = true;
+      listOpen = true;
+    }
+  }, loadOptionsInterval);
+  function setValue() {
+    if (typeof value === "string") {
+      value = { [optionIdentifier]: value, label: value };
+    } else if (isMulti && Array.isArray(value) && value.length > 0) {
+      value = value.map((item) => typeof item === "string" ? { value: item, label: item } : item);
+    }
+  }
+  let _inputAttributes;
+  function assignInputAttributes() {
+    _inputAttributes = Object.assign({
+      autocapitalize: "none",
+      autocomplete: "off",
+      autocorrect: "off",
+      spellcheck: false,
+      tabindex: 0,
+      type: "text",
+      "aria-autocomplete": "list"
+    }, inputAttributes);
+    if (id) {
+      _inputAttributes.id = id;
+    }
+    if (!isSearchable) {
+      _inputAttributes.readonly = true;
+    }
+  }
+  function filterGroupedItems(_items) {
+    const groupValues = [];
+    const groups = {};
+    _items.forEach((item) => {
+      const groupValue = groupBy(item);
+      if (!groupValues.includes(groupValue)) {
+        groupValues.push(groupValue);
+        groups[groupValue] = [];
+        if (groupValue) {
+          groups[groupValue].push(Object.assign(createGroupHeaderItem(groupValue, item), {
+            id: groupValue,
+            isGroupHeader: true,
+            isSelectable: isGroupHeaderSelectable
+          }));
+        }
+      }
+      groups[groupValue].push(Object.assign({ isGroupItem: !!groupValue }, item));
+    });
+    const sortedGroupedItems = [];
+    groupFilter(groupValues).forEach((groupValue) => {
+      sortedGroupedItems.push(...groups[groupValue]);
+    });
+    return sortedGroupedItems;
+  }
+  function dispatchSelectedItem() {
+    if (isMulti) {
+      if (JSON.stringify(value) !== JSON.stringify(prev_value)) {
+        if (checkValueForDuplicates()) {
+          dispatch("select", value);
+        }
+      }
+      return;
+    }
+    {
+      dispatch("select", value);
+    }
+  }
+  function setupFocus() {
+    if (isFocused || listOpen) {
+      handleFocus();
+    } else {
+      if (input)
+        input.blur();
+    }
+  }
+  function setupMulti() {
+    if (value) {
+      if (Array.isArray(value)) {
+        value = [...value];
+      } else {
+        value = [value];
+      }
+    }
+  }
+  function setupFilterText() {
+    if (filterText.length === 0)
+      return;
+    isFocused = true;
+    listOpen = true;
+    if (loadOptions) {
+      getItems();
+    } else {
+      listOpen = true;
+      if (isMulti) {
+        activeValue = void 0;
+      }
+    }
+  }
+  function checkValueForDuplicates() {
+    let noDuplicates = true;
+    if (value) {
+      const ids = [];
+      const uniqueValues = [];
+      value.forEach((val) => {
+        if (!ids.includes(val[optionIdentifier])) {
+          ids.push(val[optionIdentifier]);
+          uniqueValues.push(val);
+        } else {
+          noDuplicates = false;
+        }
+      });
+      if (!noDuplicates)
+        value = uniqueValues;
+    }
+    return noDuplicates;
+  }
+  function findItem(selection) {
+    let matchTo = selection ? selection[optionIdentifier] : value[optionIdentifier];
+    return items2.find((item) => item[optionIdentifier] === matchTo);
+  }
+  function updateValueDisplay(items3) {
+    if (!items3 || items3.length === 0 || items3.some((item) => typeof item !== "object"))
+      return;
+    if (!value || (isMulti ? value.some((selection) => !selection || !selection[optionIdentifier]) : !value[optionIdentifier]))
+      return;
+    if (Array.isArray(value)) {
+      value = value.map((selection) => findItem(selection) || selection);
+    } else {
+      value = findItem() || value;
+    }
+  }
+  function handleFocus() {
+    isFocused = true;
+    if (input)
+      input.focus();
+  }
+  function handleClear() {
+    value = void 0;
+    listOpen = false;
+    dispatch("clear", value);
+    handleFocus();
+  }
+  let { ariaValues = (values) => {
+    return `Option ${values}, selected.`;
+  } } = $$props;
+  let { ariaListOpen = (label, count) => {
+    return `You are currently focused on option ${label}. There are ${count} results available.`;
+  } } = $$props;
+  let { ariaFocused = () => {
+    return `Select is focused, type to refine list, press down to open the menu.`;
+  } } = $$props;
+  function handleAriaSelection() {
+    let selected = void 0;
+    if (isMulti && value.length > 0) {
+      selected = value.map((v) => getSelectionLabel(v)).join(", ");
+    } else {
+      selected = getSelectionLabel(value);
+    }
+    return ariaValues(selected);
+  }
+  function handleAriaContent() {
+    if (!isFocused || !filteredItems || filteredItems.length === 0)
+      return "";
+    let _item = filteredItems[hoverItemIndex];
+    if (listOpen && _item) {
+      let label = getSelectionLabel(_item);
+      let count = filteredItems ? filteredItems.length : 0;
+      return ariaListOpen(label, count);
+    } else {
+      return ariaFocused();
+    }
+  }
+  if ($$props.id === void 0 && $$bindings.id && id !== void 0)
+    $$bindings.id(id);
+  if ($$props.container === void 0 && $$bindings.container && container !== void 0)
+    $$bindings.container(container);
+  if ($$props.input === void 0 && $$bindings.input && input !== void 0)
+    $$bindings.input(input);
+  if ($$props.isMulti === void 0 && $$bindings.isMulti && isMulti !== void 0)
+    $$bindings.isMulti(isMulti);
+  if ($$props.multiFullItemClearable === void 0 && $$bindings.multiFullItemClearable && multiFullItemClearable !== void 0)
+    $$bindings.multiFullItemClearable(multiFullItemClearable);
+  if ($$props.isDisabled === void 0 && $$bindings.isDisabled && isDisabled !== void 0)
+    $$bindings.isDisabled(isDisabled);
+  if ($$props.isCreatable === void 0 && $$bindings.isCreatable && isCreatable !== void 0)
+    $$bindings.isCreatable(isCreatable);
+  if ($$props.isFocused === void 0 && $$bindings.isFocused && isFocused !== void 0)
+    $$bindings.isFocused(isFocused);
+  if ($$props.value === void 0 && $$bindings.value && value !== void 0)
+    $$bindings.value(value);
+  if ($$props.filterText === void 0 && $$bindings.filterText && filterText !== void 0)
+    $$bindings.filterText(filterText);
+  if ($$props.placeholder === void 0 && $$bindings.placeholder && placeholder !== void 0)
+    $$bindings.placeholder(placeholder);
+  if ($$props.placeholderAlwaysShow === void 0 && $$bindings.placeholderAlwaysShow && placeholderAlwaysShow !== void 0)
+    $$bindings.placeholderAlwaysShow(placeholderAlwaysShow);
+  if ($$props.items === void 0 && $$bindings.items && items2 !== void 0)
+    $$bindings.items(items2);
+  if ($$props.itemFilter === void 0 && $$bindings.itemFilter && itemFilter !== void 0)
+    $$bindings.itemFilter(itemFilter);
+  if ($$props.groupBy === void 0 && $$bindings.groupBy && groupBy !== void 0)
+    $$bindings.groupBy(groupBy);
+  if ($$props.groupFilter === void 0 && $$bindings.groupFilter && groupFilter !== void 0)
+    $$bindings.groupFilter(groupFilter);
+  if ($$props.isGroupHeaderSelectable === void 0 && $$bindings.isGroupHeaderSelectable && isGroupHeaderSelectable !== void 0)
+    $$bindings.isGroupHeaderSelectable(isGroupHeaderSelectable);
+  if ($$props.getGroupHeaderLabel === void 0 && $$bindings.getGroupHeaderLabel && getGroupHeaderLabel !== void 0)
+    $$bindings.getGroupHeaderLabel(getGroupHeaderLabel);
+  if ($$props.labelIdentifier === void 0 && $$bindings.labelIdentifier && labelIdentifier !== void 0)
+    $$bindings.labelIdentifier(labelIdentifier);
+  if ($$props.getOptionLabel === void 0 && $$bindings.getOptionLabel && getOptionLabel !== void 0)
+    $$bindings.getOptionLabel(getOptionLabel);
+  if ($$props.optionIdentifier === void 0 && $$bindings.optionIdentifier && optionIdentifier !== void 0)
+    $$bindings.optionIdentifier(optionIdentifier);
+  if ($$props.loadOptions === void 0 && $$bindings.loadOptions && loadOptions !== void 0)
+    $$bindings.loadOptions(loadOptions);
+  if ($$props.hasError === void 0 && $$bindings.hasError && hasError !== void 0)
+    $$bindings.hasError(hasError);
+  if ($$props.containerStyles === void 0 && $$bindings.containerStyles && containerStyles !== void 0)
+    $$bindings.containerStyles(containerStyles);
+  if ($$props.getSelectionLabel === void 0 && $$bindings.getSelectionLabel && getSelectionLabel !== void 0)
+    $$bindings.getSelectionLabel(getSelectionLabel);
+  if ($$props.createGroupHeaderItem === void 0 && $$bindings.createGroupHeaderItem && createGroupHeaderItem !== void 0)
+    $$bindings.createGroupHeaderItem(createGroupHeaderItem);
+  if ($$props.createItem === void 0 && $$bindings.createItem && createItem !== void 0)
+    $$bindings.createItem(createItem);
+  if ($$props.getFilteredItems === void 0 && $$bindings.getFilteredItems && getFilteredItems !== void 0)
+    $$bindings.getFilteredItems(getFilteredItems);
+  if ($$props.isSearchable === void 0 && $$bindings.isSearchable && isSearchable !== void 0)
+    $$bindings.isSearchable(isSearchable);
+  if ($$props.inputStyles === void 0 && $$bindings.inputStyles && inputStyles !== void 0)
+    $$bindings.inputStyles(inputStyles);
+  if ($$props.isClearable === void 0 && $$bindings.isClearable && isClearable !== void 0)
+    $$bindings.isClearable(isClearable);
+  if ($$props.isWaiting === void 0 && $$bindings.isWaiting && isWaiting !== void 0)
+    $$bindings.isWaiting(isWaiting);
+  if ($$props.listPlacement === void 0 && $$bindings.listPlacement && listPlacement !== void 0)
+    $$bindings.listPlacement(listPlacement);
+  if ($$props.listOpen === void 0 && $$bindings.listOpen && listOpen !== void 0)
+    $$bindings.listOpen(listOpen);
+  if ($$props.isVirtualList === void 0 && $$bindings.isVirtualList && isVirtualList !== void 0)
+    $$bindings.isVirtualList(isVirtualList);
+  if ($$props.loadOptionsInterval === void 0 && $$bindings.loadOptionsInterval && loadOptionsInterval !== void 0)
+    $$bindings.loadOptionsInterval(loadOptionsInterval);
+  if ($$props.noOptionsMessage === void 0 && $$bindings.noOptionsMessage && noOptionsMessage !== void 0)
+    $$bindings.noOptionsMessage(noOptionsMessage);
+  if ($$props.hideEmptyState === void 0 && $$bindings.hideEmptyState && hideEmptyState !== void 0)
+    $$bindings.hideEmptyState(hideEmptyState);
+  if ($$props.inputAttributes === void 0 && $$bindings.inputAttributes && inputAttributes !== void 0)
+    $$bindings.inputAttributes(inputAttributes);
+  if ($$props.listAutoWidth === void 0 && $$bindings.listAutoWidth && listAutoWidth !== void 0)
+    $$bindings.listAutoWidth(listAutoWidth);
+  if ($$props.itemHeight === void 0 && $$bindings.itemHeight && itemHeight !== void 0)
+    $$bindings.itemHeight(itemHeight);
+  if ($$props.Icon === void 0 && $$bindings.Icon && Icon !== void 0)
+    $$bindings.Icon(Icon);
+  if ($$props.iconProps === void 0 && $$bindings.iconProps && iconProps !== void 0)
+    $$bindings.iconProps(iconProps);
+  if ($$props.showChevron === void 0 && $$bindings.showChevron && showChevron !== void 0)
+    $$bindings.showChevron(showChevron);
+  if ($$props.showIndicator === void 0 && $$bindings.showIndicator && showIndicator !== void 0)
+    $$bindings.showIndicator(showIndicator);
+  if ($$props.containerClasses === void 0 && $$bindings.containerClasses && containerClasses !== void 0)
+    $$bindings.containerClasses(containerClasses);
+  if ($$props.indicatorSvg === void 0 && $$bindings.indicatorSvg && indicatorSvg !== void 0)
+    $$bindings.indicatorSvg(indicatorSvg);
+  if ($$props.listOffset === void 0 && $$bindings.listOffset && listOffset !== void 0)
+    $$bindings.listOffset(listOffset);
+  if ($$props.ClearIcon === void 0 && $$bindings.ClearIcon && ClearIcon$1 !== void 0)
+    $$bindings.ClearIcon(ClearIcon$1);
+  if ($$props.Item === void 0 && $$bindings.Item && Item$1 !== void 0)
+    $$bindings.Item(Item$1);
+  if ($$props.List === void 0 && $$bindings.List && List$1 !== void 0)
+    $$bindings.List(List$1);
+  if ($$props.Selection === void 0 && $$bindings.Selection && Selection$1 !== void 0)
+    $$bindings.Selection(Selection$1);
+  if ($$props.MultiSelection === void 0 && $$bindings.MultiSelection && MultiSelection$1 !== void 0)
+    $$bindings.MultiSelection(MultiSelection$1);
+  if ($$props.VirtualList === void 0 && $$bindings.VirtualList && VirtualList$1 !== void 0)
+    $$bindings.VirtualList(VirtualList$1);
+  if ($$props.selectedValue === void 0 && $$bindings.selectedValue && selectedValue !== void 0)
+    $$bindings.selectedValue(selectedValue);
+  if ($$props.handleClear === void 0 && $$bindings.handleClear && handleClear !== void 0)
+    $$bindings.handleClear(handleClear);
+  if ($$props.ariaValues === void 0 && $$bindings.ariaValues && ariaValues !== void 0)
+    $$bindings.ariaValues(ariaValues);
+  if ($$props.ariaListOpen === void 0 && $$bindings.ariaListOpen && ariaListOpen !== void 0)
+    $$bindings.ariaListOpen(ariaListOpen);
+  if ($$props.ariaFocused === void 0 && $$bindings.ariaFocused && ariaFocused !== void 0)
+    $$bindings.ariaFocused(ariaFocused);
+  $$result.css.add(css$2);
+  let $$settled;
+  let $$rendered;
+  do {
+    $$settled = true;
+    filteredItems = filterMethod({
+      loadOptions,
+      filterText,
+      items: items2,
+      value,
+      isMulti,
+      optionIdentifier,
+      groupBy,
+      isCreatable
+    });
+    {
+      {
+        if (selectedValue)
+          console.warn("selectedValue is no longer used. Please use value instead.");
+      }
+    }
+    {
+      updateValueDisplay(items2);
+    }
+    {
+      {
+        if (value)
+          setValue();
+      }
+    }
+    {
+      {
+        if (inputAttributes || !isSearchable)
+          assignInputAttributes();
+      }
+    }
+    {
+      {
+        if (isMulti) {
+          setupMulti();
+        }
+      }
+    }
+    {
+      {
+        if (isMulti && value && value.length > 1) {
+          checkValueForDuplicates();
+        }
+      }
+    }
+    {
+      {
+        if (value)
+          dispatchSelectedItem();
+      }
+    }
+    {
+      {
+        if (!value && isMulti && prev_value) {
+          dispatch("select", value);
+        }
+      }
+    }
+    {
+      {
+        if (isFocused !== prev_isFocused) {
+          setupFocus();
+        }
+      }
+    }
+    {
+      {
+        if (filterText !== prev_filterText) {
+          setupFilterText();
+        }
+      }
+    }
+    showSelectedItem = value && filterText.length === 0;
+    showClearIcon = showSelectedItem && isClearable && !isDisabled && !isWaiting;
+    placeholderText = placeholderAlwaysShow && isMulti ? placeholder : value ? "" : placeholder;
+    showMultiSelect = isMulti && value && value.length > 0;
+    listProps = {
+      Item: Item$1,
+      filterText,
+      optionIdentifier,
+      noOptionsMessage,
+      hideEmptyState,
+      isVirtualList,
+      VirtualList: VirtualList$1,
+      value,
+      isMulti,
+      getGroupHeaderLabel,
+      items: filteredItems,
+      itemHeight,
+      getOptionLabel,
+      listPlacement,
+      parent: container,
+      listAutoWidth,
+      listOffset
+    };
+    ariaSelection = value ? handleAriaSelection() : "";
+    ariaContext = handleAriaContent();
+    $$rendered = `
+
+<div class="${[
+      "selectContainer " + escape(containerClasses) + " svelte-17l1npl",
+      (hasError ? "hasError" : "") + " " + (isMulti ? "multiSelect" : "") + " " + (isDisabled ? "disabled" : "") + " " + (isFocused ? "focused" : "")
+    ].join(" ").trim()}"${add_attribute("style", containerStyles, 0)}${add_attribute("this", container, 0)}><span aria-live="${"polite"}" aria-atomic="${"false"}" aria-relevant="${"additions text"}" class="${"a11yText svelte-17l1npl"}">${isFocused ? `<span id="${"aria-selection"}">${escape(ariaSelection)}</span>
+            <span id="${"aria-context"}">${escape(ariaContext)}</span>` : ``}</span>
+
+    ${Icon ? `${validate_component(Icon || missing_component, "svelte:component").$$render($$result, Object_1.assign(iconProps), {}, {})}` : ``}
+
+    ${showMultiSelect ? `${validate_component(MultiSelection$1 || missing_component, "svelte:component").$$render($$result, {
+      value,
+      getSelectionLabel,
+      activeValue,
+      isDisabled,
+      multiFullItemClearable
+    }, {}, {})}` : ``}
+
+    <input${spread([
+      { readonly: !isSearchable || null },
+      escape_object(_inputAttributes),
+      {
+        placeholder: escape_attribute_value(placeholderText)
+      },
+      {
+        style: escape_attribute_value(inputStyles)
+      },
+      { disabled: isDisabled || null }
+    ], { classes: "svelte-17l1npl" })}${add_attribute("this", input, 0)}${add_attribute("value", filterText, 0)}>
+
+    ${!isMulti && showSelectedItem ? `<div class="${"selectedItem svelte-17l1npl"}">${validate_component(Selection$1 || missing_component, "svelte:component").$$render($$result, { item: value, getSelectionLabel }, {}, {})}</div>` : ``}
+
+    ${showClearIcon ? `<div class="${"clearSelect svelte-17l1npl"}" aria-hidden="${"true"}">${validate_component(ClearIcon$1 || missing_component, "svelte:component").$$render($$result, {}, {}, {})}</div>` : ``}
+
+    ${!showClearIcon && (showIndicator || showChevron && !value || !isSearchable && !isDisabled && !isWaiting && (showSelectedItem && !isClearable || !showSelectedItem)) ? `<div class="${"indicator svelte-17l1npl"}" aria-hidden="${"true"}">${indicatorSvg ? `<!-- HTML_TAG_START -->${indicatorSvg}<!-- HTML_TAG_END -->` : `<svg width="${"100%"}" height="${"100%"}" viewBox="${"0 0 20 20"}" focusable="${"false"}" aria-hidden="${"true"}" class="${"svelte-17l1npl"}"><path d="${"M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747\n          3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0\n          1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502\n          0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0\n          0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"}"></path></svg>`}</div>` : ``}
+
+    ${isWaiting ? `<div class="${"spinner svelte-17l1npl"}"><svg class="${"spinner_icon svelte-17l1npl"}" viewBox="${"25 25 50 50"}"><circle class="${"spinner_path svelte-17l1npl"}" cx="${"50"}" cy="${"50"}" r="${"20"}" fill="${"none"}" stroke="${"currentColor"}" stroke-width="${"5"}" stroke-miterlimit="${"10"}"></circle></svg></div>` : ``}
+
+    ${listOpen ? `${validate_component(List$1 || missing_component, "svelte:component").$$render($$result, Object_1.assign(listProps, { hoverItemIndex }), {
+      hoverItemIndex: ($$value) => {
+        hoverItemIndex = $$value;
+        $$settled = false;
+      }
+    }, {})}` : ``}
+
+    ${!isMulti || isMulti && !showMultiSelect ? `<input${add_attribute("name", inputAttributes.name, 0)} type="${"hidden"}"${add_attribute("value", value ? getSelectionLabel(value) : null, 0)} class="${"svelte-17l1npl"}">` : ``}
+
+    ${isMulti && showMultiSelect ? `${each(value, (item) => {
+      return `<input${add_attribute("name", inputAttributes.name, 0)} type="${"hidden"}"${add_attribute("value", item ? getSelectionLabel(item) : null, 0)} class="${"svelte-17l1npl"}">`;
+    })}` : ``}</div>`;
+  } while (!$$settled);
+  return $$rendered;
+});
+var Select_svelte_svelte_type_style_lang = "";
+const css$1 = {
+  code: ".selectbox.svelte-lfed90{box-sizing:border-box;margin:0;border:0}.selectbox.svelte-lfed90{--border:2px solid #206095;--borderRadius:0;--listBorderRadius:0;--itemFirstBorderRadius:0;--multiItemBorderRadius:0;--padding:0 8px;--multiSelectPadding:0 8px;--clearSelectBottom:auto;--clearSelectRight:8px;--clearSelectTop:auto;--clearSelectWidth:24px;--clearSelectColor:#206095;--borderHoverColor:#206095;--borderFocusColor:#206095;--inputColor:#206095;--itemColor:#206095;--placeholderColor:#206095;--itemIsActiveBG:#206095;--itemHoverBG:#3875d7;--itemHoverColor:white;--clearSelectColor:white;--clearSelectFocusColor:white;--clearSelectHoverColor:white;--indicatorColor:white;--multiItemActiveColor:white;--multiClearFill:white;--multiClearBG:none;--multiClearHoverBG:none;--multiItemBG:grey;--multiItemActiveBG:grey;--spinnerColor:rgba(255,255,255,0)}.selectbox, .selectbox input, .selectbox .item, .selectbox svg{cursor:pointer !important}.selectbox input:focus{cursor:default !important}.selectbox > .selectContainer{box-shadow:inset -40px 0px #206095}.selectbox.multi-selected > .selectContainer{box-shadow:none !important}.selectbox.focused > .selectContainer{outline:4px solid orange}.selectbox.selected > .selectContainer{background-color:#206095 !important}.selectbox.selected .selectedItem{color:white !important;font-weight:bold}.selectbox .selectedItem .group{display:none}.selectbox .item > .group{font-size:smaller;opacity:0.7}.selectbox .selectContainer > .multiSelectItem{color:white !important;font-weight:bold}.selectbox .selectContainer > .multiSelectItem:nth-of-type(1){background-color:var(--firstItem) !important}.selectbox .selectContainer > .multiSelectItem:nth-of-type(2){background-color:var(--secondItem) !important}.selectbox .selectContainer > .multiSelectItem:nth-of-type(3){background-color:var(--thirdItem) !important}.selectbox .selectContainer > .multiSelectItem:nth-of-type(4){background-color:var(--fourthItem) !important}.selectbox .indicator svg{fill:white}.selectbox .clearSelect{height:24px}.selectbox .indicator{width:20px;height:20px}.selectbox .multiSelectItem .group{display:none}",
+  map: null
+};
+const Select_1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let noOptionsMessage;
+  let itemFilter;
+  const searchIcon = `<svg viewBox="0 0 20 20" fill-rule="evenodd"><path d="M0,8a8,8,0,1,0,16,0a8,8,0,1,0,-16,0ZM3,8a5,5,0,1,0,10,0a5,5,0,1,0,-10,0Z"/><path d="M18,20L20,18L14,12L12,14Z"/></svg>`;
+  const chevronIcon = `<svg viewBox="0 0 20 20"><path d="M1,6L19,6L10,15Z"/></svg>`;
+  createEventDispatcher();
+  let { id = "" } = $$props;
+  let { mode = "default" } = $$props;
+  let { items: items2 } = $$props;
+  let { placeholder = "Select one..." } = $$props;
+  let { value = null } = $$props;
+  let { filterText = "" } = $$props;
+  let { isSearchable = true } = $$props;
+  let { autoClear = false } = $$props;
+  let { idKey = "value" } = $$props;
+  let { labelKey = "label" } = $$props;
+  let { groupKey = null } = $$props;
+  let { groupItems = false } = $$props;
+  let { loadOptions = void 0 } = $$props;
+  let { fontSize = "1rem" } = $$props;
+  let { height = 42 } = $$props;
+  let { isMulti = false } = $$props;
+  let { maxSelected = 4 } = $$props;
+  let { colors = ["#206095", "#a8bd3a", "#871a5b", "#27a0cc"] } = $$props;
+  const getOptionLabel = groupKey && !groupItems ? (option) => `${option[labelKey]} <span class="group">${option[groupKey]}</span>` : (option) => option[labelKey];
+  let { getSelectionLabel = (option) => {
+    if (option)
+      return getOptionLabel(option);
+    else
+      return null;
+  } } = $$props;
+  const groupBy = groupItems && groupKey ? (item) => item[groupKey] : void 0;
+  const indicatorSvg = mode == "search" ? searchIcon : chevronIcon;
+  const containerStyles = `--inputFontSize: ${fontSize}; --groupTitleFontSize: ${fontSize}; --height: ${height}px; font-size: ${fontSize};`;
+  const ariaValues = (values) => `${values}, selected.`;
+  const ariaListOpen = (label, count) => `You are currently focused on ${label}. There are ${count} results available.`;
+  const ariaFocused = () => `Select is focused, type to refine list, press down to open the menu.`;
+  let isFocused;
+  let listOpen;
+  let isWaiting;
+  let handleClear;
+  if ($$props.id === void 0 && $$bindings.id && id !== void 0)
+    $$bindings.id(id);
+  if ($$props.mode === void 0 && $$bindings.mode && mode !== void 0)
+    $$bindings.mode(mode);
+  if ($$props.items === void 0 && $$bindings.items && items2 !== void 0)
+    $$bindings.items(items2);
+  if ($$props.placeholder === void 0 && $$bindings.placeholder && placeholder !== void 0)
+    $$bindings.placeholder(placeholder);
+  if ($$props.value === void 0 && $$bindings.value && value !== void 0)
+    $$bindings.value(value);
+  if ($$props.filterText === void 0 && $$bindings.filterText && filterText !== void 0)
+    $$bindings.filterText(filterText);
+  if ($$props.isSearchable === void 0 && $$bindings.isSearchable && isSearchable !== void 0)
+    $$bindings.isSearchable(isSearchable);
+  if ($$props.autoClear === void 0 && $$bindings.autoClear && autoClear !== void 0)
+    $$bindings.autoClear(autoClear);
+  if ($$props.idKey === void 0 && $$bindings.idKey && idKey !== void 0)
+    $$bindings.idKey(idKey);
+  if ($$props.labelKey === void 0 && $$bindings.labelKey && labelKey !== void 0)
+    $$bindings.labelKey(labelKey);
+  if ($$props.groupKey === void 0 && $$bindings.groupKey && groupKey !== void 0)
+    $$bindings.groupKey(groupKey);
+  if ($$props.groupItems === void 0 && $$bindings.groupItems && groupItems !== void 0)
+    $$bindings.groupItems(groupItems);
+  if ($$props.loadOptions === void 0 && $$bindings.loadOptions && loadOptions !== void 0)
+    $$bindings.loadOptions(loadOptions);
+  if ($$props.fontSize === void 0 && $$bindings.fontSize && fontSize !== void 0)
+    $$bindings.fontSize(fontSize);
+  if ($$props.height === void 0 && $$bindings.height && height !== void 0)
+    $$bindings.height(height);
+  if ($$props.isMulti === void 0 && $$bindings.isMulti && isMulti !== void 0)
+    $$bindings.isMulti(isMulti);
+  if ($$props.maxSelected === void 0 && $$bindings.maxSelected && maxSelected !== void 0)
+    $$bindings.maxSelected(maxSelected);
+  if ($$props.colors === void 0 && $$bindings.colors && colors !== void 0)
+    $$bindings.colors(colors);
+  if ($$props.getSelectionLabel === void 0 && $$bindings.getSelectionLabel && getSelectionLabel !== void 0)
+    $$bindings.getSelectionLabel(getSelectionLabel);
+  $$result.css.add(css$1);
+  let $$settled;
+  let $$rendered;
+  do {
+    $$settled = true;
+    noOptionsMessage = isWaiting ? "Loading..." : mode == "search" && filterText < 3 ? "Enter 3 or more characters for suggestions" : `No results match ${filterText}`;
+    itemFilter = Array.isArray(value) && value.length >= maxSelected || mode == "search" && filterText.length < 3 ? (label, filterText2, option) => false : (label, filterText2, option) => `${label}`.split("<")[0].toLowerCase().slice(0, filterText2.length) == filterText2.toLowerCase();
+    $$rendered = `<div class="${[
+      "selectbox svelte-lfed90",
+      (value && isMulti ? "multi-selected" : "") + " " + (isFocused ? "focused" : "") + " " + (value && !listOpen && !isMulti ? "selected" : "")
+    ].join(" ").trim()}">${validate_component(Select, "Select").$$render($$result, {
+      id,
+      items: items2,
+      placeholder,
+      isMulti,
+      isSearchable,
+      groupBy,
+      loadOptions,
+      getSelectionLabel,
+      getOptionLabel,
+      itemFilter,
+      ariaValues,
+      ariaListOpen,
+      ariaFocused,
+      noOptionsMessage,
+      indicatorSvg,
+      containerStyles,
+      optionIdentifier: idKey,
+      showIndicator: true,
+      isClearable: !isMulti,
+      isFocused,
+      value,
+      listOpen,
+      filterText,
+      isWaiting,
+      handleClear
+    }, {
+      isFocused: ($$value) => {
+        isFocused = $$value;
+        $$settled = false;
+      },
+      value: ($$value) => {
+        value = $$value;
+        $$settled = false;
+      },
+      listOpen: ($$value) => {
+        listOpen = $$value;
+        $$settled = false;
+      },
+      filterText: ($$value) => {
+        filterText = $$value;
+        $$settled = false;
+      },
+      isWaiting: ($$value) => {
+        isWaiting = $$value;
+        $$settled = false;
+      },
+      handleClear: ($$value) => {
+        handleClear = $$value;
+        $$settled = false;
+      }
+    }, {})}
+</div>`;
+  } while (!$$settled);
+  return $$rendered;
+});
 var App_svelte_svelte_type_style_lang = "";
 const css = {
-  code: "@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');body{font-family:'Open Sans', sans-serif}label.svelte-1iad7dh{margin:20px 0 4px 0;font-weight:bold}p.svelte-1iad7dh{margin:4px 0 20px 0}",
+  code: "@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');body{font-family:'Open Sans', sans-serif}label.svelte-1iad7dh{margin:20px 0 4px 0;font-weight:bold}",
   map: null
 };
 const App = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let { selected: selected2 = null, selection = null } = $$props;
-  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
-    $$bindings.selected(selected2);
-  if ($$props.selection === void 0 && $$bindings.selection && selection !== void 0)
-    $$bindings.selection(selection);
+  let { selected = null } = $$props;
+  if ($$props.selected === void 0 && $$bindings.selected && selected !== void 0)
+    $$bindings.selected(selected);
   $$result.css.add(css);
   return `<form><label for="${"single"}" class="${"svelte-1iad7dh"}">Select one local authority:</label>
 	${validate_component(Select_1, "Select").$$render($$result, {
@@ -12756,35 +20755,29 @@ const App = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     items
   }, {}, {})}</form>
 
-<p class="${"svelte-1iad7dh"}">Selected: ${escape(selected2 ? selected2.areanm : "None")}</p>`;
+<h1>${escape(selected ? selected.areanm : "None")}</h1>`;
 });
 const prerender = true;
-let selected, test;
-let a;
-let b;
-async function load({ params, fetch, session, stuff }) {
-  const response = await fetch(`${assets}/data/place_data/${params.code}.json`);
-  test = params.code;
-  a = await import("../../../chunks/neighbours-25764e6a.js");
-  b = a.default;
-  selected = params.code;
-  let data = await response.json();
-  let myNeighbours = {};
-  Object.keys(b).forEach((e) => myNeighbours[e] = b[e].flat().slice(0, 9));
-  return { props: { data, myNeighbours, test } };
+async function load({ params, fetch: fetch2, session, stuff }) {
+  const response = await fetch2(`${assets}/data/place_data/${params.code}.json`);
+  let all_data = await response.json();
+  return { props: { all_data } };
 }
 let top = 0;
 let threshold = 0.5;
 let bottom = 1;
 const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $story_json, $$unsubscribe_story_json;
-  let $all_data, $$unsubscribe_all_data;
   $$unsubscribe_story_json = subscribe(story_json, (value) => $story_json = value);
-  $$unsubscribe_all_data = subscribe(all_data, (value) => $all_data = value);
-  let selection;
-  let { data, myNeighbours } = $$props;
-  all_data.set(data);
-  const country = data.CODE[0];
+  let { all_data, myNeighbours } = $$props;
+  let selected;
+  let currentSelect;
+  if (all_data) {
+    selected = items.find((e) => e.areacd == all_data.CODE);
+    currentSelect = selected;
+  }
+  myNeighbours = {};
+  Object.keys(neighbours).forEach((e) => myNeighbours[e] = neighbours[e].flat().slice(0, 9));
   let story;
   story = $story_json;
   let theme = getContext("theme");
@@ -12794,16 +20787,24 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
   let progress;
   let components = {};
   let animation;
-  if ($$props.data === void 0 && $$bindings.data && data !== void 0)
-    $$bindings.data(data);
+  let country;
+  if ($$props.all_data === void 0 && $$bindings.all_data && all_data !== void 0)
+    $$bindings.all_data(all_data);
   if ($$props.myNeighbours === void 0 && $$bindings.myNeighbours && myNeighbours !== void 0)
     $$bindings.myNeighbours(myNeighbours);
   let $$settled;
   let $$rendered;
   do {
     $$settled = true;
-    $$rendered = `${data && country && story ? `${escape(story)}
-  ${validate_component(Header, "Header").$$render($$result, {
+    {
+      {
+        country = all_data.CODE[0];
+      }
+    }
+    selected != currentSelect && goto(`/${selected.areacd}`) && function() {
+      currentSelect = selected;
+    };
+    $$rendered = `${all_data && country && story ? `${validate_component(Header, "Header").$$render($$result, {
       bgcolor: "#206095",
       bgfixed: true,
       theme,
@@ -12817,23 +20818,21 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
 	<p class="${"text-big"}" style="${"margin-top: 5px"}"><!-- HTML_TAG_START -->${story[0].lede}<!-- HTML_TAG_END --></p>
 	<br>
     
-	<div class="${"ons-field"}">${validate_component(App, "Dropdown").$$render($$result, { selection }, {
-          selection: ($$value) => {
-            selection = $$value;
+	<div class="${"ons-field"}">${validate_component(App, "Dropdown").$$render($$result, { selected }, {
+          selected: ($$value) => {
+            selected = $$value;
             $$settled = false;
           }
         }, {})}</div>
-	<div style="${"margin-top: 90px;"}">${validate_component(Arrow, "Arrow").$$render($$result, { color: "white", animation }, {}, {
+	${selected ? `<div style="${"margin-top: 90px;"}">${validate_component(Arrow, "Arrow").$$render($$result, { color: "white", animation }, {}, {
           default: () => {
-            return `Scroll to begin`;
+            return `Scroll to read about ${escape(selected.areanm)}`;
           }
-        })}</div>`;
+        })}</div>` : ``}`;
       }
     })}
 
-  
-  
-	${each(story, (chunk, i) => {
+  ${selected ? `${each(story, (chunk, i) => {
       return `${chunk.type === "Scroller" ? `${validate_component(Scroller, "Scroller").$$render($$result, {
         top,
         threshold,
@@ -12866,8 +20865,8 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
             return `<section${add_attribute("id", section["data-id"], 0)}>${section.content && typeof section.content == "object" ? `<div>${each(Object.keys(section.section.content), (type) => {
               return `${validate_component(components[type] || missing_component, "svelte:component").$$render($$result, { content: section.section.content[type] }, {}, {})}`;
             })}
-				  </div>` : `<div${add_attribute("data-id", section["data-id"], 0)}><p><!-- HTML_TAG_START -->${createText(section.section.content, $all_data)}<!-- HTML_TAG_END --></p>
-					${section.section.actions["data-description"] ? `<p style="${"color:blue"}" class="${"screen-reader-only"}"><!-- HTML_TAG_START -->${createText(section.section.actions["data-description"], $all_data)}<!-- HTML_TAG_END -->
+				  </div>` : `<div${add_attribute("data-id", section["data-id"], 0)}><p><!-- HTML_TAG_START -->${createText(section.section.content, all_data)}<!-- HTML_TAG_END --></p>
+					${section.section.actions["data-description"] ? `<p style="${"color:blue"}" class="${"screen-reader-only"}"><!-- HTML_TAG_START -->${createText(section.section.actions["data-description"], all_data)}<!-- HTML_TAG_END -->
 					  </p>` : ``}
 					  ${section.section.actions["data-title"] ? `` : ``}
 				  </div>`}
@@ -12885,7 +20884,8 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
             component: chunk.background,
             animation: chunk.foreground[index],
             country,
-            data
+            all_data,
+            selected: selected.areacd
           }, {}, {})}	  
 
 </div>`;
@@ -12898,14 +20898,13 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
         center: false
       }, {}, {
         default: () => {
-          return `<p class="${"text-big"}"><!-- HTML_TAG_START -->${createText(chunk.content, $all_data)}<!-- HTML_TAG_END --></p>
+          return `<p class="${"text-big"}"><!-- HTML_TAG_START -->${createText(chunk.content, all_data)}<!-- HTML_TAG_END --></p>
 		`;
         }
       })}` : ``}`;
-    })}` : ``}`;
+    })}` : ``}` : ``}`;
   } while (!$$settled);
   $$unsubscribe_story_json();
-  $$unsubscribe_all_data();
   return $$rendered;
 });
-export { U5Bcodeu5D as default, load, prerender, selected, test };
+export { U5Bcodeu5D as default, load, prerender };

@@ -10,7 +10,8 @@
   import { geoAlbers, geoPath, geoProjection, geoMercator } from 'd3-geo'
   import { extent } from 'd3-array'
   import { onMount } from 'svelte'
-  import { feature } from 'topojson'
+  import * as topojson from 'topojson'
+  const { feature } = topojson
   import { interpolateViridis } from 'd3-scale-chromatic'
   import { select, selectAll } from 'd3-selection'
   import { zm } from '$lib/zm'
@@ -21,24 +22,20 @@
   import frequency from './frequency.js'
   import {step} from '$lib/step'
   import Key from './Key.svelte'
-  import { all_data } from '../../../stores.js';
-  export let country;
+ // import { all_data } from '../../../stores.js';
+  export let country, all_data;
   let key=true
   let chart_key=false
-  //$: country=$all_data.CODE[0]
-export let progress, animation, width, height, padding
-//console.log ("ALL DATA", $all_data)
+  //$: country=all_data.CODE[0]
+export let progress, animation, width, height, padding, selected
+//console.log ("ALL DATA", all_data)
 	//const padding = 80
-  import {dims} from '$lib/background_dimensions' 
+
 
 //$: {width=$dims.w, height=dims.h} 
 
-  const mercator = geoMercator()
-    //.rotate([4.4, 0.8])
-    .center(country=="E"?[-2, 52.5]:[-3.9, 52.3])
-   // .scale(height*3.5)
-    .scale(country=="E"?width<height?width*7:height*5:width<height?width*15:height*15)
-    .translate([width / 2, height / 2])
+let  currentProj, path, Greenwich, FirstMeridian
+
   const easing = cubicInOut
 	let axes
 	let loaded
@@ -47,24 +44,8 @@ export let progress, animation, width, height, padding
 	//$: console.log($zm)
   let data = []
 	let timeline	
-  let currentProj = mercator
- 
-	let path = geoPath().projection(currentProj)
 
-var geoJsonPoint = {
-    type: "Point",
-    coordinates: [0,0],
-} 
 
-let Greenwich = +path({
-    type: "Point",
-    coordinates: [0,0],
-} ).split(",")[0].slice(1);
-	
-let FirstMeridian = +path({
-    type: "Point",
-    coordinates: [10,0],
-} ).split(",")[0].slice(1);
 	
   let bar = {
     left: 85,
@@ -74,7 +55,9 @@ let FirstMeridian = +path({
   let newData
   //let current = 0
 	let metric
-	let selected = writable();//="E09000002"
+	
+
+  console.log("SELECTED",selected)
 	let x=0,y=0,k=1
 //console.log(path().projection([0,0]))
 
@@ -126,7 +109,7 @@ let FirstMeridian = +path({
         mouseout: mouseout,
 				pop:arr[i].pop,
 				y:writable(arr[i].centroid[1]),
-				selected:arr[i].properties.AREACD==$selected,
+				selected:arr[i].properties.AREACD==selected,
 				label_opacity:tweened(0),
         zoom:arr[i].zoom
       })
@@ -243,7 +226,7 @@ data.forEach((e, i) => {
 //% FREQUENCY BELL REGION
 let frequencyBellRegion = function(){
   let region_codes = JSON.parse(JSON.stringify(growth))
-  region_codes=region_codes.filter(e=>e.REGION==$all_data.REGION_CODE).sort((a,b)=>b.GROWTH-a.GROWTH).map(e=>e.LAD17CD)
+  region_codes=region_codes.filter(e=>e.REGION==all_data.REGION_CODE).sort((a,b)=>b.GROWTH-a.GROWTH).map(e=>e.LAD17CD)
   let region_data=JSON.parse(JSON.stringify(frequency))
   region_data[country].forEach(e=>e.lads=e.lads.filter(el=>region_codes.includes(el)))
   region_data[country]=region_data[country].filter(e=>e.lads.length)
@@ -286,7 +269,7 @@ data.forEach((e, i) => {
 }()
     //% GROWTH BAR CHART
 
-    let bar_data = JSON.parse(JSON.stringify(growth)).filter(e=>e.REGION==$all_data.REGION_CODE).sort((a,b)=>b.GROWTH-a.GROWTH)
+    let bar_data = JSON.parse(JSON.stringify(growth)).filter(e=>e.REGION==all_data.REGION_CODE).sort((a,b)=>b.GROWTH-a.GROWTH)
     //console.log("BAR_DATA",bar_data)
     let bar_extents = {
       growth: extent(bar_data.map((e) => e.GROWTH)),
@@ -336,7 +319,7 @@ let region_codes=bar_data.map(e=>e.LAD17CD)
 
 //% NATIONAL GROWTH BAR CHART
 
-let national_bar_data = JSON.parse(JSON.stringify(growth)).filter(e=>e.LAD17CD[0]==$selected[0]).sort((a,b)=>b.GROWTH-a.GROWTH)
+let national_bar_data = JSON.parse(JSON.stringify(growth)).filter(e=>e.LAD17CD[0]==selected[0]).sort((a,b)=>b.GROWTH-a.GROWTH)
    // console.log("BAR_DATA",national_bar_data)
     let national_bar_extents = {
       growth: extent(national_bar_data.map((e) => e.GROWTH)),
@@ -502,8 +485,7 @@ data = data.sort((a, b) => b.growth - a.growth)
     return data
   }
 
-
-  onMount(async function () {
+async function reload(){
 		
     const response = await fetch( 'https://raw.githubusercontent.com/ONSvisual/topojson_boundaries/master/geogLA2021EW.json',
     )
@@ -514,9 +496,25 @@ data = data.sort((a, b) => b.growth - a.growth)
       features: topoData.features,
     }
     data = land.features.filter(e=>e.properties.AREACD[0]==country)
-    console.log(data)
-    //newData = redrawData(data, 1)
-  })
+currentProj = geoMercator()
+    //.rotate([4.4, 0.8])
+    .center(country=="E"?[-2, 52.5]:[-3.9, 52.3])
+   // .scale(height*3.5)
+    .scale(country=="E"?width<height?width*7:height*5:width<height?width*15:height*15)
+    .translate([width / 2, height / 2])
+path = geoPath().projection(currentProj)
+
+Greenwich = +path({
+    type: "Point",
+    coordinates: [0,0],
+} ).split(",")[0].slice(1);
+	
+FirstMeridian = +path({
+    type: "Point",
+    coordinates: [10,0],
+} ).split(",")[0].slice(1);
+}
+  onMount(reload)
 
   //const scaleExtent = extent(growth.map((e) => e.GROWTH))
   const scaleColor = (val, dataSet, data) =>{
@@ -543,12 +541,12 @@ if (charts.length>current){
     let zoomFactor=charts[current].zoom*itemScale
     let neighbours_zoom=charts[current].neighbours_zoom
     if(neighbours_zoom){
-  let nb=neighbourBounds(data.filter(e=>$all_data.NEIGHBOURS.CODES.includes(e.properties.AREACD)).map(e=>e.bounds))
+  let nb=neighbourBounds(data.filter(e=>all_data.NEIGHBOURS.CODES.includes(e.properties.AREACD)).map(e=>e.bounds))
   zoomFactor=1/(Math.max(...[nb[1][0]-nb[0][0],nb[1][1]-nb[0][1]])/width)
 }
 let region_zoom=charts[current].region_zoom
     if(region_zoom){
-      let region_codes = JSON.parse(JSON.stringify(growth)).filter(e=>e.REGION==$all_data.REGION_CODE).sort((a,b)=>b.GROWTH-a.GROWTH).map(e=>e.LAD17CD)
+      let region_codes = JSON.parse(JSON.stringify(growth)).filter(e=>e.REGION==all_data.REGION_CODE).sort((a,b)=>b.GROWTH-a.GROWTH).map(e=>e.LAD17CD)
   let nb=neighbourBounds(data.filter(e=>region_codes.includes(e.properties.AREACD)).map(e=>e.bounds))
   zoomFactor=1/(Math.max(...[nb[1][0]-nb[0][0],nb[1][1]-nb[0][1]])/width)
 }
@@ -589,11 +587,11 @@ if (zoomFactor){
 				if(charts[current].highlight){
           step.fillOpacity.set(0.4);
           step.label_opacity.set(0,{duration:10, easing})
-        if (charts[current].highlight==1 && Object.values($all_data.NEIGHBOURS.PC_CHANGE).map(e=>e.CODE).includes(newData[i].properties.AREACD)||newData[i].properties.AREACD==$selected){step.fillOpacity.set(1);step.label_opacity.set(1,{duration:10, easing}); console.log("BOUNDS",newData.filter(e=>$all_data.NEIGHBOURS.CODES.includes(e.properties.AREACD)).map(e=>e.bounds))}
-        if (charts[current].highlight==2 && Object.values($all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_UP).map(e=>e.LAD17CD).includes(newData[i].properties.AREACD)||newData[i].properties.AREACD==$selected)step.fillOpacity.set(1)
-        if (charts[current].highlight==3 && ($all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.LAD17CD==newData[i].properties.AREACD)||newData[i].properties.AREACD==$selected)step.fillOpacity.set(1)
-        if (charts[current].highlight==4 && Object.values($all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP).map(e=>e.LAD17CD).includes(newData[i].properties.AREACD)||newData[i].properties.AREACD==$selected)step.fillOpacity.set(1)
-        if (charts[current].highlight==5 && Object.values($all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN).map(e=>e.LAD17CD).includes(newData[i].properties.AREACD)||newData[i].properties.AREACD==$selected)step.fillOpacity.set(1)
+        if (charts[current].highlight==1 && Object.values(all_data.NEIGHBOURS.PC_CHANGE).map(e=>e.CODE).includes(newData[i].properties.AREACD)||newData[i].properties.AREACD==selected){step.fillOpacity.set(1);step.label_opacity.set(1,{duration:10, easing}); console.log("BOUNDS",newData.filter(e=>all_data.NEIGHBOURS.CODES.includes(e.properties.AREACD)).map(e=>e.bounds))}
+        if (charts[current].highlight==2 && Object.values(all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_UP).map(e=>e.LAD17CD).includes(newData[i].properties.AREACD)||newData[i].properties.AREACD==selected)step.fillOpacity.set(1)
+        if (charts[current].highlight==3 && (all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.LAD17CD==newData[i].properties.AREACD)||newData[i].properties.AREACD==selected)step.fillOpacity.set(1)
+        if (charts[current].highlight==4 && Object.values(all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP).map(e=>e.LAD17CD).includes(newData[i].properties.AREACD)||newData[i].properties.AREACD==selected)step.fillOpacity.set(1)
+        if (charts[current].highlight==5 && Object.values(all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN).map(e=>e.LAD17CD).includes(newData[i].properties.AREACD)||newData[i].properties.AREACD==selected)step.fillOpacity.set(1)
       }
     
     
@@ -609,11 +607,12 @@ if (zoomFactor){
 									}
                   //forward(0)               
 $: axes && loaded && country && forward(animation)
-//$: $step && forward($step)
-//$: $step && console.log("STEP",$step)
-$: { selected.set($all_data.CODE); newData=redrawData(data) }
+
+$: { newData=redrawData(data) }
+
 $: width && function(){newData=redrawData(data)}
 
+$: all_data && reload()
 </script>
 
 <style>
@@ -621,26 +620,25 @@ $: width && function(){newData=redrawData(data)}
 
 
 </style>
+{#if all_data && timeline && width && height && selected}
 
-<ZoomSvg id="charts1" zm={$zm} {...zoomState} {width} {height} {key} viewBox="0 0 {width} {height}">
-  {#if timeline && width && height}
+<ZoomSvg id="charts1" zm={$zm} {...zoomState} {width} {height} {key} viewBox="0 0 {width} {height}" {all_data}>
+
 <g id="wrapper">
     {#each timeline as feature, i}
       <Path {...feature} />
 	{/each}
     {#each timeline as feature, i}
-   <Text {...feature} {...zoomState} zm={$zm}></Text>
+   <Text {...feature} {...zoomState} ></Text>
 	{/each}
 </g>
 	<use xlink:href="#selected"/>
 	<use xlink:href="#selectedText"/>	
   <use xlink:href="#selectedValue"/>	
   <Axis {...axes} {width} {height} {padding} {spacing} {values} {chart_key}/>
-  {/if}
 
-    
 
  </ZoomSvg>
-
+ {/if}
 
  

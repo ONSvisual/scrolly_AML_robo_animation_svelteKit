@@ -1,16 +1,14 @@
 <script>
 	import Select from "./Select.svelte";
 	import items from "./items.json";
-	export let selected = null, selection=null
-	// Single select
+	export let selected=null
 
 	function doSelect(event) {
 		selected = event.detail
-		selection=selected.areacd
 	}
+
 	function doClear() {
 		selected = null;
-		selection=null
 	}
 	
 
@@ -19,10 +17,10 @@
 
 <form>
 	<label for="single">Select one local authority:</label>
-	<Select id="single" idKey="areacd" labelKey="areanm" {items} on:select={doSelect} on:clear={doClear}/>
+	<Select id="single" idKey="areacd" labelKey="areanm" {items} on:select="{doSelect}" on:clear="{doClear}"/>
 </form>
 
-<p>Selected: {selected ? selected.areanm : 'None'}</p>
+<h1> {selected ? selected.areanm : 'None'}</h1>
 
 <style>
 	@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');

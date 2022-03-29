@@ -1,57 +1,39 @@
 <script context="module">
-    export const prerender = true
-	import {writable} from 'svelte/store'
-	import { base, assets } from "$app/paths";
-	//import data from "$lib/allData.js"
+	
+	
 
-	import { all_data } from '$lib/stores.js' //the data store for hydrating robojournalism and charts
-	//all_data.set(data)
-	import { page } from '$app/stores';
-	export let selected,test
-	//import neighbours from '$lib/neighbours.js'
-	let a
-	let b
+    export const prerender = true
+	import { base, assets } from "$app/paths";
+
 
  export async function load({ params, fetch, session, stuff }) {
    const response = await fetch(`${assets}/data/place_data/${params.code}.json`);
-   	test=params.code
-   	a = await import ('$lib/neighbours.json');
-  	b = a.default;
-
-
-   //console.log("code",b)
-   selected=params.code
-  
-   let data = await response.json()
-   //console.log(data)
-   let myNeighbours={};
-   Object.keys(b).forEach(e=>myNeighbours[e]=b[e].flat().slice(0,9))
-
-   return {props:{data,myNeighbours,test}}
+   
+	let all_data = await response.json()
+	
+	return {props:{all_data}}
   }
-  //console.log(page)
-
-
 </script>
 
   <script>
+import Component from '$lib/vis/Component.svelte'	  
+export let all_data, myNeighbours
+let selected
+let currentSelect
+import items from "$lib/vis/dropdown/src/items.json"
+if (all_data){selected =items.find(e=>e.areacd==all_data.CODE); currentSelect=selected}
 
-	let selection
-	import { afterNavigate, goto } from '$app/navigation';
-	import lookup from '$lib/lookup.js'
+import neighbours from '$lib/neighbours.js'
+myNeighbours={}
+Object.keys(neighbours).forEach(e=>myNeighbours[e]=neighbours[e].flat().slice(0,9))
 
-	$: selected //&& console.log(`${base}/${selected}`)
- 	export let data, myNeighbours
-	 //console.log("myNeighbours",myNeighbours)
-	all_data.set(data)
+import { afterNavigate, goto } from '$app/navigation';
 
-
-	const country = data.CODE[0] 
-	//console.log("countrty", country)
+ 	
 
 	import { getContext } from 'svelte'
 	//COMPONENTS
-	import Component from '$lib/vis/Component.svelte'
+	
 	import Section from '$lib/layout/Section.svelte'
 	import Header from '$lib/layout/Header.svelte'
 	import Filler from '$lib/layout/Filler.svelte'
@@ -98,13 +80,18 @@
 	  Map1: {},
 	}
 
-	$: selection && goto(`/${selection}`)
+	let country
+
+$: {country=all_data.CODE[0];}
+
+
+	$: selected!=currentSelect && goto(`/${selected.areacd}`) && function(){currentSelect=selected}
+
+
   </script>
   
+  {#if all_data && country && story}
 
-  
-  {#if data && country && story}
-  {story}
   <Header
 	bgcolor="#206095"
 	bgfixed={true}
@@ -123,14 +110,16 @@
 	<br />
     
 	<div class="ons-field">
-		<Dropdown bind:selection={selection} />
+		<Dropdown bind:selected={selected} />
 	  </div>
+	{#if selected}  
 	<div style="margin-top: 90px;">
-	  <Arrow color="white" {animation}>Scroll to begin</Arrow>
+	  <Arrow color="white" {animation}>Scroll to read about {selected.areanm}</Arrow>
 	</div>
+	{/if}
   </Header>
 
-  
+  {#if selected}  
   
 	{#each story as chunk, i}
 	  {#if chunk.type === 'Scroller'}
@@ -156,7 +145,8 @@
 			  component={chunk.background}
 			  animation={chunk.foreground[index]}
 			  {country}
-			  {data}
+			  {all_data}
+			  selected={selected.areacd}
 			  >
 
 
@@ -179,11 +169,11 @@
 				{:else}
 				  <div data-id={section['data-id']}>
 					<p>
-					  {@html robojournalist(section.section.content, $all_data)}
+					  {@html robojournalist(section.section.content, all_data)}
 					</p>
 					{#if section.section.actions["data-description"]}
 					<p style="color:blue" class="screen-reader-only">
-						{@html robojournalist(section.section.actions["data-description"], $all_data)}
+						{@html robojournalist(section.section.actions["data-description"], all_data)}
 					  </p>
 					  {/if}
 					  {#if section.section.actions["data-title"]}
@@ -202,11 +192,11 @@
 	  {#if chunk.type === 'Filler'}
 		<Filler theme="lightblue" short={true} wide={true} center={false}>
 		  <p class="text-big">
-			{@html robojournalist(chunk.content, $all_data)}
+			{@html robojournalist(chunk.content, all_data)}
 		  </p>
 		</Filler>
 	  {/if}
 	{/each}
   {/if}
   
-  
+  {/if}

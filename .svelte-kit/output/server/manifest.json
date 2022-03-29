@@ -53,11 +53,8 @@
       "_index-0089343d.js",
       "_paths-396f020f.js"
     ],
-    "dynamicImports": [
-      "src/lib/neighbours.json"
-    ],
     "css": [
-      "assets/entries/pages/_code_/index.svelte-10d78723.css"
+      "assets/entries/pages/_code_/index.svelte-704b8bc6.css"
     ]
   },
   "_paths-396f020f.js": {
@@ -65,10 +62,5 @@
   },
   "_index-0089343d.js": {
     "file": "chunks/index-0089343d.js"
-  },
-  "src/lib/neighbours.json": {
-    "file": "chunks/neighbours-25764e6a.js",
-    "src": "src/lib/neighbours.json",
-    "isDynamicEntry": true
   }
 }

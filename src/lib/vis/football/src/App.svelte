@@ -4,15 +4,13 @@
   import { checkIntersection } from 'line-intersect'
   import { tweened } from 'svelte/motion'
   import { cubicInOut } from 'svelte/easing'
-  import { select, selectAll } from 'd3-selection'
 
+  export let animation, height, width, all_data
 
-  export let animation, height, width, padding, data
-
-  let pitches = Math.ceil(187 / data.LA.DENSITY.DENSITY11)
-  let people = data.LA.DENSITY.DENSITY11 / 187
-  let mostPeople=Math.ceil(data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.PEOPLE_PER_FOOOTY_PITCH)
-  let leastPeople=data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.PEOPLE_PER_FOOOTY_PITCH
+  let pitches = Math.ceil(187 / all_data.LA.DENSITY.DENSITY11)
+  let people = all_data.LA.DENSITY.DENSITY11 / 187
+  let mostPeople=Math.ceil(all_data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.PEOPLE_PER_FOOOTY_PITCH)
+  let leastPeople=all_data.COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.PEOPLE_PER_FOOOTY_PITCH
   //console.log("PEOPLE", people)
   let intersect = checkIntersection
   let peopleHere = people
@@ -154,7 +152,7 @@
  $: animation && change(animation)
 </script>
 
-{#if peopleHere && testData}
+{#if peopleHere && all_data}
 <svg
   style="width:{width}"
   {width}
