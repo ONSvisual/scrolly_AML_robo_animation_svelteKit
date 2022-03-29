@@ -29,7 +29,9 @@ Object.keys(neighbours).forEach(e=>myNeighbours[e]=neighbours[e].flat().slice(0,
 
 import { afterNavigate, goto } from '$app/navigation';
 
- 	
+afterNavigate(
+ 
+)
 
 	import { getContext } from 'svelte'
 	//COMPONENTS
@@ -43,12 +45,13 @@ import { afterNavigate, goto } from '$app/navigation';
 	import Scroller from '$lib/layout/Scroller.svelte'
 	import Dropdown from '$lib/vis/dropdown/src/App.svelte'
 	// ARCHIEML AND ROBO
-	import robojournalist from '$lib/robojournalist' //for parsing robojournalism from ArchieML
+	import robojournalist from '$lib/robojournalist/index.js' //for parsing robojournalism from ArchieML
+
 	import { story_json } from '$lib/story'
 	let story
 	story = $story_json
 	//console.log(story)
-	//console.log($all_data)
+	console.log(all_data)
 	// SCROLLY IMPORTS
   
 	let theme = getContext('theme')
@@ -82,11 +85,12 @@ import { afterNavigate, goto } from '$app/navigation';
 
 	let country
 
-$: {country=all_data.CODE[0];}
+$: {country=all_data.CODE[0]; if (country=="E"){all_data.WALES=0} else all_data.WALES=1}
+
 
 
 	$: selected!=currentSelect && goto(`/${selected.areacd}`) && function(){currentSelect=selected}
-
+$: console.log("all_data",all_data)
 
   </script>
   

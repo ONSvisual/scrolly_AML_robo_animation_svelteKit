@@ -71,5 +71,8 @@
   "__comment__dependencies": {
     "sirv-cli": "^1.0.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "robojournalist": "^0.0.9"
+  }
 }

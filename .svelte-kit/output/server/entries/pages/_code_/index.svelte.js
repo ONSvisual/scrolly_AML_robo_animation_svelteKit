@@ -7,11 +7,12 @@ import { svgPathProperties } from "svg-path-properties";
 import "earcut";
 import "topojson-client";
 import { extent } from "d3-array";
-import { geoMercator, geoPath } from "d3-geo";
-import * as topojson from "topojson";
+import "d3-geo";
+import "topojson";
 import { interpolateViridis } from "d3-scale-chromatic";
 import { select } from "d3-selection";
 import { checkIntersection } from "line-intersect";
+import { l as lookup } from "../../../chunks/lookup-3729f603.js";
 const subscriber_queue = [];
 function writable(value, start = noop) {
   let stop;
@@ -86,7 +87,7 @@ data-highlighted:
 data-description:The local authorities displayed on the map change form and position to create a bar chart, ordering neighbouring neighbouring districts from highest to lowest. {TABLE}
 data-title:Ten year population growth in local authority districts near {NAME}
 {}
-content:Some nearby areas like {NEIGHBOURS.PC_CHANGE.top.NAME} and {NEIGHBOURS.PC_CHANGE.second.NAME} have seen their populations increase by {NEIGHBOURS.PC_CHANGE.top.VAL .0}% and {NEIGHBOURS.PC_CHANGE.second.VAL .0}% respectively, while others such as {NEIGHBOURS.PC_CHANGE.last.NAME} ({NEIGHBOURS.PC_CHANGE.last.VAL .0}%) and {NEIGHBOURS.PC_CHANGE.penultimate.NAME} ({NEIGHBOURS.PC_CHANGE.penultimate.VAL .0}%) have seen smaller changes.
+content:Some nearby areas like {NEIGHBOURS.PC_CHANGE.top.NAME @} and {NEIGHBOURS.PC_CHANGE.second.NAME @} have seen their populations increase by {NEIGHBOURS.PC_CHANGE.top.VAL .0}% and {NEIGHBOURS.PC_CHANGE.second.VAL .0}% respectively, while others such as {NEIGHBOURS.PC_CHANGE.last.NAME @} ({NEIGHBOURS.PC_CHANGE.last.VAL .0}%) and {NEIGHBOURS.PC_CHANGE.penultimate.NAME @} ({NEIGHBOURS.PC_CHANGE.penultimate.VAL .0}%) have seen smaller changes.
 {}
 {.section}
 {.actions}
@@ -98,7 +99,7 @@ data-explore:false
 data-description:More bars are added to the bar chart, to display all of the local authority districts in {REGION}. The two fastest growing places are highlighted. {TABLE}
 data-title:Ten year population growth of local authority districts in {REGION_NAME}
 {}
-content:The sharpest population increases in {REGION_NAME} have been seen in {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.top.NAME} and {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.second.NAME}, where the populations have grown by {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.top.CHANGE}% and {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.second.CHANGE}% respectively.
+content:The sharpest population increases in {REGION_NAME} have been seen in {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.top.NAME @} and {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.second.NAME @}, where the populations have grown by {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.top.CHANGE}% and {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.second.CHANGE}% respectively.
 {}
 {.section}
 {.actions}
@@ -106,7 +107,7 @@ data-id:3
 data-description:On the same bar chart,  The district that has recorded the slowest growth is  highlighted. {TABLE}
 data-title:Ten year population growth of local authority districts in {REGION_NAME}
 {}
-content:At the other end of the scale, {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.NAME} has seen {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE 0 <?a fall of {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE ~abs}%.:}{REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE 0 >?an increase of just {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE}%.:}{REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE?:no notable change.}
+content:At the other end of the scale, {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.NAME @} has seen {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE 0 <?a fall of {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE ~abs}%.:}{REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE 0 >?an increase of just {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE}%.:}{REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE?:no notable change.}
 {}
 {.section}
 {.actions}
@@ -123,7 +124,7 @@ data-id:5
 data-description:The two fastest growing places in the country are highlighted on the bell curve.{TABLE}
 data-title:Local authority districts grouped by population growth in {COUNTRY_NAME}
 {}
-content:{COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.top.NAME} saw the largest percentage growth in population in {COUNTRY_NAME}, increasing {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.top.CHANGE}% between 2001 and 2011. {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.second.NAME} was second, increasing {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.second.CHANGE}%.
+content:{COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.top.NAME @} saw the largest percentage growth in population in {COUNTRY_NAME}, increasing {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.top.CHANGE}% between 2001 and 2011. {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.second.NAME @} was second, increasing {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.second.CHANGE}%.
 {}
 {.section}
 {.actions}
@@ -131,7 +132,7 @@ data-id:6
 data-description:The district that has seen the greatest fall in population is highlighted on the bell curve.{TABLE}
 data-title:Local authority districts grouped by population growth in {COUNTRY_NAME}
 {}
-content:A few places have seen their populations decline. {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.NAME} in the {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.GOR10NM} had an estimated population of {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP11 ,} in 2011, which was {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP01 COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP11 - ,} fewer than in 2001, and a decrease of {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE ~abs}%.
+content:A few places have seen their populations decline. {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.NAME @} had an estimated population of {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP11 ,} in 2011, which was {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP01 COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP11 - ,} fewer than in 2001, and a decrease of {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE ~abs}%.
 {}
 {.section}
 {.actions}
@@ -139,7 +140,7 @@ data-id:7
 data-description:The bell curve changes into circles located at the centre of each district on a map. The area of each circle indicates the total population.{TABLE}
 data-title:Population size of local authority districts in {COUNTRY_NAME}
 {}
-content:The total population of local authority areas varies a lot, from {COUNTRY.HEADLINES.BIGGEST_POP.top.NAME} with over {COUNTRY.HEADLINES.BIGGEST_POP.top.POP11 ,} people to {COUNTRY.HEADLINES.SMALLEST_POP.lowest.NAME} with just over {COUNTRY.HEADLINES.SMALLEST_POP.lowest.NAME} people. The area of these circles indicates total population.
+content:The total population of local authority areas varies a lot, from {COUNTRY.HEADLINES.BIGGEST_POP.top.NAME @} with over {COUNTRY.HEADLINES.BIGGEST_POP.top.POP11 ,} people to {COUNTRY.HEADLINES.SMALLEST_POP.lowest.NAME @} with just over {COUNTRY.HEADLINES.SMALLEST_POP.lowest.POP11} people. The area of these circles indicates total population.
 {}
 {.section}
 {.actions}
@@ -191,14 +192,14 @@ content:{LA.REGION_RANK.DENSITY.Y11.here LA.REGION_RANK.DENSITY.Y11.all 2 / >?As
 data-id:10
 data-title: Population density of {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.NAME}
 {}
-content:In {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.NAME}, the population works out at around {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.PEOPLE_PER_FOOOTY_PITCH .0} per pitch.
+content:In {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.NAME @}, the population works out at around {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.PEOPLE_PER_FOOOTY_PITCH .0} per pitch.
 {}
 {.section}
 {.actions}
 data-id:11
 data-title: Population density of {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.NAME}
 {}
-content:At the other end of the population density scale, the amount of land in the rural district of {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.NAME} works out at nearly {1 COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.PEOPLE_PER_FOOOTY_PITCH / .0} pitches per resident.
+content:At the other end of the population density scale, the amount of land in the rural district of {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.NAME @} works out at nearly {1 COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.PEOPLE_PER_FOOOTY_PITCH / .0} pitches per resident.
 {}
 :skip
 {.section}
@@ -309,7 +310,7 @@ data-description: A map of {COUNTRY_NAME} highlights the 5 places with the highe
 data-title:The most male and female places in {COUNTRY_NAME}
 
 {}
-content:Every local authority district in Wales has more females than males, with the most balanced place being Wrexham. The places with the highest ratio of females to males in {COUNTRY_NAME} is Conwy, which has 106 females for every 100 males. 
+content:{WALES 1 ===?Every local authority district in Wales has more females than males, with the most balanced place being Wrexham. The place with the highest ratio of females to males in {COUNTRY_NAME} is Conwy, which has 106 females for every 100 males.:The most male places in England/Wales are City of London, Richmondshire and Newham. The most female places; West Somerset, Rother and Arun. } 
 {}
 []
 {}//end of fifth Scroller
@@ -4198,6 +4199,12 @@ var frequency = {
     }
   ]
 };
+function guard(name) {
+  return () => {
+    throw new Error(`Cannot call ${name}(...) on the server`);
+  };
+}
+const goto = guard("goto");
 const { Object: Object_1$1 } = globals;
 let x = 0, y = 0, k = 1;
 function neighbourBounds(bounds) {
@@ -4212,12 +4219,11 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $zm, $$unsubscribe_zm;
   $$unsubscribe_zm = subscribe(zm, (value) => $zm = value);
   console.log("interpolate", interpolate);
-  const { feature } = topojson;
   let { country, all_data } = $$props;
   let key = true;
   let chart_key = false;
   let { progress, animation, width: width2, height, padding, selected } = $$props;
-  let currentProj, path, Greenwich, FirstMeridian;
+  let path, Greenwich, FirstMeridian;
   const easing = cubicInOut;
   let axes;
   let loaded;
@@ -4516,17 +4522,6 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     }, 1e3);
     return data;
   }
-  async function reload() {
-    const response = await fetch("https://raw.githubusercontent.com/ONSvisual/topojson_boundaries/master/geogLA2021EW.json");
-    const json = await response.json();
-    const topoData = feature(json, json.objects.geog);
-    const land = { ...topoData, features: topoData.features };
-    data = land.features.filter((e) => e.properties.AREACD[0] == country);
-    currentProj = geoMercator().center(country == "E" ? [-2, 52.5] : [-3.9, 52.3]).scale(country == "E" ? width2 < height ? width2 * 7 : height * 5 : width2 < height ? width2 * 15 : height * 15).translate([width2 / 2, height / 2]);
-    path = geoPath().projection(currentProj);
-    Greenwich = +path({ type: "Point", coordinates: [0, 0] }).split(",")[0].slice(1);
-    FirstMeridian = +path({ type: "Point", coordinates: [10, 0] }).split(",")[0].slice(1);
-  }
   const scaleColor = (val, dataSet, data2) => {
     let scaleExtent = extent(dataSet.map((e) => e[data2]));
     return val == null ? 0.5 : (val - scaleExtent[0]) / (scaleExtent[1] - scaleExtent[0]);
@@ -4664,14 +4659,13 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       newData = redrawData(data);
     }
   }
-  all_data && reload();
   $$unsubscribe_zm();
   return `${all_data && timeline && width2 && height && selected ? `${validate_component(ZoomSvg, "ZoomSvg").$$render($$result, Object_1$1.assign({ id: "charts1" }, { zm: $zm }, zoomState, { width: width2 }, { height }, { key }, { viewBox: "0 0 " + width2 + " " + height }, { all_data }), {}, {
     default: () => {
-      return `<g id="${"wrapper"}">${each(timeline, (feature2, i) => {
-        return `${validate_component(Path, "Path").$$render($$result, Object_1$1.assign(feature2), {}, {})}`;
-      })}${each(timeline, (feature2, i) => {
-        return `${validate_component(Text, "Text").$$render($$result, Object_1$1.assign(feature2, zoomState), {}, {})}`;
+      return `<g id="${"wrapper"}">${each(timeline, (feature, i) => {
+        return `${validate_component(Path, "Path").$$render($$result, Object_1$1.assign(feature), {}, {})}`;
+      })}${each(timeline, (feature, i) => {
+        return `${validate_component(Text, "Text").$$render($$result, Object_1$1.assign(feature, zoomState), {}, {})}`;
       })}</g>
 	<use xlink:href="${"#selected"}"></use>
 	<use xlink:href="${"#selectedText"}"></use>	
@@ -9526,6 +9520,14 @@ const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   $$unsubscribe_pyramidStore();
   return $$rendered;
 });
+function objectFlip(obj) {
+  const ret = {};
+  Object.keys(obj).forEach((key) => {
+    ret[obj[key]] = key;
+  });
+  return ret;
+}
+let flippedLookup = objectFlip(lookup);
 const ordinal = (i) => {
   if (i < 10) {
     return [
@@ -9561,6 +9563,10 @@ const possessive = (s) => {
   }
   return s + "'s";
 };
+const hyperlink = (s) => {
+  return '<a href="/' + flippedLookup[s] + '">' + s + "</a>";
+};
+const filterCountry = (s, k2, dict) => dict.CODE[0] == k2 ? s : "";
 const createText = (template, dict) => {
   if (typeof template !== "string") {
     throw new TypeError(`Expected a string, got ${typeof template} here: ${template}`);
@@ -9635,6 +9641,12 @@ const createText = (template, dict) => {
         stack[stack.length - 1] = Math.abs(stack[stack.length - 1]);
       } else if (token === "~ord") {
         stack[stack.length - 1] = ordinal(Number(stack[stack.length - 1]));
+      } else if (token === "@") {
+        stack[stack.length - 1] = hyperlink(stack[stack.length - 1]);
+      } else if (token === "~E") {
+        stack[stack.length - 1] = filterCountry(stack[stack.length - 1], "E", dict);
+      } else if (token === "~W") {
+        stack[stack.length - 1] = filterCountry(stack[stack.length - 1], "W", dict);
       } else if (token === "~ord'") {
         let result2 = ordinal(Number(stack.pop()));
         if (result2 === "first") {
@@ -19522,12 +19534,6 @@ var neighbours = {
     "E07000188"
   ]
 };
-function guard(name) {
-  return () => {
-    throw new Error(`Cannot call ${name}(...) on the server`);
-  };
-}
-const goto = guard("goto");
 var Header_svelte_svelte_type_style_lang = "";
 const css$b = {
   code: ".short.svelte-19u0sv3{min-height:85vh}.v-padded.svelte-19u0sv3{box-sizing:border-box;padding:40px 0}",
@@ -19613,7 +19619,7 @@ const Arrow = create_ssr_component(($$result, $$props, $$bindings, slots) => {
 });
 var Scroller_svelte_svelte_type_style_lang = "";
 const css$8 = {
-  code: "svelte-scroller-outer.svelte-6siu2r{display:block;position:relative;max-width:100%}svelte-scroller-background.svelte-6siu2r{display:block;position:relative;width:100%}svelte-scroller-foreground.svelte-6siu2r{display:block;position:relative;z-index:2;pointer-events:none\r\n	}svelte-scroller-foreground.svelte-6siu2r::after{content:' ';display:block;clear:both}svelte-scroller-background-container.svelte-6siu2r{display:block;position:absolute;width:100%;max-width:100%;pointer-events:none;will-change:transform}",
+  code: "svelte-scroller-outer.svelte-1mjpzk3{display:block;position:relative;max-width:100%}svelte-scroller-background.svelte-1mjpzk3{display:block;position:relative;width:100%}svelte-scroller-foreground.svelte-1mjpzk3{display:block;position:relative;z-index:2}svelte-scroller-foreground.svelte-1mjpzk3::after{content:' ';display:block;clear:both}svelte-scroller-background-container.svelte-1mjpzk3{display:block;position:absolute;width:100%;max-width:100%;pointer-events:none;will-change:transform}",
   map: null
 };
 const handlers = [];
@@ -19685,9 +19691,9 @@ const Scroller = create_ssr_component(($$result, $$props, $$bindings, slots) => 
   $$result.css.add(css$8);
   return `
 
-<svelte-scroller-outer class="${["svelte-6siu2r", splitscreen ? "splitscreen" : ""].join(" ").trim()}"${add_attribute("this", outer, 0)}><svelte-scroller-background-container class="${"background-container svelte-6siu2r"}"${add_attribute("this", bgContainer, 0)}><svelte-scroller-background class="${"svelte-6siu2r"}"${add_attribute("this", background, 0)}>${slots.background ? slots.background({}) : ``}</svelte-scroller-background></svelte-scroller-background-container>
+<svelte-scroller-outer class="${["svelte-1mjpzk3", splitscreen ? "splitscreen" : ""].join(" ").trim()}"${add_attribute("this", outer, 0)}><svelte-scroller-background-container class="${"background-container svelte-1mjpzk3"}"${add_attribute("this", bgContainer, 0)}><svelte-scroller-background class="${"svelte-1mjpzk3"}"${add_attribute("this", background, 0)}>${slots.background ? slots.background({}) : ``}</svelte-scroller-background></svelte-scroller-background-container>
 
-	<svelte-scroller-foreground class="${"svelte-6siu2r"}"${add_attribute("this", foreground, 0)}>${slots.foreground ? slots.foreground({}) : ``}</svelte-scroller-foreground>
+	<svelte-scroller-foreground class="${"svelte-1mjpzk3"}"${add_attribute("this", foreground, 0)}>${slots.foreground ? slots.foreground({}) : ``}</svelte-scroller-foreground>
 </svelte-scroller-outer>`;
 });
 function isOutOfViewport(parent, container) {
@@ -20743,6 +20749,8 @@ const css = {
   map: null
 };
 const App = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let items2 = [];
+  Object.keys(lookup).forEach((e, i) => items2[i] = { "areacd": e, "areanm": lookup[e] });
   let { selected = null } = $$props;
   if ($$props.selected === void 0 && $$bindings.selected && selected !== void 0)
     $$bindings.selected(selected);
@@ -20752,14 +20760,14 @@ const App = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     id: "single",
     idKey: "areacd",
     labelKey: "areanm",
-    items
+    items: items2
   }, {}, {})}</form>
 
 <h1>${escape(selected ? selected.areanm : "None")}</h1>`;
 });
 const prerender = true;
-async function load({ params, fetch: fetch2, session, stuff }) {
-  const response = await fetch2(`${assets}/data/place_data/${params.code}.json`);
+async function load({ params, fetch, session, stuff }) {
+  const response = await fetch(`${assets}/data/place_data/${params.code}.json`);
   let all_data = await response.json();
   return { props: { all_data } };
 }
@@ -20780,6 +20788,7 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
   Object.keys(neighbours).forEach((e) => myNeighbours[e] = neighbours[e].flat().slice(0, 9));
   let story;
   story = $story_json;
+  console.log(all_data);
   let theme = getContext("theme");
   let count;
   let index;
@@ -20799,11 +20808,18 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
     {
       {
         country = all_data.CODE[0];
+        if (country == "E") {
+          all_data.WALES = 0;
+        } else
+          all_data.WALES = 1;
       }
     }
     selected != currentSelect && goto(`/${selected.areacd}`) && function() {
       currentSelect = selected;
     };
+    {
+      console.log("all_data", all_data);
+    }
     $$rendered = `${all_data && country && story ? `${validate_component(Header, "Header").$$render($$result, {
       bgcolor: "#206095",
       bgfixed: true,

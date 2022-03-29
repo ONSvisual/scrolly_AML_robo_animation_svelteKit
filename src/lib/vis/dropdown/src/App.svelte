@@ -1,6 +1,11 @@
 <script>
 	import Select from "./Select.svelte";
-	import items from "./items.json";
+	import lookup from "$lib/lookup.js"
+	let items=[]
+	Object.keys(lookup).forEach((e,i)=>items[i]=( {
+    "areacd": e,
+    "areanm": lookup[e]
+  }))
 	export let selected=null
 
 	function doSelect(event) {

@@ -1,3 +1,13 @@
+import lookup from "$lib/lookup.js"
+function objectFlip(obj) {
+	const ret = {};
+	Object.keys(obj).forEach(key => {
+	  ret[obj[key]] = key;
+	});
+	return ret;
+  }
+let flippedLookup=objectFlip(lookup)
+
 const ordinal = i => {
 	if (i < 10) {
 		return [
@@ -41,6 +51,15 @@ const possessive = s => {
 
 	return s + '\'s';
 };
+
+
+
+const hyperlink = s => {
+	return '<a href="/' + flippedLookup[s] + '">' + s + '</a>';
+};
+
+
+const filterCountry= (s,k, dict) => dict.CODE[0]==k?s:""
 
 const createText = (template, dict) => {
 	// This is based on Douglas Crockford's old json_parse https://github.com/douglascrockford/JSON-js/blob/03157639c7a7cddd2e9f032537f346f1a87c0f6d/json_parse.js
@@ -131,7 +150,13 @@ const createText = (template, dict) => {
 				stack[stack.length - 1] = Math.abs(stack[stack.length - 1]);
 			} else if (token === '~ord') {
 				stack[stack.length - 1] = ordinal(Number(stack[stack.length - 1]));
-			} else if (token === '~ord\'') {
+			} else if (token === '@') {
+				stack[stack.length - 1] = hyperlink(stack[stack.length - 1]);
+			} else if (token === '~E') {
+				stack[stack.length - 1] = filterCountry(stack[stack.length - 1],"E",dict);
+			} else if (token === '~W') {
+				stack[stack.length - 1] = filterCountry(stack[stack.length - 1],"W",dict);
+			}   else if (token === '~ord\'') {
 				let result = ordinal(Number(stack.pop()));
 				if (result === 'first') {
 					result = '';

@@ -28,7 +28,7 @@ data-highlighted:
 data-description:The local authorities displayed on the map change form and position to create a bar chart, ordering neighbouring neighbouring districts from highest to lowest. {TABLE}
 data-title:Ten year population growth in local authority districts near {NAME}
 {}
-content:Some nearby areas like {NEIGHBOURS.PC_CHANGE.top.NAME} and {NEIGHBOURS.PC_CHANGE.second.NAME} have seen their populations increase by {NEIGHBOURS.PC_CHANGE.top.VAL .0}% and {NEIGHBOURS.PC_CHANGE.second.VAL .0}% respectively, while others such as {NEIGHBOURS.PC_CHANGE.last.NAME} ({NEIGHBOURS.PC_CHANGE.last.VAL .0}%) and {NEIGHBOURS.PC_CHANGE.penultimate.NAME} ({NEIGHBOURS.PC_CHANGE.penultimate.VAL .0}%) have seen smaller changes.
+content:Some nearby areas like {NEIGHBOURS.PC_CHANGE.top.NAME @} and {NEIGHBOURS.PC_CHANGE.second.NAME @} have seen their populations increase by {NEIGHBOURS.PC_CHANGE.top.VAL .0}% and {NEIGHBOURS.PC_CHANGE.second.VAL .0}% respectively, while others such as {NEIGHBOURS.PC_CHANGE.last.NAME @} ({NEIGHBOURS.PC_CHANGE.last.VAL .0}%) and {NEIGHBOURS.PC_CHANGE.penultimate.NAME @} ({NEIGHBOURS.PC_CHANGE.penultimate.VAL .0}%) have seen smaller changes.
 {}
 {.section}
 {.actions}
@@ -40,7 +40,7 @@ data-explore:false
 data-description:More bars are added to the bar chart, to display all of the local authority districts in {REGION}. The two fastest growing places are highlighted. {TABLE}
 data-title:Ten year population growth of local authority districts in {REGION_NAME}
 {}
-content:The sharpest population increases in {REGION_NAME} have been seen in {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.top.NAME} and {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.second.NAME}, where the populations have grown by {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.top.CHANGE}% and {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.second.CHANGE}% respectively.
+content:The sharpest population increases in {REGION_NAME} have been seen in {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.top.NAME @} and {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.second.NAME @}, where the populations have grown by {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.top.CHANGE}% and {REGION.HEADLINES.BIGGEST_POP_CHANGE_UP.second.CHANGE}% respectively.
 {}
 {.section}
 {.actions}
@@ -48,7 +48,7 @@ data-id:3
 data-description:On the same bar chart,  The district that has recorded the slowest growth is  highlighted. {TABLE}
 data-title:Ten year population growth of local authority districts in {REGION_NAME}
 {}
-content:At the other end of the scale, {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.NAME} has seen {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE 0 <?a fall of {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE ~abs}%.:}{REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE 0 >?an increase of just {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE}%.:}{REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE?:no notable change.}
+content:At the other end of the scale, {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.NAME @} has seen {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE 0 <?a fall of {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE ~abs}%.:}{REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE 0 >?an increase of just {REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE}%.:}{REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE?:no notable change.}
 {}
 {.section}
 {.actions}
@@ -65,7 +65,7 @@ data-id:5
 data-description:The two fastest growing places in the country are highlighted on the bell curve.{TABLE}
 data-title:Local authority districts grouped by population growth in {COUNTRY_NAME}
 {}
-content:{COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.top.NAME} saw the largest percentage growth in population in {COUNTRY_NAME}, increasing {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.top.CHANGE}% between 2001 and 2011. {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.second.NAME} was second, increasing {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.second.CHANGE}%.
+content:{COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.top.NAME @} saw the largest percentage growth in population in {COUNTRY_NAME}, increasing {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.top.CHANGE}% between 2001 and 2011. {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.second.NAME @} was second, increasing {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP.second.CHANGE}%.
 {}
 {.section}
 {.actions}
@@ -73,7 +73,7 @@ data-id:6
 data-description:The district that has seen the greatest fall in population is highlighted on the bell curve.{TABLE}
 data-title:Local authority districts grouped by population growth in {COUNTRY_NAME}
 {}
-content:A few places have seen their populations decline. {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.NAME} in the {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.GOR10NM} had an estimated population of {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP11 ,} in 2011, which was {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP01 COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP11 - ,} fewer than in 2001, and a decrease of {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE ~abs}%.
+content:A few places have seen their populations decline. {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.NAME @} had an estimated population of {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP11 ,} in 2011, which was {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP01 COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.POP11 - ,} fewer than in 2001, and a decrease of {COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.CHANGE ~abs}%.
 {}
 {.section}
 {.actions}
@@ -81,7 +81,7 @@ data-id:7
 data-description:The bell curve changes into circles located at the centre of each district on a map. The area of each circle indicates the total population.{TABLE}
 data-title:Population size of local authority districts in {COUNTRY_NAME}
 {}
-content:The total population of local authority areas varies a lot, from {COUNTRY.HEADLINES.BIGGEST_POP.top.NAME} with over {COUNTRY.HEADLINES.BIGGEST_POP.top.POP11 ,} people to {COUNTRY.HEADLINES.SMALLEST_POP.lowest.NAME} with just over {COUNTRY.HEADLINES.SMALLEST_POP.lowest.NAME} people. The area of these circles indicates total population.
+content:The total population of local authority areas varies a lot, from {COUNTRY.HEADLINES.BIGGEST_POP.top.NAME @} with over {COUNTRY.HEADLINES.BIGGEST_POP.top.POP11 ,} people to {COUNTRY.HEADLINES.SMALLEST_POP.lowest.NAME @} with just over {COUNTRY.HEADLINES.SMALLEST_POP.lowest.POP11} people. The area of these circles indicates total population.
 {}
 {.section}
 {.actions}
@@ -133,14 +133,14 @@ content:{LA.REGION_RANK.DENSITY.Y11.here LA.REGION_RANK.DENSITY.Y11.all 2 / >?As
 data-id:10
 data-title: Population density of {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.NAME}
 {}
-content:In {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.NAME}, the population works out at around {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.PEOPLE_PER_FOOOTY_PITCH .0} per pitch.
+content:In {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.NAME @}, the population works out at around {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.highest.PEOPLE_PER_FOOOTY_PITCH .0} per pitch.
 {}
 {.section}
 {.actions}
 data-id:11
 data-title: Population density of {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.NAME}
 {}
-content:At the other end of the population density scale, the amount of land in the rural district of {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.NAME} works out at nearly {1 COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.PEOPLE_PER_FOOOTY_PITCH / .0} pitches per resident.
+content:At the other end of the population density scale, the amount of land in the rural district of {COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.NAME @} works out at nearly {1 COUNTRY.HEADLINES.FOOTBALL_PITCH_EXTREMES.lowest.PEOPLE_PER_FOOOTY_PITCH / .0} pitches per resident.
 {}
 :skip
 {.section}
@@ -251,7 +251,7 @@ data-description: A map of {COUNTRY_NAME} highlights the 5 places with the highe
 data-title:The most male and female places in {COUNTRY_NAME}
 
 {}
-content:Every local authority district in Wales has more females than males, with the most balanced place being Wrexham. The places with the highest ratio of females to males in {COUNTRY_NAME} is Conwy, which has 106 females for every 100 males. 
+content:{WALES 1 ===?Every local authority district in Wales has more females than males, with the most balanced place being Wrexham. The place with the highest ratio of females to males in {COUNTRY_NAME} is Conwy, which has 106 females for every 100 males.:The most male places in England/Wales are City of London, Richmondshire and Newham. The most female places; West Somerset, Rother and Arun. } 
 {}
 []
 {}//end of fifth Scroller

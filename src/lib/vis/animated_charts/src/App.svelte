@@ -30,6 +30,8 @@
 export let progress, animation, width, height, padding, selected
 //console.log ("ALL DATA", all_data)
 	//const padding = 80
+  import { afterNavigate, goto } from '$app/navigation';
+
 
 
 //$: {width=$dims.w, height=dims.h} 
@@ -612,7 +614,7 @@ $: { newData=redrawData(data) }
 
 $: width && function(){newData=redrawData(data)}
 
-$: all_data && reload()
+afterNavigate(reload)
 </script>
 
 <style>
