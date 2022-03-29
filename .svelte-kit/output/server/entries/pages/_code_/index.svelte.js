@@ -20788,7 +20788,6 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
   Object.keys(neighbours).forEach((e) => myNeighbours[e] = neighbours[e].flat().slice(0, 9));
   let story;
   story = $story_json;
-  console.log(all_data);
   let theme = getContext("theme");
   let count;
   let index;
@@ -20817,9 +20816,6 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
     selected != currentSelect && goto(`/${selected.areacd}`) && function() {
       currentSelect = selected;
     };
-    {
-      console.log("all_data", all_data);
-    }
     $$rendered = `${all_data && country && story ? `${validate_component(Header, "Header").$$render($$result, {
       bgcolor: "#206095",
       bgfixed: true,

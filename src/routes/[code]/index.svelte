@@ -51,7 +51,7 @@ afterNavigate(
 	let story
 	story = $story_json
 	//console.log(story)
-	console.log(all_data)
+	//console.log(all_data)
 	// SCROLLY IMPORTS
   
 	let theme = getContext('theme')
@@ -90,7 +90,7 @@ $: {country=all_data.CODE[0]; if (country=="E"){all_data.WALES=0} else all_data.
 
 
 	$: selected!=currentSelect && goto(`/${selected.areacd}`) && function(){currentSelect=selected}
-$: console.log("all_data",all_data)
+//$: console.log("all_data",all_data)
 
   </script>
   
