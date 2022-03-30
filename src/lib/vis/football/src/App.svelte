@@ -64,7 +64,7 @@
     if (count < 1) {
       let addPitches = setInterval(function () {
         let numberPitches=Math.ceil(1/count)
-        if (pitches == numberPitches){ clearInterval(addPitches)}
+        if (pitches == numberPitches){ clearInterval(addPitches); return}
         if (pitches < numberPitches) pitches++
         if (pitches > numberPitches) pitches--
 
@@ -73,14 +73,14 @@
     if (count >= 1) {
       let numberPitches=Math.ceil(1/count)
       let removePitches = setInterval(function () {
-        if (pitches == numberPitches){ clearInterval(removePitches)}    
+        if (pitches == numberPitches){ clearInterval(removePitches); return}    
         if (pitches > numberPitches) pitches--
       }, 100)
     }
 
     let addPeople = setInterval(function () {
       let currentPeople=Math.ceil(people)
-      if (currentPeople == Math.round(count)){ clearInterval(addPeople)}
+      if (currentPeople == Math.round(count)){ clearInterval(addPeople); return}
       if (people < Math.round(count)) people++
       if (people > Math.round(count)) people--
     }, 500 / (peopleAtStart - count))
@@ -139,6 +139,7 @@
       if (step == 9){changePeople(peopleHere)}
       if (step == 10){changePeople(mostPeople)}
       if (step == 11){changePeople(leastPeople)}
+      if (step > 11){return}
       stepPrev=step
       // timeline(step)
     }
@@ -149,7 +150,7 @@
    // console.log(data);
     return true
   }
- $: animation && change(animation)
+ $: animation && animation>8 && animation<12 && change(animation)
 </script>
 
 {#if peopleHere && all_data}
@@ -206,5 +207,5 @@
     {/each}
   </g>
 </svg>
-<text x="100" y="500" >step:{animation},   {pitches} pitches, {people} people,  most:{mostPeople},  least:{leastPeople}  here:{peopleHere}</text>
+<!--<text x="100" y="500" >step:{animation},   {pitches} pitches, {people} people,  most:{mostPeople},  least:{leastPeople}  here:{peopleHere}</text>-->
 {/if}

@@ -614,7 +614,7 @@ $: { newData=redrawData(data) }
 
 $: width && function(){newData=redrawData(data)}
 
-afterNavigate(reload)
+afterNavigate(function(){reload; window.scrollTo({ top: 0, behavior: 'smooth' })})
 </script>
 
 <style>

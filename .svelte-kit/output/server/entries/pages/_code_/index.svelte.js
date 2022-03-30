@@ -5376,6 +5376,7 @@ const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
         let numberPitches = Math.ceil(1 / count);
         if (pitches == numberPitches) {
           clearInterval(addPitches);
+          return;
         }
         if (pitches < numberPitches)
           pitches++;
@@ -5388,6 +5389,7 @@ const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let removePitches = setInterval(function() {
         if (pitches == numberPitches) {
           clearInterval(removePitches);
+          return;
         }
         if (pitches > numberPitches)
           pitches--;
@@ -5397,6 +5399,7 @@ const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let currentPeople = Math.ceil(people);
       if (currentPeople == Math.round(count)) {
         clearInterval(addPeople);
+        return;
       }
       if (people < Math.round(count))
         people++;
@@ -5438,6 +5441,9 @@ const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       if (step2 == 11) {
         changePeople(leastPeople);
       }
+      if (step2 > 11) {
+        return;
+      }
       stepPrev = step2;
     }
     return step2;
@@ -5450,7 +5456,7 @@ const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.width(width2);
   if ($$props.all_data === void 0 && $$bindings.all_data && all_data !== void 0)
     $$bindings.all_data(all_data);
-  animation && change(animation);
+  animation && animation > 8 && animation < 12 && change(animation);
   $$unsubscribe_zeds();
   return `${peopleHere && all_data ? `<svg style="${"width:" + escape(width2)}"${add_attribute("width", width2, 0)}${add_attribute("height", height, 0)} viewBox="${escape(-width2 / 6) + "\n  " + escape(-height / 2) + "\n  " + escape(width2 / 3) + "\n  " + escape(h_orig)}"><rect${add_attribute("x", -width2 / 2, 0)}${add_attribute("y", -height / 2, 0)}${add_attribute("width", width2, 0)}${add_attribute("height", height, 0)} fill="${"#40826D"}" fill-opacity="${"0.7"}"></rect><g transform="${"scale(" + escape(width2 / 1500) + ")"}">${each(newPitch, (params) => {
     return `<line${spread([
@@ -5471,7 +5477,7 @@ const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     return `
       <g class="${"person"}" transform="${"translate(" + escape(point.x - 14) + ", " + escape(point.y - 25.5) + ") scale(" + escape(6 * point.scale) + ")\n        translate(" + escape(0) + ", " + escape($zeds[i]) + ") "}"><path${add_attribute("d", folk[i % 45].shadow, 0)} fill="${"black"}"${add_attribute("visibility", point.order > people + 2 ? "hidden" : "visible", 0)}></path></g>`;
   })}</g></svg>
-<text x="${"100"}" y="${"500"}">step:${escape(animation)},   ${escape(pitches)} pitches, ${escape(people)} people,  most:${escape(mostPeople)},  least:${escape(leastPeople)}  here:${escape(peopleHere)}</text>` : ``}`;
+` : ``}`;
 });
 var rankings = [
   [
