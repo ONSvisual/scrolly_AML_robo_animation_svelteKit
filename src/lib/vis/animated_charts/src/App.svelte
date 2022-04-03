@@ -6,7 +6,7 @@
   import { tweened } from 'svelte/motion'
 	import { cubicInOut } from 'svelte/easing'
   import { interpolate } from "$lib/flubber/index.js"
-  console.log("interpolate",interpolate)
+  //console.log("interpolate",interpolate)
   import { geoAlbers, geoPath, geoProjection, geoMercator } from 'd3-geo'
   import { extent } from 'd3-array'
   import { onMount } from 'svelte'
@@ -59,7 +59,7 @@ let  currentProj, path, Greenwich, FirstMeridian
 	let metric
 	
 
-  console.log("SELECTED",selected)
+ // console.log("SELECTED",selected)
 	let x=0,y=0,k=1
 //console.log(path().projection([0,0]))
 
@@ -534,7 +534,7 @@ if (charts.length>current){
 		axes.x_offset.set(charts[current].axis.x.spacing,{duration:charts[current].duration, easing})
 		axes.y_origin.set(charts[current].axis.y.origin,{duration:charts[current].duration, easing})
 		axes.y_offset.set(charts[current].axis.y.spacing,{duration:charts[current].duration, easing})
-		console.log("axes",axes)
+	//	console.log("axes",axes)
 		//newData = newData.sort((a, b) => (b[charts[current].sort_by])-(a[charts[current].sort_by]))
     let triggerZoom=0
    // let zoomFactor=charts[current].zoom

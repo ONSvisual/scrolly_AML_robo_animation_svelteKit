@@ -8,6 +8,8 @@
   import Animated_charts from '$lib/vis/animated_charts/src/App.svelte'
   import Football  from '$lib/vis/football/src/App.svelte'
   import Pyramids  from '$lib/vis/animated_pyramids/src/App.svelte' 
+  import MaleFemale from '$lib/vis/animated_pointillism/src/App.svelte'
+  import Highlighted_map from '$lib/vis/highlighted_map/src/App.svelte'  
   import robojournalist from '$lib/robojournalist'
 
   let story =$story_json
@@ -17,12 +19,18 @@
   let components = {
     Animated_charts: Animated_charts,
     Football:Football,
-    Pyramids:Pyramids
+    Pyramids:Pyramids,
+    MaleFemale:MaleFemale,
+    Highlighted_map:Highlighted_map
   }
 
+  let stpPrev = 0;
     function updateStep(stp){
-      tracker.set(stp)
-        return $tracker
+      console.log(stp)
+      //if (stpPrev  + 1 != stp && stpPrev - 1 != stp ){return}
+      if (stpPrev ==1 && stp == 0){stpPrev=stp; return stp}
+      if (stpPrev !=1 && stp == 0){return stpPrev}
+      if (stpPrev !=stp){stpPrev=stp; return stp}
     }
 
     function getStep(){
@@ -36,7 +44,7 @@ if(height)getPadding()
 <div class="container" bind:clientHeight={height} bind:clientWidth={width} family={family} component={component}>
 
 {#if height}
-{#if animation}<h3 class= "title_over" x={getPadding()} y={padding/2}  >{ robojournalist(animation.section.actions['data-title'],all_data) }</h3>{/if}
+{#if animation}<h3 class= "title_over" x={getPadding()} y={padding/2}  >{animation.section.actions['data-id']}: { robojournalist(animation.section.actions['data-title'],all_data) }</h3>{/if}
   <svg {height} {width} {count} {index} {offset} {progress} {animation}>
     
 <!--  <rect

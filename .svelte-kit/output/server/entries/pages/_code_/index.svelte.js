@@ -2,7 +2,7 @@ import { n as noop, d as safe_not_equal, c as create_ssr_component, f as subscri
 import { a as assets } from "../../../chunks/paths-396f020f.js";
 import pkg from "archieml";
 import { polygonLength, polygonArea } from "d3-polygon";
-import Path$1 from "svgpath";
+import Path$2 from "svgpath";
 import { svgPathProperties } from "svg-path-properties";
 import "earcut";
 import "topojson-client";
@@ -260,29 +260,34 @@ data-title: Population change by age group in {NAME}
 {}
 content:This is how {NAME} compares. There has been {LA.OVER65.ABS.Y11 LA.OVER65.ABS.Y01 >?an increase: a decrease} of {LA.OVER65.ABS.Y11 LA.OVER65.ABS.Y01 - LA.OVER65.ABS.Y01 / 100 * .0 ~abs}% in people aged 65 years and over, {LA.WORKING.ABS.Y11 LA.WORKING.ABS.Y01 >?an increase:a decrease} of {LA.WORKING.ABS.Y11 LA.WORKING.ABS.Y01 - LA.WORKING.ABS.Y01 / 100 * .0 ~abs}% in people aged 20 to 65 years, and {LA.UNDER20.ABS.Y11 LA.UNDER20.ABS.Y01 >?an increase:a decrease} of {LA.UNDER20.ABS.Y11 LA.UNDER20.ABS.Y01 - LA.UNDER20.ABS.Y01 / 100 * .0 ~abs}% in people aged under 20 years.
 {}
+[]
+{}
+****** GROWTH BY AGE GROUP ******
+{.Part}
+type:Filler
+content:In some areas in {COUNTRY_NAME}, population growth has been highest among children and young people, while in others working age or older people have increased the most. These maps show where each of the age-groups has grown the most.
+{}//end of Filler
+{.Part}
+type:Scroller
+background:Highlighted_map
 
-
-
+[.foreground]
 {.section}
 {.actions}
 data-id:17
 data-description: A map of {COUNTRY_NAME} appears, highlighting the 10 districts with the greatest increase in people aged 65 and over.{TABLE}
-data-title: Top ten districts for population increase in over-65\u2019s 
+data-title: Top five districts for population increase in over-65\u2019s 
 {}
-content:The places that have seen the largest increases in the proportion of people aged 65 years and over are Monmouthshire (25% increase) and Isle of Anglesey (23%).
+content:{WALES 1 ===?The places that have seen the largest increases in the proportion of people aged 65 years and over are <a href="/W06000021">Monmouthshire</a>, which has seen 25% growth, and the <a href="/W06000001">Isle of Anglesey</a> (23%):The places that have seen the largest increases in the proportion of people aged 65 years and over are <a href="/E07000089">Hart</a>, in the South East, which has seen 42% growth, and <a href="/E07000194">Lichfield</a> (40%)}.
 {}
 
-
-
-
-****** AGE_CHARACTERISTICS ******
 {.section}
 {.actions}
 data-id:18
 data-description: The map now highlights the 10 districts with the greatest increase in people aged under 15.{TABLE}
-data-title: Top ten districts for population increase in under-15\u2019s
+data-title: Top five districts for population increase in under-15\u2019s
 {}
-content: The number of children in every local authority district of Wales has decreased, with the exception of Wrexham, which has seen a 1% increase in people aged under 15.
+content:{WALES 1 ===?The number of children in every local authority district of Wales has decreased, with the exception of Wrexham, which has seen a 1% increase in people aged under 15:The places that have seen the largest increase in the proportion of people aged under 15 years are <a href="/E09000033">Westminster</a>, in London, which has seen 32% growth, and <a href="/E06000039">Slough</a> in the South East (26%). Seven of the ten places that have seen the greatest growth in number of children are in the London region}.
 {}
 []
 {}//end of 4th Scroller*** SEX ***
@@ -292,16 +297,16 @@ content:Around 51% of the population of {COUNTRY_NAME} is female and 49% is male
 {}//end of Filler
 {.Part}
 type:Scroller
-background:Pyramids
+background:MaleFemale
 family:verticalBar
 [.foreground]
 {.section}
 {.actions}
 data-id:19
 data-description: A bar chart is displayed with two bars showing the number of males and females aged 65 years and over in {NAME}.{TABLE}
-data-title:The split of males and females in the over-65\u2019s age group in {NAME}
+data-title:The split of males and females aged 65 years and over in {NAME}
 {}
-content:In the 65 years and over age group, {NAME} has a split of 14,500 females to 9,600 males.
+content:In the 65 years and over age group, {NAME} has a split of {LA.OVER65.ABS.F ,} females to {LA.OVER65.ABS.M ,} males.
 {}
 {.section}
 {.actions}
@@ -310,7 +315,7 @@ data-description: A map of {COUNTRY_NAME} highlights the 5 places with the highe
 data-title:The most male and female places in {COUNTRY_NAME}
 
 {}
-content:{WALES 1 ===?Every local authority district in Wales has more females than males, with the most balanced place being Wrexham. The place with the highest ratio of females to males in {COUNTRY_NAME} is Conwy, which has 106 females for every 100 males.:The most male places in England/Wales are City of London, Richmondshire and Newham. The most female places; West Somerset, Rother and Arun. } 
+content:{WALES 1 ===?Every local authority district in Wales has more females than males, with the most balanced place being Wrexham. The place with the highest ratio of females to males in {COUNTRY_NAME} is Conwy, which has 106 females for every 100 males.:The most male places in England are the City of London, Richmondshire and Newham. The most female places; West Somerset, Rother and Arun. } 
 {}
 []
 {}//end of fifth Scroller
@@ -322,8 +327,8 @@ content:We are publishing more insights from Census 2021. These first results ar
 `;
 const { load: load$1 } = pkg;
 const story_json = writable(load$1(txt).ScrollY.map((e) => e.Part));
-var Axis_svelte_svelte_type_style_lang = "";
-const css$e = {
+var Axis_svelte_svelte_type_style_lang$1 = "";
+const css$f = {
   code: "line.svelte-1ma9czi{vector-effect:non-scaling-stroke}",
   map: null
 };
@@ -383,7 +388,7 @@ const Axis = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.horizontalStrokes(horizontalStrokes);
   if ($$props.chart_key === void 0 && $$bindings.chart_key && chart_key !== void 0)
     $$bindings.chart_key(chart_key);
-  $$result.css.add(css$e);
+  $$result.css.add(css$f);
   $$unsubscribe_x_origin();
   $$unsubscribe_x_offset();
   $$unsubscribe_y_origin();
@@ -399,7 +404,7 @@ ${chart_key ? `<g transform="${"translate(" + escape(padding) + "," + escape(hei
     return `${value % 5 == 0 || i == 0 || i == values.length - 1 ? `<text text-align="${"center"}"${add_attribute("x", spacing * i, 0)} y="${"0"}" fill="${"black"}" stroke="${"black"}">${escape(i == values.length - 1 ? value + "% growth" : value)}</text>` : ``}`;
   })}` : ``}</g>` : ``}`;
 });
-const Path = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+const Path$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $d, $$unsubscribe_d;
   let $fill, $$unsubscribe_fill;
   let $title, $$unsubscribe_title;
@@ -408,7 +413,7 @@ const Path = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $metric, $$unsubscribe_metric;
   let $y, $$unsubscribe_y;
   let $area_cd, $$unsubscribe_area_cd;
-  let { d, centroid, fill, fillOpacity, title, mouseover, mouseout, value, pop, metric, y: y2, selected, area_cd, label_opacity, zoom } = $$props;
+  let { d, centroid, fill, fillOpacity, title, mouseover, mouseout, value, pop, metric, y: y2, selected: selected2, area_cd, label_opacity, zoom } = $$props;
   $$unsubscribe_d = subscribe(d, (value2) => $d = value2);
   $$unsubscribe_fill = subscribe(fill, (value2) => $fill = value2);
   $$unsubscribe_fillOpacity = subscribe(fillOpacity, (value2) => $fillOpacity = value2);
@@ -439,8 +444,8 @@ const Path = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.metric(metric);
   if ($$props.y === void 0 && $$bindings.y && y2 !== void 0)
     $$bindings.y(y2);
-  if ($$props.selected === void 0 && $$bindings.selected && selected !== void 0)
-    $$bindings.selected(selected);
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
+    $$bindings.selected(selected2);
   if ($$props.area_cd === void 0 && $$bindings.area_cd && area_cd !== void 0)
     $$bindings.area_cd(area_cd);
   if ($$props.label_opacity === void 0 && $$bindings.label_opacity && label_opacity !== void 0)
@@ -455,7 +460,7 @@ const Path = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   $$unsubscribe_metric();
   $$unsubscribe_y();
   $$unsubscribe_area_cd();
-  return `<path${add_attribute("id", selected ? "selected" : null, 0)}${add_attribute("d", $d, 0)}${add_attribute("centroid", centroid, 0)} class="${"shape"}"${add_attribute("fill", $fill, 0)}${add_attribute("title", $title, 0)}${add_attribute("fill-opacity", $fillOpacity, 0)}${add_attribute("stroke-width", selected ? "1pt" : "0.5pt", 0)}${add_attribute("stroke", selected ? "black" : "", 0)} style="${"vector-effect: non-scaling-stroke;"}"${add_attribute("value", $value, 0)}${add_attribute("pop", pop, 0)}${add_attribute("metric", $metric, 0)}${add_attribute("y", $y, 0)}${add_attribute("area_cd", $area_cd, 0)}${add_attribute("zoom", zoom, 0)}>${selected ? `<animate attributeName="${"stroke-width"}" values="${"0;4;0"}" dur="${"2s"}" begin="${"0s"}" repeatCount="${"indefinite"}"></animate>` : ``}</path>
+  return `<path${add_attribute("id", selected2 ? "selected" : null, 0)}${add_attribute("d", $d, 0)}${add_attribute("centroid", centroid, 0)} class="${"shape"}"${add_attribute("fill", $fill, 0)}${add_attribute("title", $title, 0)}${add_attribute("fill-opacity", $fillOpacity, 0)}${add_attribute("stroke-width", selected2 ? "1pt" : "0.5pt", 0)}${add_attribute("stroke", selected2 ? "black" : "", 0)} style="${"vector-effect: non-scaling-stroke;"}"${add_attribute("value", $value, 0)}${add_attribute("pop", pop, 0)}${add_attribute("metric", $metric, 0)}${add_attribute("y", $y, 0)}${add_attribute("area_cd", $area_cd, 0)}${add_attribute("zoom", zoom, 0)}>${selected2 ? `<animate attributeName="${"stroke-width"}" values="${"0;4;0"}" dur="${"2s"}" begin="${"0s"}" repeatCount="${"indefinite"}"></animate>` : ``}</path>
 `;
 });
 function cubicInOut(t) {
@@ -567,7 +572,7 @@ const Text = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $title, $$unsubscribe_title;
   let $value, $$unsubscribe_value;
   let $metric, $$unsubscribe_metric;
-  let { d, centroid, fill, fillOpacity, title, mouseover, mouseout, value, pop, metric, selected, area_cd, label_opacity, zoom, x: x2, y: y2, k: k2 } = $$props;
+  let { d, centroid, fill, fillOpacity, title, mouseover, mouseout, value, pop, metric, selected: selected2, area_cd, label_opacity, zoom, x: x2, y: y2, k: k2 } = $$props;
   $$unsubscribe_title = subscribe(title, (value2) => $title = value2);
   $$unsubscribe_value = subscribe(value, (value2) => $value = value2);
   $$unsubscribe_metric = subscribe(metric, (value2) => $metric = value2);
@@ -594,8 +599,8 @@ const Text = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.pop(pop);
   if ($$props.metric === void 0 && $$bindings.metric && metric !== void 0)
     $$bindings.metric(metric);
-  if ($$props.selected === void 0 && $$bindings.selected && selected !== void 0)
-    $$bindings.selected(selected);
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
+    $$bindings.selected(selected2);
   if ($$props.area_cd === void 0 && $$bindings.area_cd && area_cd !== void 0)
     $$bindings.area_cd(area_cd);
   if ($$props.label_opacity === void 0 && $$bindings.label_opacity && label_opacity !== void 0)
@@ -613,7 +618,7 @@ const Text = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   $$unsubscribe_title();
   $$unsubscribe_value();
   $$unsubscribe_metric();
-  return `<g class="${"label"}"><text class="${"titles"}"${add_attribute("x", centroid[0], 0)}${add_attribute("y", centroid[1], 0)} text-anchor="${"middle"}"${add_attribute("font-size", 15 / $k, 0)}${add_attribute("opacity", $label_opacity, 0)} style="${"pointer-events: none;"}"${add_attribute("id", selected ? "selectedText" : null, 0)}>${escape($title)}</text><text class="${"titles"}"${add_attribute("x", centroid[0], 0)}${add_attribute("y", centroid[1] + 20 / $k, 0)} text-anchor="${"middle"}"${add_attribute("font-size", 15 / $k, 0)}${add_attribute("opacity", $label_opacity, 0)} style="${"pointer-events: none;"}"${add_attribute("id", selected ? "selectedValue" : null, 0)}>${escape($value + " " + $metric)}</text></g>`;
+  return `<g class="${"label"}"><text class="${"titles"}"${add_attribute("x", centroid[0], 0)}${add_attribute("y", centroid[1], 0)} text-anchor="${"middle"}"${add_attribute("font-size", 15 / $k, 0)}${add_attribute("opacity", $label_opacity, 0)} style="${"pointer-events: none;"}"${add_attribute("id", selected2 ? "selectedText" : null, 0)}>${escape($title)}</text><text class="${"titles"}"${add_attribute("x", centroid[0], 0)}${add_attribute("y", centroid[1] + 20 / $k, 0)} text-anchor="${"middle"}"${add_attribute("font-size", 15 / $k, 0)}${add_attribute("opacity", $label_opacity, 0)} style="${"pointer-events: none;"}"${add_attribute("id", selected2 ? "selectedValue" : null, 0)}>${escape($value + " " + $metric)}</text></g>`;
 });
 function distance(a, b) {
   return Math.sqrt((a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]));
@@ -645,7 +650,7 @@ Example valid ways of supplying a shape would be:
 "M0,0 L10,0 L10,10Z"
 `;
 function parse(str) {
-  return new Path$1(str).abs();
+  return new Path$2(str).abs();
 }
 function split(parsed) {
   return parsed.toString().split("M").map((d, i) => {
@@ -805,7 +810,7 @@ function interpolateRing(fromRing, toRing, string) {
   rotate(fromRing, toRing);
   return interpolatePoints(fromRing, toRing, string);
 }
-var growth = [
+var growth$1 = [
   {
     "LAD17CD": "E06000001",
     "GROWTH": 4,
@@ -3124,7 +3129,7 @@ var growth = [
     "REGION": "W92000004"
   }
 ];
-const Key = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+const Key$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let { percent, key, uk, place, max, min, step: step2, width: width2, height, name } = $$props;
   let arr = Array.from({ length: max - min + 1 }, (_, i) => i + min);
   let range = max - min;
@@ -3156,12 +3161,12 @@ ${clr % 10 == 0 || i == 0 || i == arr.length - 1 ? `<text y="${"90"}"${add_attri
   })}<line${add_attribute("y1", 100, 0)}${add_attribute("y2", 210, 0)}${add_attribute("x1", 50 + 500 * place_position, 0)}${add_attribute("x2", 50 + place_position * 500, 0)} stroke="${"#666"}" stroke-width="${"8"}" stroke-linecap="${"round"}"></line><text y="${"210"}"${add_attribute("x", 60 + place_position * 500, 0)} fill="${"#666"}" font-size="${"24pt"}">${escape(name)}</text>${step2 == 1 ? `<line${add_attribute("y1", 100, 0)}${add_attribute("y2", 180, 0)}${add_attribute("x1", 50 + uk_position * 500, 0)}${add_attribute("x2", 50 + uk_position * 500, 0)} stroke="${"#666"}" stroke-width="${"8"}" stroke-linecap="${"round"}"></line>
 <text y="${"175"}"${add_attribute("x", 40 + uk_position * 500, 0)} text-anchor="${"end"}" fill="${"#666"}" font-size="${"24pt"}">average</text>` : ``}<text y="${"250"}"${add_attribute("x", 40, 0)} fill="${"grey"}" font-size="${"24pt"}">Greatest</text><text y="${"290"}"${add_attribute("x", 40, 0)} fill="${"grey"}" font-size="${"24pt"}">decrease</text><text y="${"250"}"${add_attribute("x", 555, 0)} text-anchor="${"end"}" fill="${"grey"}" font-size="${"24pt"}">Greatest</text><text y="${"290"}"${add_attribute("x", 555, 0)} text-anchor="${"end"}" fill="${"grey"}" font-size="${"24pt"}">increase</text></g>`;
 });
-var ZoomSvg_svelte_svelte_type_style_lang = "";
-const css$d = {
+var ZoomSvg_svelte_svelte_type_style_lang$1 = "";
+const css$e = {
   code: "#canvas.svelte-1rh2i4z{position:absolute;right:0;height:100vh;width:100vh}",
   map: null
 };
-const ZoomSvg = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+const ZoomSvg$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $zm, $$unsubscribe_zm;
   let $x, $$unsubscribe_x;
   let $y, $$unsubscribe_y;
@@ -3192,13 +3197,13 @@ const ZoomSvg = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.y(y2);
   if ($$props.k === void 0 && $$bindings.k && k2 !== void 0)
     $$bindings.k(k2);
-  $$result.css.add(css$d);
+  $$result.css.add(css$e);
   $$unsubscribe_zm();
   $$unsubscribe_x();
   $$unsubscribe_y();
   $$unsubscribe_k();
   $$unsubscribe_step();
-  return `${width2 && all_data ? `<svg id="${"canvas"}"${add_attribute("viewBox", viewBox, 0)}${add_attribute("height", height, 0)}${add_attribute("width", width2, 0)}${add_attribute("zm", $zm, 0)} class="${"svelte-1rh2i4z"}"${add_attribute("this", svg, 0)}><g transform="${"translate(" + escape($x) + ", " + escape($y) + ") scale(" + escape($k) + ")"}" id="${"zoomable"}">${slots.default ? slots.default({}) : ``}</g>${key ? `${validate_component(Key, "Key").$$render($$result, {
+  return `${width2 && all_data ? `<svg id="${"canvas"}"${add_attribute("viewBox", viewBox, 0)}${add_attribute("height", height, 0)}${add_attribute("width", width2, 0)}${add_attribute("zm", $zm, 0)} class="${"svelte-1rh2i4z"}"${add_attribute("this", svg, 0)}><g transform="${"translate(" + escape($x) + ", " + escape($y) + ") scale(" + escape($k) + ")"}" id="${"zoomable"}">${slots.default ? slots.default({}) : ``}</g>${key ? `${validate_component(Key$1, "Key").$$render($$result, {
     percent: true,
     width: width2,
     height,
@@ -3212,7 +3217,7 @@ const ZoomSvg = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   }, {}, {})}` : ``}</svg>` : ``}`;
 });
 let width;
-var charts = [
+var charts$1 = [
   {
     chart: "xys",
     title: "Population growth in ",
@@ -4205,8 +4210,8 @@ function guard(name) {
   };
 }
 const goto = guard("goto");
-const { Object: Object_1$1 } = globals;
-let x = 0, y = 0, k = 1;
+const { Object: Object_1$2 } = globals;
+let x$1 = 0, y$1 = 0, k$1 = 1;
 function neighbourBounds(bounds) {
   let min_x = bounds.sort((a, b) => a[0][0] - b[0][0])[0][0][0];
   let max_x = bounds.sort((a, b) => b[1][0] - a[1][0])[0][1][0];
@@ -4215,14 +4220,13 @@ function neighbourBounds(bounds) {
   let neighbour_bounds = [[min_x, min_y], [max_x, max_y]];
   return neighbour_bounds;
 }
-const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+const App$5 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $zm, $$unsubscribe_zm;
   $$unsubscribe_zm = subscribe(zm, (value) => $zm = value);
-  console.log("interpolate", interpolate);
   let { country, all_data } = $$props;
   let key = true;
   let chart_key = false;
-  let { progress, animation, width: width2, height, padding, selected } = $$props;
+  let { progress, animation, width: width2, height, padding, selected: selected2 } = $$props;
   let path, Greenwich, FirstMeridian;
   const easing = cubicInOut;
   let axes;
@@ -4233,7 +4237,6 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let timeline;
   let bar = { left: 85, height: 1.5, scale: 0.18 };
   let newData;
-  console.log("SELECTED", selected);
   let timelineMaker = (arr) => {
     let y_labels2 = [];
     axes = {
@@ -4270,7 +4273,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
         mouseout,
         pop: arr[i].pop,
         y: writable(arr[i].centroid[1]),
-        selected: arr[i].properties.AREACD == selected,
+        selected: arr[i].properties.AREACD == selected2,
         label_opacity: tweened(0),
         zoom: arr[i].zoom
       });
@@ -4278,9 +4281,9 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     return x2;
   };
   let zoomState = {
-    x: tweened(x, { duration: 200 }),
-    y: tweened(y, { duration: 200 }),
-    k: tweened(k, { duration: 200 })
+    x: tweened(x$1, { duration: 200 }),
+    y: tweened(y$1, { duration: 200 }),
+    k: tweened(k$1, { duration: 200 })
   };
   let mouseover = function(d) {
     let title = d.target.getAttribute("title");
@@ -4295,7 +4298,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   };
   function redrawData(datas, zm2) {
     data = data.filter((e) => e.properties.AREACD[0] == country);
-    data.forEach((e) => e.growth = growth.find((el) => el.LAD17CD == e.properties.AREACD) || { GROWTH: 0, TOTAL11: 0 });
+    data.forEach((e) => e.growth = growth$1.find((el) => el.LAD17CD == e.properties.AREACD) || { GROWTH: 0, TOTAL11: 0 });
     data.forEach((e) => {
       let obj = e.growth;
       e.growth = +obj.GROWTH;
@@ -4305,7 +4308,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     data.forEach((e) => e.centroid = path.centroid(e));
     data.forEach((e) => e.y = path.centroid(e)[1] * -1);
     data.forEach((e) => e.xys = path(e));
-    let map_charts = charts.filter((e) => e.chart == "xys");
+    let map_charts = charts$1.filter((e) => e.chart == "xys");
     map_charts.forEach((e) => {
       e.axis.x.origin = Greenwich;
       e.axis.x.spacing = (Greenwich - FirstMeridian) / 10;
@@ -4345,18 +4348,18 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
           let gap = Math.abs(square.y / 2 - square.x / 2);
           let cx = x2 + square.x / 2, r = Math.min(square.y / 2, square.x / 2), cy = y2 + square.y / 2 - r * 2;
           e.bell = `M${cx - r},${cy} a${r},${r} 0 1,0 ${r * 2},0 a${r},${r} 0 1,0 ${r * -2},0Z`;
-          let chart2 = charts.find((e2) => e2.chart == "bell");
+          let chart2 = charts$1.find((e2) => e2.chart == "bell");
           chart2.axis.x.origin = -10;
           chart2.axis.x.spacing = 2e3;
           chart2.axis.y.origin = height - padding * 2 + gap * 2;
           chart2.axis.y.spacing = 5e3;
         }
         if (e.bell == void 0)
-          console.log("x", x, "y", y);
+          console.log("x", x$1, "y", y$1);
       });
     })();
     (function() {
-      let region_codes2 = JSON.parse(JSON.stringify(growth));
+      let region_codes2 = JSON.parse(JSON.stringify(growth$1));
       region_codes2 = region_codes2.filter((e) => e.REGION == all_data.REGION_CODE).sort((a, b) => b.GROWTH - a.GROWTH).map((e) => e.LAD17CD);
       let region_data = JSON.parse(JSON.stringify(frequency));
       region_data[country].forEach((e) => e.lads = e.lads.filter((el) => region_codes2.includes(el)));
@@ -4381,24 +4384,24 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
           let gap = Math.abs(square.y / 2 - square.x / 2);
           let cx = x2 + square.x / 2, r = Math.min(square.y / 2, square.x / 2), cy = y2 + square.y / 2 - r * 2;
           e.bell_region = `M${cx - r},${cy} a${r},${r} 0 1,0 ${r * 2},0 a${r},${r} 0 1,0 ${r * -2},0Z`;
-          let chart2 = charts.find((e2) => e2.chart == "bell");
+          let chart2 = charts$1.find((e2) => e2.chart == "bell");
           chart2.axis.x.origin = -10;
           chart2.axis.x.spacing = 2e3;
           chart2.axis.y.origin = height - padding * 2 + gap * 2;
           chart2.axis.y.spacing = 5e3;
         }
         if (e.bell_region == void 0)
-          console.log("x", x, "y", y);
+          console.log("x", x$1, "y", y$1);
       });
     })();
-    let bar_data = JSON.parse(JSON.stringify(growth)).filter((e) => e.REGION == all_data.REGION_CODE).sort((a, b) => b.GROWTH - a.GROWTH);
+    let bar_data = JSON.parse(JSON.stringify(growth$1)).filter((e) => e.REGION == all_data.REGION_CODE).sort((a, b) => b.GROWTH - a.GROWTH);
     let bar_extents = {
       growth: extent(bar_data.map((e) => e.GROWTH))
     };
     bar.height = (height - padding * 3) / bar_data.length;
     bar.left = padding + Math.abs(bar_extents.growth[0]) / (bar_extents.growth[1] - bar_extents.growth[0]) * (width2 - padding * 2);
     bar.scale = 1 / (bar_extents.growth[1] - bar_extents.growth[0]) * (width2 - padding * 2);
-    let chart = charts.find((e) => e.chart == "bar");
+    let chart = charts$1.find((e) => e.chart == "bar");
     chart.axis.x.origin = bar.left;
     chart.axis.x.spacing = width2 / 10;
     chart.axis.y.origin = height + padding;
@@ -4420,14 +4423,14 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       if (region_codes.includes(e.properties.AREACD))
         e.xys_region = e.xys;
     });
-    let national_bar_data = JSON.parse(JSON.stringify(growth)).filter((e) => e.LAD17CD[0] == selected[0]).sort((a, b) => b.GROWTH - a.GROWTH);
+    let national_bar_data = JSON.parse(JSON.stringify(growth$1)).filter((e) => e.LAD17CD[0] == selected2[0]).sort((a, b) => b.GROWTH - a.GROWTH);
     let national_bar_extents = {
       growth: extent(national_bar_data.map((e) => e.GROWTH))
     };
     bar.height = (height - padding * 2) / national_bar_data.length;
     bar.left = padding + Math.abs(national_bar_extents.growth[0]) / (national_bar_extents.growth[1] - national_bar_extents.growth[0]) * width2;
     bar.scale = 1 / (national_bar_extents.growth[1] - national_bar_extents.growth[0]) * width2;
-    let national_chart = charts.find((e) => e.chart == "national_bar");
+    let national_chart = charts$1.find((e) => e.chart == "national_bar");
     national_chart.axis.x.origin = bar.left;
     national_chart.axis.x.spacing = width2 / 10;
     national_chart.axis.y.origin = height + padding;
@@ -4443,7 +4446,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       }
     });
     data = data.sort((a, b) => b.growth - a.growth);
-    chart = charts.find((e) => e.chart == "absolute");
+    chart = charts$1.find((e) => e.chart == "absolute");
     chart.axis.x.origin = Greenwich;
     chart.axis.x.spacing = (Greenwich - FirstMeridian) / 10;
     chart.axis.y.origin = height + padding + height / 10;
@@ -4456,7 +4459,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     bar.height = height / data.length;
     bar.left = padding + Math.abs(extents.abs[0]) / (extents.abs[1] - extents.abs[0]) * width2;
     bar.scale = 1 / (extents.abs[1] - extents.abs[0]) * width2;
-    chart = charts.find((e) => e.chart == "absoluteBar");
+    chart = charts$1.find((e) => e.chart == "absoluteBar");
     chart.axis.x.origin = bar.left;
     chart.axis.x.spacing = width2 / 10;
     chart.axis.y.origin = height + padding;
@@ -4469,7 +4472,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     bar.height = height / data.length;
     bar.left = padding + Math.abs(extents.pop[0]) / (extents.pop[1] - extents.pop[0]) * width2;
     bar.scale = 1 / (extents.pop[1] - extents.pop[0]) * width2;
-    chart = charts.find((e) => e.chart == "popBar");
+    chart = charts$1.find((e) => e.chart == "popBar");
     chart.axis.x.origin = bar.left + width2 / 10;
     chart.axis.x.spacing = width2 / 10;
     chart.axis.y.origin = height + padding;
@@ -4480,7 +4483,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       data.find((el) => el.y - e.y == 0).popBar = `M${bar.left} ${i * bar.height + padding}, ${bar.left + absolute * bar.scale} ${i * bar.height + padding}, ${bar.left + absolute * bar.scale} ${bar.height + i * bar.height + padding},${bar.left} ${bar.height + i * bar.height + padding}Z`;
     });
     data = data.sort((a, b) => b.growth - a.growth);
-    chart = charts.find((e) => e.chart == "circle");
+    chart = charts$1.find((e) => e.chart == "circle");
     chart.axis.x.origin = Greenwich;
     chart.axis.x.spacing = (Greenwich - FirstMeridian) / 10;
     chart.axis.y.origin = height + padding + height / 10;
@@ -4489,7 +4492,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let radius = Math.sqrt(e.pop / 8e3);
       e.circle = `M${e.centroid[0] - radius},${e.centroid[1]} a${radius},${radius} 0 1,0 ${radius * 2},0 a${radius},${radius} 0 1,0 ${radius * -2},0Z`;
     });
-    chart = charts.find((e) => e.chart == "comparative_circle");
+    chart = charts$1.find((e) => e.chart == "comparative_circle");
     chart.axis.x.origin = Greenwich;
     chart.axis.x.spacing = (Greenwich - FirstMeridian) / 10;
     chart.axis.y.origin = height + padding + height / 10;
@@ -4505,7 +4508,7 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let radius = Math.sqrt(e.pop / 8e4);
       e.small_circle = `M${e.centroid[0] - radius},${e.centroid[1]} a${radius},${radius} 0 1,0 ${radius * 2},0 a${radius},${radius} 0 1,0 ${radius * -2},0Z`;
     });
-    chart = charts.find((e) => e.chart == "scatter");
+    chart = charts$1.find((e) => e.chart == "scatter");
     chart.axis.x.origin = bar.left;
     chart.axis.x.spacing = width2 / 10;
     chart.axis.y.origin = height - Math.abs(extents.growth[0]) / (extents.growth[1] - extents.growth[0]) * height + padding * 2;
@@ -4527,110 +4530,109 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     return val == null ? 0.5 : (val - scaleExtent[0]) / (scaleExtent[1] - scaleExtent[0]);
   };
   function forward(current) {
-    if (charts.length > current) {
-      axes.x_origin.set(charts[current].axis.x.origin, {
-        duration: charts[current].duration,
+    if (charts$1.length > current) {
+      axes.x_origin.set(charts$1[current].axis.x.origin, {
+        duration: charts$1[current].duration,
         easing
       });
-      axes.x_offset.set(charts[current].axis.x.spacing, {
-        duration: charts[current].duration,
+      axes.x_offset.set(charts$1[current].axis.x.spacing, {
+        duration: charts$1[current].duration,
         easing
       });
-      axes.y_origin.set(charts[current].axis.y.origin, {
-        duration: charts[current].duration,
+      axes.y_origin.set(charts$1[current].axis.y.origin, {
+        duration: charts$1[current].duration,
         easing
       });
-      axes.y_offset.set(charts[current].axis.y.spacing, {
-        duration: charts[current].duration,
+      axes.y_offset.set(charts$1[current].axis.y.spacing, {
+        duration: charts$1[current].duration,
         easing
       });
-      console.log("axes", axes);
       let item = select(document.getElementById("selected"));
       let itemScale = item.attr("zoom");
-      let zoomFactor = charts[current].zoom * itemScale;
-      let neighbours_zoom = charts[current].neighbours_zoom;
+      let zoomFactor = charts$1[current].zoom * itemScale;
+      let neighbours_zoom = charts$1[current].neighbours_zoom;
       if (neighbours_zoom) {
         let nb = neighbourBounds(data.filter((e) => all_data.NEIGHBOURS.CODES.includes(e.properties.AREACD)).map((e) => e.bounds));
         zoomFactor = 1 / (Math.max(...[nb[1][0] - nb[0][0], nb[1][1] - nb[0][1]]) / width2);
       }
-      let region_zoom = charts[current].region_zoom;
+      let region_zoom = charts$1[current].region_zoom;
       if (region_zoom) {
-        let region_codes = JSON.parse(JSON.stringify(growth)).filter((e) => e.REGION == all_data.REGION_CODE).sort((a, b) => b.GROWTH - a.GROWTH).map((e) => e.LAD17CD);
+        let region_codes = JSON.parse(JSON.stringify(growth$1)).filter((e) => e.REGION == all_data.REGION_CODE).sort((a, b) => b.GROWTH - a.GROWTH).map((e) => e.LAD17CD);
         let nb = neighbourBounds(data.filter((e) => region_codes.includes(e.properties.AREACD)).map((e) => e.bounds));
         zoomFactor = 1 / (Math.max(...[nb[1][0] - nb[0][0], nb[1][1] - nb[0][1]]) / width2);
       }
       let focus = select(document.getElementById("selected")).attr("centroid").split(",").map((e, i) => i == 0 ? width2 / 2 - zoomFactor * e : -zoomFactor * e + height / 2);
-      charts[current].highlight;
-      let labels = charts[current].region_zoom;
+      charts$1[current].highlight;
+      let labels = charts$1[current].region_zoom;
       if (zoomFactor) {
         zm.set(zoomFactor);
         if (labels)
           timeline.forEach((step2, i) => step2.label_opacity.set(1, {
-            duration: charts[current].duration,
+            duration: charts$1[current].duration,
             easing
           }));
         zoomState.x.set(focus[0], {
-          duration: charts[current].duration,
+          duration: charts$1[current].duration,
           easing
         });
         zoomState.y.set(focus[1], {
-          duration: charts[current].duration,
+          duration: charts$1[current].duration,
           easing
         });
         zoomState.k.set(zoomFactor, {
-          duration: charts[current].duration,
+          duration: charts$1[current].duration,
           easing
         });
       } else {
         zm.set(1);
         timeline.forEach((step2, i) => step2.label_opacity.set(0, { duration: 10, easing }));
         zoomState.x.set(0, {
-          duration: charts[current].duration,
+          duration: charts$1[current].duration,
           easing
         });
         zoomState.y.set(0, {
-          duration: charts[current].duration,
+          duration: charts$1[current].duration,
           easing
         });
         zoomState.k.set(1, {
-          duration: charts[current].duration,
+          duration: charts$1[current].duration,
           easing
         });
       }
       timeline.forEach((step2, i) => {
-        step2.d.set(newData[i][charts[current].chart], {
-          duration: charts[current].duration,
-          delay: charts[current].delay * i,
+        step2.d.set(newData[i][charts$1[current].chart], {
+          duration: charts$1[current].duration,
+          delay: charts$1[current].delay * i,
           interpolate
         });
-        step2.metric.set(charts[current].tooltip_metric);
-        step2.value.set(newData[i][charts[current].value]);
+        step2.metric.set(charts$1[current].tooltip_metric);
+        step2.value.set(newData[i][charts$1[current].value]);
         step2.title.set(newData[i].properties.AREANM);
-        if (charts[current].key) {
+        if (charts$1[current].key) {
           key = 1;
         } else {
           key = 0;
         }
-        if (charts[current].chart_key) {
+        if (charts$1[current].chart_key) {
           chart_key = 1;
         } else {
           chart_key = 0;
         }
-        if (charts[current].highlight) {
+        if (charts$1[current].highlight) {
           step2.fillOpacity.set(0.4);
           step2.label_opacity.set(0, { duration: 10, easing });
-          if (charts[current].highlight == 1 && Object.values(all_data.NEIGHBOURS.PC_CHANGE).map((e) => e.CODE).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected) {
+          if (charts$1[current].highlight == 1 && Object.values(all_data.NEIGHBOURS.PC_CHANGE).map((e) => e.CODE).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected2) {
             step2.fillOpacity.set(1);
             step2.label_opacity.set(1, { duration: 10, easing });
             console.log("BOUNDS", newData.filter((e) => all_data.NEIGHBOURS.CODES.includes(e.properties.AREACD)).map((e) => e.bounds));
           }
-          if (charts[current].highlight == 2 && Object.values(all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_UP).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected)
+          if (charts$1[current].highlight == 2 && Object.values(all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_UP).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected2)
             step2.fillOpacity.set(1);
-          if (charts[current].highlight == 3 && all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.LAD17CD == newData[i].properties.AREACD || newData[i].properties.AREACD == selected)
+          if (charts$1[current].highlight == 3 && all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.LAD17CD == newData[i].properties.AREACD || newData[i].properties.AREACD == selected2)
             step2.fillOpacity.set(1);
-          if (charts[current].highlight == 4 && Object.values(all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected)
+          if (charts$1[current].highlight == 4 && Object.values(all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected2)
             step2.fillOpacity.set(1);
-          if (charts[current].highlight == 5 && Object.values(all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected)
+          if (charts$1[current].highlight == 5 && Object.values(all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected2)
             step2.fillOpacity.set(1);
         } else
           step2.fillOpacity.set(1);
@@ -4651,8 +4653,8 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     $$bindings.height(height);
   if ($$props.padding === void 0 && $$bindings.padding && padding !== void 0)
     $$bindings.padding(padding);
-  if ($$props.selected === void 0 && $$bindings.selected && selected !== void 0)
-    $$bindings.selected(selected);
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
+    $$bindings.selected(selected2);
   axes && loaded && country && forward(animation);
   {
     {
@@ -4660,17 +4662,17 @@ const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     }
   }
   $$unsubscribe_zm();
-  return `${all_data && timeline && width2 && height && selected ? `${validate_component(ZoomSvg, "ZoomSvg").$$render($$result, Object_1$1.assign({ id: "charts1" }, { zm: $zm }, zoomState, { width: width2 }, { height }, { key }, { viewBox: "0 0 " + width2 + " " + height }, { all_data }), {}, {
+  return `${all_data && timeline && width2 && height && selected2 ? `${validate_component(ZoomSvg$1, "ZoomSvg").$$render($$result, Object_1$2.assign({ id: "charts1" }, { zm: $zm }, zoomState, { width: width2 }, { height }, { key }, { viewBox: "0 0 " + width2 + " " + height }, { all_data }), {}, {
     default: () => {
       return `<g id="${"wrapper"}">${each(timeline, (feature, i) => {
-        return `${validate_component(Path, "Path").$$render($$result, Object_1$1.assign(feature), {}, {})}`;
+        return `${validate_component(Path$1, "Path").$$render($$result, Object_1$2.assign(feature), {}, {})}`;
       })}${each(timeline, (feature, i) => {
-        return `${validate_component(Text, "Text").$$render($$result, Object_1$1.assign(feature, zoomState), {}, {})}`;
+        return `${validate_component(Text, "Text").$$render($$result, Object_1$2.assign(feature, zoomState), {}, {})}`;
       })}</g>
 	<use xlink:href="${"#selected"}"></use>
 	<use xlink:href="${"#selectedText"}"></use>	
   <use xlink:href="${"#selectedValue"}"></use>	
-  ${validate_component(Axis, "Axis").$$render($$result, Object_1$1.assign(axes, { width: width2 }, { height }, { padding }, { spacing }, { values }, { chart_key }), {}, {})}`;
+  ${validate_component(Axis, "Axis").$$render($$result, Object_1$2.assign(axes, { width: width2 }, { height }, { padding }, { spacing }, { values }, { chart_key }), {}, {})}`;
     }
   })}` : ``}`;
 });
@@ -5332,7 +5334,7 @@ var folk = [
   }
 ];
 let vp = 300;
-const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+const App$4 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $zeds, $$unsubscribe_zeds;
   let { animation, height, width: width2, all_data } = $$props;
   let pitches = Math.ceil(187 / all_data.LA.DENSITY.DENSITY11);
@@ -9398,7 +9400,7 @@ const Pyramid = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     </text></g>` : ``}
 ${request == "comparison1" || request == "comparison2" ? `` : ``}`;
 });
-const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+const App$3 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $pyramidStore, $$unsubscribe_pyramidStore;
   $$unsubscribe_pyramidStore = subscribe(pyramidStore, (value) => $pyramidStore = value);
   rankings.map((e) => e[0]);
@@ -9416,7 +9418,6 @@ const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     bars[1].reverse();
     return bars;
   };
-  pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID01));
   let la_change = all_data.LA.PYRAMID11.map((e, i) => e.map((el, ii) => el - all_data.LA.PYRAMID01[i][ii]));
   let la_change_blended = la_change[0].map((e, i) => e + la_change[1][i]);
   let arr = [
@@ -9442,7 +9443,6 @@ const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   });
   la_change_divided[0] = la_change_divided[0].map((e) => e / w * w_change);
   la_change_divided[1] = la_change_divided[1].map((e) => e / w_change * w);
-  console.log("LA_CHANGE_DIVIDED", w, w_change, la_change_divided);
   let country_change_divided = [[], []];
   country_change_blended.forEach((e, i) => {
     if (e >= 0) {
@@ -9455,12 +9455,11 @@ const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   });
   country_change_divided[0] = country_change_divided[0].map((e) => e / w * w_change);
   country_change_divided[1] = country_change_divided[1].map((e) => e / w_change * w);
-  console.log("COUNTRY_CHANGE_DIVIDED", w, w_change, country_change_divided);
   let stepPrev;
   let request;
   function change(stp) {
     if (stp != stepPrev) {
-      if (stp == 12) {
+      if (stp == 12 && stepPrev != 11) {
         request = "bars";
         pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID01), { easing: sineInOut });
       }
@@ -9488,7 +9487,6 @@ const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       stepPrev = stp;
     }
   }
-  console.log("COUNTRY_CHANGE", country_change);
   if ($$props.animation === void 0 && $$bindings.animation && animation !== void 0)
     $$bindings.animation(animation);
   if ($$props.height === void 0 && $$bindings.height && height !== void 0)
@@ -9525,6 +9523,2839 @@ const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   } while (!$$settled);
   $$unsubscribe_pyramidStore();
   return $$rendered;
+});
+const App$2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let $jitterBug1, $$unsubscribe_jitterBug1;
+  let $jitterBug2, $$unsubscribe_jitterBug2;
+  let { progress, animation, width: width2, height, padding, selected: selected2, all_data } = $$props;
+  console.log(all_data);
+  let box_width = width2 / 2 - padding, box_height = width2 / 2 - padding + height / 3;
+  let females = all_data.LA.OVER65.ABS.F;
+  let factor = females > 5e4 ? 100 : females > 1e4 ? 10 : 1;
+  let numbers = [all_data.LA.OVER65.ABS.F / factor, all_data.LA.OVER65.ABS.M / factor].sort((a, b) => b - a);
+  let [number1, number2] = [numbers[0], numbers[1]];
+  let base = Math.floor(Math.sqrt(number1));
+  let radius = box_width / 3 / base;
+  let extras1 = number1 - base * base;
+  let arr1 = new Array(base).fill(new Array(base).fill(0));
+  if (extras1 > base) {
+    arr1.push(new Array(base).fill(0));
+    extras1 -= base;
+  }
+  arr1.push(new Array(extras1).fill(0));
+  arr1 = arr1.map((e) => e.map((el) => [radius / 2 - Math.random() * radius, radius / 2 - Math.random() * radius]));
+  let currentJitter = JSON.parse(JSON.stringify(arr1)).map((e) => e.map((el) => [el[0] - (0.5 - Math.random()), el[1] - (0.5 - Math.random())]));
+  let jitter1 = [];
+  for (let i = 0; i < 10; i++) {
+    jitter1.push(currentJitter);
+    currentJitter = JSON.parse(JSON.stringify(currentJitter)).map((e) => e.map((el) => [el[0] - (0.5 - Math.random()), el[1] - (0.5 - Math.random())]));
+  }
+  let jitter2 = JSON.parse(JSON.stringify(jitter1)).slice(1);
+  jitter2 = jitter2.reverse();
+  let jitter = jitter1.concat(jitter2);
+  let height2 = Math.floor(number2 / base);
+  let extras2 = number2 - height2 * base;
+  let arr2 = new Array(height2).fill(new Array(base).fill(0));
+  if (extras2 > base) {
+    arr2.push(new Array(base).fill(0));
+    extras1 -= base;
+  }
+  arr2.push(new Array(extras2).fill(0));
+  arr2 = arr2.map((e) => e.map((el) => ({
+    x: radius / 2 - Math.random() * radius,
+    y: radius / 2 - Math.random() * radius
+  })));
+  let jitterBug1 = writable(jitter[0]);
+  $$unsubscribe_jitterBug1 = subscribe(jitterBug1, (value) => $jitterBug1 = value);
+  let jitterBug2 = writable(jitter[0]);
+  $$unsubscribe_jitterBug2 = subscribe(jitterBug2, (value) => $jitterBug2 = value);
+  let count = 0;
+  setInterval(function() {
+    count++;
+    jitterBug1.set(jitter[count % 19]);
+    jitterBug2.set(jitter[count % 19]);
+  }, 300);
+  if ($$props.progress === void 0 && $$bindings.progress && progress !== void 0)
+    $$bindings.progress(progress);
+  if ($$props.animation === void 0 && $$bindings.animation && animation !== void 0)
+    $$bindings.animation(animation);
+  if ($$props.width === void 0 && $$bindings.width && width2 !== void 0)
+    $$bindings.width(width2);
+  if ($$props.height === void 0 && $$bindings.height && height !== void 0)
+    $$bindings.height(height);
+  if ($$props.padding === void 0 && $$bindings.padding && padding !== void 0)
+    $$bindings.padding(padding);
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
+    $$bindings.selected(selected2);
+  if ($$props.all_data === void 0 && $$bindings.all_data && all_data !== void 0)
+    $$bindings.all_data(all_data);
+  $$unsubscribe_jitterBug1();
+  $$unsubscribe_jitterBug2();
+  return `<svg${add_attribute("width", box_width * 2 + 20, 0)}${add_attribute("height", box_height, 0)}><g>${each(arr1, (a, y2) => {
+    return `${each(a, (offset, x2) => {
+      return `<circle${add_attribute("cx", x2 * (box_width / base) + (box_width + 20) + 200 / base + $jitterBug1[y2][x2][1], 0)}${add_attribute("cy", box_height - 100 - y2 * (box_width / base) + $jitterBug1[y2][x2][0], 0)}${add_attribute("r", radius, 0)} fill="${"slategrey"}"${add_attribute("fill-opacity", 1 - Math.random() / 3, 0)}></circle>
+`;
+    })}`;
+  })}${each(arr2, (a, y2) => {
+    return `${each(a, (offset, x2) => {
+      return `<circle${add_attribute("cx", x2 * (box_width / base) + 200 / base + $jitterBug2[y2][x2][1] + 5, 0)}${add_attribute("cy", box_height - 100 - y2 * (box_width / base) + $jitterBug2[y2][x2][0], 0)}${add_attribute("r", radius, 0)} fill="${"slategrey"}"${add_attribute("fill-opacity", 1 - Math.random() / 3, 0)}></circle>
+`;
+    })}`;
+  })}</g><text${add_attribute("x", box_width + 20, 0)}${add_attribute("y", box_height - 60, 0)} fill="${"#666"}" font-size="${"22px"}">${escape((number1 * factor).toLocaleString("en-US"))} females</text><text${add_attribute("x", box_width, 0)}${add_attribute("y", box_height - 60, 0)} text-anchor="${"end"}" fill="${"#666"}" font-size="${"22px"}">${escape((number2 * factor).toLocaleString("en-US"))} males</text></svg>`;
+});
+var Axis_svelte_svelte_type_style_lang = "";
+const Path = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let $d, $$unsubscribe_d;
+  let $fill, $$unsubscribe_fill;
+  let $title, $$unsubscribe_title;
+  let $fillOpacity, $$unsubscribe_fillOpacity;
+  let $value, $$unsubscribe_value;
+  let $metric, $$unsubscribe_metric;
+  let $y, $$unsubscribe_y;
+  let $area_cd, $$unsubscribe_area_cd;
+  let { d, centroid, fill, fillOpacity, title, value, pop, metric, y: y2, area_cd, label_opacity, zoom } = $$props;
+  $$unsubscribe_d = subscribe(d, (value2) => $d = value2);
+  $$unsubscribe_fill = subscribe(fill, (value2) => $fill = value2);
+  $$unsubscribe_fillOpacity = subscribe(fillOpacity, (value2) => $fillOpacity = value2);
+  $$unsubscribe_title = subscribe(title, (value2) => $title = value2);
+  $$unsubscribe_value = subscribe(value, (value2) => $value = value2);
+  $$unsubscribe_metric = subscribe(metric, (value2) => $metric = value2);
+  $$unsubscribe_y = subscribe(y2, (value2) => $y = value2);
+  $$unsubscribe_area_cd = subscribe(area_cd, (value2) => $area_cd = value2);
+  if ($$props.d === void 0 && $$bindings.d && d !== void 0)
+    $$bindings.d(d);
+  if ($$props.centroid === void 0 && $$bindings.centroid && centroid !== void 0)
+    $$bindings.centroid(centroid);
+  if ($$props.fill === void 0 && $$bindings.fill && fill !== void 0)
+    $$bindings.fill(fill);
+  if ($$props.fillOpacity === void 0 && $$bindings.fillOpacity && fillOpacity !== void 0)
+    $$bindings.fillOpacity(fillOpacity);
+  if ($$props.title === void 0 && $$bindings.title && title !== void 0)
+    $$bindings.title(title);
+  if ($$props.value === void 0 && $$bindings.value && value !== void 0)
+    $$bindings.value(value);
+  if ($$props.pop === void 0 && $$bindings.pop && pop !== void 0)
+    $$bindings.pop(pop);
+  if ($$props.metric === void 0 && $$bindings.metric && metric !== void 0)
+    $$bindings.metric(metric);
+  if ($$props.y === void 0 && $$bindings.y && y2 !== void 0)
+    $$bindings.y(y2);
+  if ($$props.area_cd === void 0 && $$bindings.area_cd && area_cd !== void 0)
+    $$bindings.area_cd(area_cd);
+  if ($$props.label_opacity === void 0 && $$bindings.label_opacity && label_opacity !== void 0)
+    $$bindings.label_opacity(label_opacity);
+  if ($$props.zoom === void 0 && $$bindings.zoom && zoom !== void 0)
+    $$bindings.zoom(zoom);
+  $$unsubscribe_d();
+  $$unsubscribe_fill();
+  $$unsubscribe_title();
+  $$unsubscribe_fillOpacity();
+  $$unsubscribe_value();
+  $$unsubscribe_metric();
+  $$unsubscribe_y();
+  $$unsubscribe_area_cd();
+  return `<path${add_attribute("id", null, 0)}${add_attribute("d", $d, 0)}${add_attribute("centroid", centroid, 0)} class="${"shape"}"${add_attribute("fill", $fill, 0)}${add_attribute("title", $title, 0)}${add_attribute("fill-opacity", $fillOpacity, 0)}${add_attribute("stroke-width", 0, 0)} style="${"vector-effect: non-scaling-stroke;"}"${add_attribute("value", $value, 0)}${add_attribute("pop", pop, 0)}${add_attribute("metric", $metric, 0)}${add_attribute("y", $y, 0)}${add_attribute("area_cd", $area_cd, 0)}${add_attribute("zoom", zoom, 0)}></path>
+`;
+});
+var growth = [
+  {
+    "LAD17CD": "E06000001",
+    "GROWTH": 4,
+    "TOTAL11": 92100,
+    "UTLA": "E06000001",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E06000002",
+    "GROWTH": 2,
+    "TOTAL11": 138600,
+    "UTLA": "E06000002",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E06000003",
+    "GROWTH": -2,
+    "TOTAL11": 135500,
+    "UTLA": "E06000003",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E06000004",
+    "GROWTH": 7,
+    "TOTAL11": 191600,
+    "UTLA": "E06000004",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E06000005",
+    "GROWTH": 7,
+    "TOTAL11": 105800,
+    "UTLA": "E06000005",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E06000006",
+    "GROWTH": 6,
+    "TOTAL11": 125900,
+    "UTLA": "E06000006",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E06000007",
+    "GROWTH": 5,
+    "TOTAL11": 202400,
+    "UTLA": "E06000007",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E06000008",
+    "GROWTH": 7,
+    "TOTAL11": 147400,
+    "UTLA": "E06000008",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E06000009",
+    "GROWTH": 0,
+    "TOTAL11": 142e3,
+    "UTLA": "E06000009",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E06000010",
+    "GROWTH": 5,
+    "TOTAL11": 256300,
+    "UTLA": "E06000010",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E06000011",
+    "GROWTH": 6,
+    "TOTAL11": 334500,
+    "UTLA": "E06000011",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E06000012",
+    "GROWTH": 1,
+    "TOTAL11": 159900,
+    "UTLA": "E06000012",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E06000013",
+    "GROWTH": 9,
+    "TOTAL11": 167100,
+    "UTLA": "E06000013",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E06000014",
+    "GROWTH": 9,
+    "TOTAL11": 198100,
+    "UTLA": "E06000014",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E06000015",
+    "GROWTH": 12,
+    "TOTAL11": 248800,
+    "UTLA": "E06000015",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E06000016",
+    "GROWTH": 17,
+    "TOTAL11": 329500,
+    "UTLA": "E06000016",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E06000017",
+    "GROWTH": 7,
+    "TOTAL11": 37200,
+    "UTLA": "E06000017",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E06000018",
+    "GROWTH": 14,
+    "TOTAL11": 305800,
+    "UTLA": "E06000018",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E06000019",
+    "GROWTH": 4,
+    "TOTAL11": 183200,
+    "UTLA": "E06000019",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E06000020",
+    "GROWTH": 5,
+    "TOTAL11": 166800,
+    "UTLA": "E06000020",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E06000021",
+    "GROWTH": 3,
+    "TOTAL11": 249100,
+    "UTLA": "E06000021",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E06000022",
+    "GROWTH": 4,
+    "TOTAL11": 176100,
+    "UTLA": "E06000022",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000023",
+    "GROWTH": 12,
+    "TOTAL11": 428100,
+    "UTLA": "E06000023",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000024",
+    "GROWTH": 7,
+    "TOTAL11": 202600,
+    "UTLA": "E06000024",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000025",
+    "GROWTH": 6,
+    "TOTAL11": 262700,
+    "UTLA": "E06000025",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000026",
+    "GROWTH": 6,
+    "TOTAL11": 256600,
+    "UTLA": "E06000026",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000027",
+    "GROWTH": 0,
+    "TOTAL11": 130700,
+    "UTLA": "E06000027",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000030",
+    "GROWTH": 15,
+    "TOTAL11": 209200,
+    "UTLA": "E06000030",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000031",
+    "GROWTH": 17,
+    "TOTAL11": 183800,
+    "UTLA": "E06000031",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E06000032",
+    "GROWTH": 10,
+    "TOTAL11": 203100,
+    "UTLA": "E06000032",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E06000033",
+    "GROWTH": 8,
+    "TOTAL11": 174e3,
+    "UTLA": "E06000033",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E06000034",
+    "GROWTH": 10,
+    "TOTAL11": 157800,
+    "UTLA": "E06000034",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E06000035",
+    "GROWTH": 5,
+    "TOTAL11": 263800,
+    "UTLA": "E06000035",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000036",
+    "GROWTH": 3,
+    "TOTAL11": 113100,
+    "UTLA": "E06000036",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000037",
+    "GROWTH": 6,
+    "TOTAL11": 153800,
+    "UTLA": "E06000037",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000038",
+    "GROWTH": 8,
+    "TOTAL11": 156100,
+    "UTLA": "E06000038",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000039",
+    "GROWTH": 17,
+    "TOTAL11": 140300,
+    "UTLA": "E06000039",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000040",
+    "GROWTH": 8,
+    "TOTAL11": 144600,
+    "UTLA": "E06000040",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000041",
+    "GROWTH": 2,
+    "TOTAL11": 154300,
+    "UTLA": "E06000041",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000042",
+    "GROWTH": 20,
+    "TOTAL11": 248700,
+    "UTLA": "E06000042",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000043",
+    "GROWTH": 10,
+    "TOTAL11": 273500,
+    "UTLA": "E06000043",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000044",
+    "GROWTH": 9,
+    "TOTAL11": 205200,
+    "UTLA": "E06000044",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000045",
+    "GROWTH": 9,
+    "TOTAL11": 237e3,
+    "UTLA": "E06000045",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000046",
+    "GROWTH": 4,
+    "TOTAL11": 138400,
+    "UTLA": "E06000046",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000047",
+    "GROWTH": 4,
+    "TOTAL11": 513600,
+    "UTLA": "E06000047",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E06000049",
+    "GROWTH": 5,
+    "TOTAL11": 370500,
+    "UTLA": "E06000049",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E06000050",
+    "GROWTH": 2,
+    "TOTAL11": 329500,
+    "UTLA": "E06000050",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E06000051",
+    "GROWTH": 8,
+    "TOTAL11": 306100,
+    "UTLA": "E06000051",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E06000052",
+    "GROWTH": 6,
+    "TOTAL11": 532300,
+    "UTLA": "E06000052",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000053",
+    "GROWTH": -7,
+    "TOTAL11": 2600,
+    "UTLA": "E06000053",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000054",
+    "GROWTH": 8,
+    "TOTAL11": 471e3,
+    "UTLA": "E06000054",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000055",
+    "GROWTH": 6,
+    "TOTAL11": 157500,
+    "UTLA": "E06000055",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E06000056",
+    "GROWTH": 8,
+    "TOTAL11": 254500,
+    "UTLA": "E06000056",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E06000057",
+    "GROWTH": 2,
+    "TOTAL11": 316100,
+    "UTLA": "E06000057",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E06000058",
+    "GROWTH": 9,
+    "TOTAL11": 378900,
+    "UTLA": "E06000058",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000059",
+    "GROWTH": 5,
+    "TOTAL11": 365100,
+    "UTLA": "E06000059",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E06000060",
+    "GROWTH": 5,
+    "TOTAL11": 505100,
+    "UTLA": "E06000060",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E06000061",
+    "GROWTH": 11,
+    "TOTAL11": 316700,
+    "UTLA": "E06000061",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E06000062",
+    "GROWTH": 8,
+    "TOTAL11": 375300,
+    "UTLA": "E06000062",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000008",
+    "GROWTH": 13,
+    "TOTAL11": 124100,
+    "UTLA": "E10000003",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000009",
+    "GROWTH": 14,
+    "TOTAL11": 84100,
+    "UTLA": "E10000003",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000010",
+    "GROWTH": 14,
+    "TOTAL11": 95300,
+    "UTLA": "E10000003",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000011",
+    "GROWTH": 7,
+    "TOTAL11": 169500,
+    "UTLA": "E10000003",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000012",
+    "GROWTH": 14,
+    "TOTAL11": 148700,
+    "UTLA": "E10000003",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000026",
+    "GROWTH": 2,
+    "TOTAL11": 96400,
+    "UTLA": "E10000006",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000027",
+    "GROWTH": -4,
+    "TOTAL11": 69e3,
+    "UTLA": "E10000006",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000028",
+    "GROWTH": 6,
+    "TOTAL11": 107700,
+    "UTLA": "E10000006",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000029",
+    "GROWTH": 2,
+    "TOTAL11": 70700,
+    "UTLA": "E10000006",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000030",
+    "GROWTH": 5,
+    "TOTAL11": 52400,
+    "UTLA": "E10000006",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000031",
+    "GROWTH": 1,
+    "TOTAL11": 103600,
+    "UTLA": "E10000006",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000032",
+    "GROWTH": 4,
+    "TOTAL11": 122400,
+    "UTLA": "E10000007",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000033",
+    "GROWTH": 5,
+    "TOTAL11": 75900,
+    "UTLA": "E10000007",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000034",
+    "GROWTH": 4,
+    "TOTAL11": 103800,
+    "UTLA": "E10000007",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000035",
+    "GROWTH": 2,
+    "TOTAL11": 71e3,
+    "UTLA": "E10000007",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000036",
+    "GROWTH": 1,
+    "TOTAL11": 112100,
+    "UTLA": "E10000007",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000037",
+    "GROWTH": 1,
+    "TOTAL11": 90900,
+    "UTLA": "E10000007",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000038",
+    "GROWTH": 1,
+    "TOTAL11": 98800,
+    "UTLA": "E10000007",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000039",
+    "GROWTH": 16,
+    "TOTAL11": 94600,
+    "UTLA": "E10000007",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000040",
+    "GROWTH": 5,
+    "TOTAL11": 132200,
+    "UTLA": "E10000008",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000041",
+    "GROWTH": 5,
+    "TOTAL11": 117800,
+    "UTLA": "E10000008",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000042",
+    "GROWTH": 10,
+    "TOTAL11": 77400,
+    "UTLA": "E10000008",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000043",
+    "GROWTH": 7,
+    "TOTAL11": 93700,
+    "UTLA": "E10000008",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000044",
+    "GROWTH": 2,
+    "TOTAL11": 83300,
+    "UTLA": "E10000008",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000045",
+    "GROWTH": 2,
+    "TOTAL11": 124400,
+    "UTLA": "E10000008",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000046",
+    "GROWTH": 8,
+    "TOTAL11": 63500,
+    "UTLA": "E10000008",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000047",
+    "GROWTH": 9,
+    "TOTAL11": 53600,
+    "UTLA": "E10000008",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000061",
+    "GROWTH": 10,
+    "TOTAL11": 99300,
+    "UTLA": "E10000011",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000062",
+    "GROWTH": 6,
+    "TOTAL11": 90400,
+    "UTLA": "E10000011",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000063",
+    "GROWTH": 5,
+    "TOTAL11": 97400,
+    "UTLA": "E10000011",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000064",
+    "GROWTH": 5,
+    "TOTAL11": 90500,
+    "UTLA": "E10000011",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000065",
+    "GROWTH": 6,
+    "TOTAL11": 148900,
+    "UTLA": "E10000011",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000066",
+    "GROWTH": 5,
+    "TOTAL11": 174400,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000067",
+    "GROWTH": 11,
+    "TOTAL11": 146800,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000068",
+    "GROWTH": 7,
+    "TOTAL11": 73700,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000069",
+    "GROWTH": 1,
+    "TOTAL11": 87900,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000070",
+    "GROWTH": 7,
+    "TOTAL11": 168100,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000071",
+    "GROWTH": 11,
+    "TOTAL11": 173e3,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000072",
+    "GROWTH": 3,
+    "TOTAL11": 124700,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000073",
+    "GROWTH": 4,
+    "TOTAL11": 82100,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000074",
+    "GROWTH": 4,
+    "TOTAL11": 61600,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000075",
+    "GROWTH": 6,
+    "TOTAL11": 83200,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000076",
+    "GROWTH": 0,
+    "TOTAL11": 138100,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000077",
+    "GROWTH": 15,
+    "TOTAL11": 79500,
+    "UTLA": "E10000012",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000078",
+    "GROWTH": 5,
+    "TOTAL11": 116200,
+    "UTLA": "E10000013",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000079",
+    "GROWTH": 2,
+    "TOTAL11": 82900,
+    "UTLA": "E10000013",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000080",
+    "GROWTH": 2,
+    "TOTAL11": 81800,
+    "UTLA": "E10000013",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000081",
+    "GROWTH": 10,
+    "TOTAL11": 121600,
+    "UTLA": "E10000013",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000082",
+    "GROWTH": 4,
+    "TOTAL11": 112600,
+    "UTLA": "E10000013",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000083",
+    "GROWTH": 7,
+    "TOTAL11": 81900,
+    "UTLA": "E10000013",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000084",
+    "GROWTH": 9,
+    "TOTAL11": 167400,
+    "UTLA": "E10000014",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000085",
+    "GROWTH": 5,
+    "TOTAL11": 115500,
+    "UTLA": "E10000014",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000086",
+    "GROWTH": 7,
+    "TOTAL11": 125e3,
+    "UTLA": "E10000014",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000087",
+    "GROWTH": 3,
+    "TOTAL11": 111500,
+    "UTLA": "E10000014",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000088",
+    "GROWTH": 8,
+    "TOTAL11": 82800,
+    "UTLA": "E10000014",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000089",
+    "GROWTH": 9,
+    "TOTAL11": 91500,
+    "UTLA": "E10000014",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000090",
+    "GROWTH": 3,
+    "TOTAL11": 120600,
+    "UTLA": "E10000014",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000091",
+    "GROWTH": 4,
+    "TOTAL11": 176800,
+    "UTLA": "E10000014",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000092",
+    "GROWTH": 2,
+    "TOTAL11": 93500,
+    "UTLA": "E10000014",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000093",
+    "GROWTH": 6,
+    "TOTAL11": 116500,
+    "UTLA": "E10000014",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000094",
+    "GROWTH": 8,
+    "TOTAL11": 116400,
+    "UTLA": "E10000014",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000095",
+    "GROWTH": 6,
+    "TOTAL11": 93300,
+    "UTLA": "E10000015",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000096",
+    "GROWTH": 5,
+    "TOTAL11": 144900,
+    "UTLA": "E10000015",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000098",
+    "GROWTH": 6,
+    "TOTAL11": 100200,
+    "UTLA": "E10000015",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000099",
+    "GROWTH": 8,
+    "TOTAL11": 127400,
+    "UTLA": "E10000015",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000102",
+    "GROWTH": 5,
+    "TOTAL11": 87600,
+    "UTLA": "E10000015",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000103",
+    "GROWTH": 13,
+    "TOTAL11": 90300,
+    "UTLA": "E10000015",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000105",
+    "GROWTH": 15,
+    "TOTAL11": 117900,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000106",
+    "GROWTH": 11,
+    "TOTAL11": 151100,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000107",
+    "GROWTH": 13,
+    "TOTAL11": 97400,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000108",
+    "GROWTH": 6,
+    "TOTAL11": 111600,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000109",
+    "GROWTH": 6,
+    "TOTAL11": 101900,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000110",
+    "GROWTH": 11,
+    "TOTAL11": 155100,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000111",
+    "GROWTH": 5,
+    "TOTAL11": 115100,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000112",
+    "GROWTH": 11,
+    "TOTAL11": 107600,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000113",
+    "GROWTH": 10,
+    "TOTAL11": 135900,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000114",
+    "GROWTH": 5,
+    "TOTAL11": 134200,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000115",
+    "GROWTH": 12,
+    "TOTAL11": 120900,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000116",
+    "GROWTH": 10,
+    "TOTAL11": 114900,
+    "UTLA": "E10000016",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000117",
+    "GROWTH": -2,
+    "TOTAL11": 87400,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000118",
+    "GROWTH": 6,
+    "TOTAL11": 107200,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000119",
+    "GROWTH": 3,
+    "TOTAL11": 76e3,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000120",
+    "GROWTH": 0,
+    "TOTAL11": 81e3,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000121",
+    "GROWTH": 3,
+    "TOTAL11": 138400,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000122",
+    "GROWTH": 0,
+    "TOTAL11": 89600,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000123",
+    "GROWTH": 8,
+    "TOTAL11": 140200,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000124",
+    "GROWTH": 5,
+    "TOTAL11": 57e3,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000125",
+    "GROWTH": 3,
+    "TOTAL11": 67900,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000126",
+    "GROWTH": 5,
+    "TOTAL11": 109100,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000127",
+    "GROWTH": 2,
+    "TOTAL11": 110600,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000128",
+    "GROWTH": 2,
+    "TOTAL11": 107900,
+    "UTLA": "E10000017",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E07000129",
+    "GROWTH": 4,
+    "TOTAL11": 94e3,
+    "UTLA": "E10000018",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000130",
+    "GROWTH": 8,
+    "TOTAL11": 166e3,
+    "UTLA": "E10000018",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000131",
+    "GROWTH": 11,
+    "TOTAL11": 85400,
+    "UTLA": "E10000018",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000132",
+    "GROWTH": 4,
+    "TOTAL11": 105e3,
+    "UTLA": "E10000018",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000133",
+    "GROWTH": 4,
+    "TOTAL11": 5e4,
+    "UTLA": "E10000018",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000134",
+    "GROWTH": 9,
+    "TOTAL11": 93600,
+    "UTLA": "E10000018",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000135",
+    "GROWTH": 0,
+    "TOTAL11": 56400,
+    "UTLA": "E10000018",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000136",
+    "GROWTH": 16,
+    "TOTAL11": 64700,
+    "UTLA": "E10000019",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000137",
+    "GROWTH": 4,
+    "TOTAL11": 136300,
+    "UTLA": "E10000019",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000138",
+    "GROWTH": 9,
+    "TOTAL11": 93700,
+    "UTLA": "E10000019",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000139",
+    "GROWTH": 15,
+    "TOTAL11": 108e3,
+    "UTLA": "E10000019",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000140",
+    "GROWTH": 15,
+    "TOTAL11": 88500,
+    "UTLA": "E10000019",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000141",
+    "GROWTH": 7,
+    "TOTAL11": 133900,
+    "UTLA": "E10000019",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000142",
+    "GROWTH": 11,
+    "TOTAL11": 89e3,
+    "UTLA": "E10000019",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000143",
+    "GROWTH": 7,
+    "TOTAL11": 130400,
+    "UTLA": "E10000020",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000144",
+    "GROWTH": 4,
+    "TOTAL11": 124700,
+    "UTLA": "E10000020",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000145",
+    "GROWTH": 7,
+    "TOTAL11": 97200,
+    "UTLA": "E10000020",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000146",
+    "GROWTH": 8,
+    "TOTAL11": 147200,
+    "UTLA": "E10000020",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000147",
+    "GROWTH": 3,
+    "TOTAL11": 101500,
+    "UTLA": "E10000020",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000148",
+    "GROWTH": 8,
+    "TOTAL11": 132500,
+    "UTLA": "E10000020",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000149",
+    "GROWTH": 11,
+    "TOTAL11": 124e3,
+    "UTLA": "E10000020",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000163",
+    "GROWTH": 2,
+    "TOTAL11": 55400,
+    "UTLA": "E10000023",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E07000164",
+    "GROWTH": 6,
+    "TOTAL11": 89200,
+    "UTLA": "E10000023",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E07000165",
+    "GROWTH": 4,
+    "TOTAL11": 157900,
+    "UTLA": "E10000023",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E07000166",
+    "GROWTH": 11,
+    "TOTAL11": 52100,
+    "UTLA": "E10000023",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E07000167",
+    "GROWTH": 2,
+    "TOTAL11": 52200,
+    "UTLA": "E10000023",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E07000168",
+    "GROWTH": 2,
+    "TOTAL11": 108600,
+    "UTLA": "E10000023",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E07000169",
+    "GROWTH": 9,
+    "TOTAL11": 83700,
+    "UTLA": "E10000023",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E07000170",
+    "GROWTH": 7,
+    "TOTAL11": 119600,
+    "UTLA": "E10000024",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000171",
+    "GROWTH": 4,
+    "TOTAL11": 112800,
+    "UTLA": "E10000024",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000172",
+    "GROWTH": 2,
+    "TOTAL11": 109900,
+    "UTLA": "E10000024",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000173",
+    "GROWTH": 1,
+    "TOTAL11": 113600,
+    "UTLA": "E10000024",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000174",
+    "GROWTH": 6,
+    "TOTAL11": 104700,
+    "UTLA": "E10000024",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000175",
+    "GROWTH": 7,
+    "TOTAL11": 114700,
+    "UTLA": "E10000024",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000176",
+    "GROWTH": 4,
+    "TOTAL11": 110800,
+    "UTLA": "E10000024",
+    "REGION": "E12000004"
+  },
+  {
+    "LAD17CD": "E07000177",
+    "GROWTH": 7,
+    "TOTAL11": 141700,
+    "UTLA": "E10000025",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000178",
+    "GROWTH": 12,
+    "TOTAL11": 151800,
+    "UTLA": "E10000025",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000179",
+    "GROWTH": 4,
+    "TOTAL11": 134200,
+    "UTLA": "E10000025",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000180",
+    "GROWTH": 4,
+    "TOTAL11": 121200,
+    "UTLA": "E10000025",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000181",
+    "GROWTH": 9,
+    "TOTAL11": 104600,
+    "UTLA": "E10000025",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000187",
+    "GROWTH": 4,
+    "TOTAL11": 109200,
+    "UTLA": "E10000027",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000188",
+    "GROWTH": 8,
+    "TOTAL11": 114600,
+    "UTLA": "E10000027",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000189",
+    "GROWTH": 6,
+    "TOTAL11": 161200,
+    "UTLA": "E10000027",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E07000192",
+    "GROWTH": 5,
+    "TOTAL11": 97300,
+    "UTLA": "E10000028",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000193",
+    "GROWTH": 9,
+    "TOTAL11": 113500,
+    "UTLA": "E10000028",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000194",
+    "GROWTH": 7,
+    "TOTAL11": 100600,
+    "UTLA": "E10000028",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000195",
+    "GROWTH": 1,
+    "TOTAL11": 123700,
+    "UTLA": "E10000028",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000196",
+    "GROWTH": 1,
+    "TOTAL11": 108e3,
+    "UTLA": "E10000028",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000197",
+    "GROWTH": 8,
+    "TOTAL11": 130900,
+    "UTLA": "E10000028",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000198",
+    "GROWTH": 3,
+    "TOTAL11": 97300,
+    "UTLA": "E10000028",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000199",
+    "GROWTH": 2,
+    "TOTAL11": 77e3,
+    "UTLA": "E10000028",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000200",
+    "GROWTH": 4,
+    "TOTAL11": 87600,
+    "UTLA": "E10000029",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000202",
+    "GROWTH": 13,
+    "TOTAL11": 133300,
+    "UTLA": "E10000029",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000203",
+    "GROWTH": 11,
+    "TOTAL11": 96900,
+    "UTLA": "E10000029",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000207",
+    "GROWTH": 7,
+    "TOTAL11": 130900,
+    "UTLA": "E10000030",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000208",
+    "GROWTH": 12,
+    "TOTAL11": 75200,
+    "UTLA": "E10000030",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000209",
+    "GROWTH": 5,
+    "TOTAL11": 137e3,
+    "UTLA": "E10000030",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000210",
+    "GROWTH": 6,
+    "TOTAL11": 85400,
+    "UTLA": "E10000030",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000211",
+    "GROWTH": 8,
+    "TOTAL11": 137600,
+    "UTLA": "E10000030",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000212",
+    "GROWTH": 3,
+    "TOTAL11": 80500,
+    "UTLA": "E10000030",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000213",
+    "GROWTH": 5,
+    "TOTAL11": 95800,
+    "UTLA": "E10000030",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000214",
+    "GROWTH": 7,
+    "TOTAL11": 86200,
+    "UTLA": "E10000030",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000215",
+    "GROWTH": 4,
+    "TOTAL11": 82900,
+    "UTLA": "E10000030",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000216",
+    "GROWTH": 5,
+    "TOTAL11": 121900,
+    "UTLA": "E10000030",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000217",
+    "GROWTH": 10,
+    "TOTAL11": 99e3,
+    "UTLA": "E10000030",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000218",
+    "GROWTH": 0,
+    "TOTAL11": 62e3,
+    "UTLA": "E10000031",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000219",
+    "GROWTH": 5,
+    "TOTAL11": 125200,
+    "UTLA": "E10000031",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000220",
+    "GROWTH": 14,
+    "TOTAL11": 100100,
+    "UTLA": "E10000031",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000221",
+    "GROWTH": 8,
+    "TOTAL11": 120500,
+    "UTLA": "E10000031",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000222",
+    "GROWTH": 9,
+    "TOTAL11": 137700,
+    "UTLA": "E10000031",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000223",
+    "GROWTH": 2,
+    "TOTAL11": 61300,
+    "UTLA": "E10000032",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000224",
+    "GROWTH": 5,
+    "TOTAL11": 149300,
+    "UTLA": "E10000032",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000225",
+    "GROWTH": 6,
+    "TOTAL11": 113700,
+    "UTLA": "E10000032",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000226",
+    "GROWTH": 7,
+    "TOTAL11": 106900,
+    "UTLA": "E10000032",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000227",
+    "GROWTH": 7,
+    "TOTAL11": 131600,
+    "UTLA": "E10000032",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000228",
+    "GROWTH": 9,
+    "TOTAL11": 139800,
+    "UTLA": "E10000032",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000229",
+    "GROWTH": 6,
+    "TOTAL11": 104500,
+    "UTLA": "E10000032",
+    "REGION": "E12000008"
+  },
+  {
+    "LAD17CD": "E07000234",
+    "GROWTH": 6,
+    "TOTAL11": 93800,
+    "UTLA": "E10000034",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000235",
+    "GROWTH": 3,
+    "TOTAL11": 74600,
+    "UTLA": "E10000034",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000236",
+    "GROWTH": 6,
+    "TOTAL11": 84400,
+    "UTLA": "E10000034",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000237",
+    "GROWTH": 5,
+    "TOTAL11": 98800,
+    "UTLA": "E10000034",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000238",
+    "GROWTH": 3,
+    "TOTAL11": 116500,
+    "UTLA": "E10000034",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000239",
+    "GROWTH": 1,
+    "TOTAL11": 98e3,
+    "UTLA": "E10000034",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E07000240",
+    "GROWTH": 8,
+    "TOTAL11": 140800,
+    "UTLA": "E10000015",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000241",
+    "GROWTH": 13,
+    "TOTAL11": 110300,
+    "UTLA": "E10000015",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000242",
+    "GROWTH": 6,
+    "TOTAL11": 137400,
+    "UTLA": "E10000015",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000243",
+    "GROWTH": 5,
+    "TOTAL11": 84e3,
+    "UTLA": "E10000015",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000244",
+    "GROWTH": 5,
+    "TOTAL11": 239700,
+    "UTLA": "E10000029",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000245",
+    "GROWTH": 11,
+    "TOTAL11": 170700,
+    "UTLA": "E10000029",
+    "REGION": "E12000006"
+  },
+  {
+    "LAD17CD": "E07000246",
+    "GROWTH": 5,
+    "TOTAL11": 144600,
+    "UTLA": "E10000027",
+    "REGION": "E12000009"
+  },
+  {
+    "LAD17CD": "E08000001",
+    "GROWTH": 5,
+    "TOTAL11": 276700,
+    "UTLA": "E11000001",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000002",
+    "GROWTH": 2,
+    "TOTAL11": 185100,
+    "UTLA": "E11000001",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000003",
+    "GROWTH": 28,
+    "TOTAL11": 503200,
+    "UTLA": "E11000001",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000004",
+    "GROWTH": 3,
+    "TOTAL11": 225100,
+    "UTLA": "E11000001",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000005",
+    "GROWTH": 3,
+    "TOTAL11": 212100,
+    "UTLA": "E11000001",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000006",
+    "GROWTH": 8,
+    "TOTAL11": 233900,
+    "UTLA": "E11000001",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000007",
+    "GROWTH": 0,
+    "TOTAL11": 283300,
+    "UTLA": "E11000001",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000008",
+    "GROWTH": 2,
+    "TOTAL11": 219100,
+    "UTLA": "E11000001",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000009",
+    "GROWTH": 7,
+    "TOTAL11": 226500,
+    "UTLA": "E11000001",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000010",
+    "GROWTH": 5,
+    "TOTAL11": 317600,
+    "UTLA": "E11000001",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000011",
+    "GROWTH": -3,
+    "TOTAL11": 145600,
+    "UTLA": "E11000002",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000012",
+    "GROWTH": 6,
+    "TOTAL11": 466600,
+    "UTLA": "E11000002",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000013",
+    "GROWTH": 0,
+    "TOTAL11": 175400,
+    "UTLA": "E11000002",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000014",
+    "GROWTH": -3,
+    "TOTAL11": 273800,
+    "UTLA": "E11000002",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000015",
+    "GROWTH": 2,
+    "TOTAL11": 319600,
+    "UTLA": "E11000002",
+    "REGION": "E12000002"
+  },
+  {
+    "LAD17CD": "E08000016",
+    "GROWTH": 6,
+    "TOTAL11": 231200,
+    "UTLA": "E11000003",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E08000017",
+    "GROWTH": 5,
+    "TOTAL11": 302400,
+    "UTLA": "E11000003",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E08000018",
+    "GROWTH": 3,
+    "TOTAL11": 257400,
+    "UTLA": "E11000003",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E08000019",
+    "GROWTH": 7,
+    "TOTAL11": 552700,
+    "UTLA": "E11000003",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E08000021",
+    "GROWTH": 8,
+    "TOTAL11": 280300,
+    "UTLA": "E11000007",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E08000022",
+    "GROWTH": 4,
+    "TOTAL11": 201e3,
+    "UTLA": "E11000007",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E08000023",
+    "GROWTH": -3,
+    "TOTAL11": 147900,
+    "UTLA": "E11000007",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E08000024",
+    "GROWTH": -1,
+    "TOTAL11": 275400,
+    "UTLA": "E11000007",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E08000025",
+    "GROWTH": 9,
+    "TOTAL11": 1073200,
+    "UTLA": "E11000005",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E08000026",
+    "GROWTH": 5,
+    "TOTAL11": 316900,
+    "UTLA": "E11000005",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E08000027",
+    "GROWTH": 2,
+    "TOTAL11": 312800,
+    "UTLA": "E11000005",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E08000028",
+    "GROWTH": 8,
+    "TOTAL11": 307900,
+    "UTLA": "E11000005",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E08000029",
+    "GROWTH": 3,
+    "TOTAL11": 206900,
+    "UTLA": "E11000005",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E08000030",
+    "GROWTH": 6,
+    "TOTAL11": 269300,
+    "UTLA": "E11000005",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E08000031",
+    "GROWTH": 5,
+    "TOTAL11": 249300,
+    "UTLA": "E11000005",
+    "REGION": "E12000005"
+  },
+  {
+    "LAD17CD": "E08000032",
+    "GROWTH": 11,
+    "TOTAL11": 522500,
+    "UTLA": "E11000006",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E08000033",
+    "GROWTH": 5,
+    "TOTAL11": 203700,
+    "UTLA": "E11000006",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E08000034",
+    "GROWTH": 8,
+    "TOTAL11": 422300,
+    "UTLA": "E11000006",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E08000035",
+    "GROWTH": 5,
+    "TOTAL11": 751600,
+    "UTLA": "E11000006",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E08000036",
+    "GROWTH": 3,
+    "TOTAL11": 325800,
+    "UTLA": "E11000006",
+    "REGION": "E12000003"
+  },
+  {
+    "LAD17CD": "E08000037",
+    "GROWTH": 4,
+    "TOTAL11": 2e5,
+    "UTLA": "E11000007",
+    "REGION": "E12000001"
+  },
+  {
+    "LAD17CD": "E09000001",
+    "GROWTH": 0,
+    "TOTAL11": 7300,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000002",
+    "GROWTH": 13,
+    "TOTAL11": 185600,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000003",
+    "GROWTH": 13,
+    "TOTAL11": 356400,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000004",
+    "GROWTH": 6,
+    "TOTAL11": 232e3,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000005",
+    "GROWTH": 18,
+    "TOTAL11": 311200,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000006",
+    "GROWTH": 4,
+    "TOTAL11": 309300,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000007",
+    "GROWTH": 11,
+    "TOTAL11": 220200,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000008",
+    "GROWTH": 9,
+    "TOTAL11": 363500,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000009",
+    "GROWTH": 12,
+    "TOTAL11": 338400,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000010",
+    "GROWTH": 14,
+    "TOTAL11": 312500,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000011",
+    "GROWTH": 18,
+    "TOTAL11": 254300,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000012",
+    "GROWTH": 21,
+    "TOTAL11": 245700,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000013",
+    "GROWTH": 10,
+    "TOTAL11": 182500,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000014",
+    "GROWTH": 17,
+    "TOTAL11": 255200,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000015",
+    "GROWTH": 15,
+    "TOTAL11": 239400,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000016",
+    "GROWTH": 5,
+    "TOTAL11": 237100,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000017",
+    "GROWTH": 12,
+    "TOTAL11": 274e3,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000018",
+    "GROWTH": 19,
+    "TOTAL11": 253900,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000019",
+    "GROWTH": 17,
+    "TOTAL11": 206200,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000020",
+    "GROWTH": 0,
+    "TOTAL11": 158800,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000021",
+    "GROWTH": 8,
+    "TOTAL11": 160200,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000022",
+    "GROWTH": 13,
+    "TOTAL11": 302800,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000023",
+    "GROWTH": 10,
+    "TOTAL11": 276e3,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000024",
+    "GROWTH": 6,
+    "TOTAL11": 199900,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000025",
+    "GROWTH": 26,
+    "TOTAL11": 307900,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000026",
+    "GROWTH": 16,
+    "TOTAL11": 278900,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000027",
+    "GROWTH": 8,
+    "TOTAL11": 186900,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000028",
+    "GROWTH": 17,
+    "TOTAL11": 288200,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000029",
+    "GROWTH": 5,
+    "TOTAL11": 190100,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000030",
+    "GROWTH": 29,
+    "TOTAL11": 254100,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000031",
+    "GROWTH": 18,
+    "TOTAL11": 258300,
+    "UTLA": "E13000002",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000032",
+    "GROWTH": 17,
+    "TOTAL11": 307300,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "E09000033",
+    "GROWTH": 21,
+    "TOTAL11": 219400,
+    "UTLA": "E13000001",
+    "REGION": "E12000007"
+  },
+  {
+    "LAD17CD": "W06000001",
+    "GROWTH": 3,
+    "TOTAL11": 69500,
+    "UTLA": "W06000001",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000002",
+    "GROWTH": 4,
+    "TOTAL11": 122e3,
+    "UTLA": "W06000002",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000003",
+    "GROWTH": 4,
+    "TOTAL11": 115300,
+    "UTLA": "W06000003",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000004",
+    "GROWTH": 0,
+    "TOTAL11": 93800,
+    "UTLA": "W06000004",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000005",
+    "GROWTH": 2,
+    "TOTAL11": 152600,
+    "UTLA": "W06000005",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000006",
+    "GROWTH": 5,
+    "TOTAL11": 135e3,
+    "UTLA": "W06000006",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000008",
+    "GROWTH": 1,
+    "TOTAL11": 76200,
+    "UTLA": "W06000008",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000009",
+    "GROWTH": 7,
+    "TOTAL11": 122700,
+    "UTLA": "W06000009",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000010",
+    "GROWTH": 6,
+    "TOTAL11": 184100,
+    "UTLA": "W06000010",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000011",
+    "GROWTH": 6,
+    "TOTAL11": 239e3,
+    "UTLA": "W06000011",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000012",
+    "GROWTH": 3,
+    "TOTAL11": 139700,
+    "UTLA": "W06000012",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000013",
+    "GROWTH": 7,
+    "TOTAL11": 139100,
+    "UTLA": "W06000013",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000014",
+    "GROWTH": 6,
+    "TOTAL11": 126400,
+    "UTLA": "W06000014",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000015",
+    "GROWTH": 13,
+    "TOTAL11": 346100,
+    "UTLA": "W06000015",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000016",
+    "GROWTH": 1,
+    "TOTAL11": 234600,
+    "UTLA": "W06000016",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000018",
+    "GROWTH": 5,
+    "TOTAL11": 178600,
+    "UTLA": "W06000018",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000019",
+    "GROWTH": 0,
+    "TOTAL11": 69600,
+    "UTLA": "W06000019",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000020",
+    "GROWTH": 0,
+    "TOTAL11": 91200,
+    "UTLA": "W06000020",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000021",
+    "GROWTH": 7,
+    "TOTAL11": 91100,
+    "UTLA": "W06000021",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000022",
+    "GROWTH": 6,
+    "TOTAL11": 145900,
+    "UTLA": "W06000022",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000023",
+    "GROWTH": 5,
+    "TOTAL11": 132900,
+    "UTLA": "W06000023",
+    "REGION": "W92000004"
+  },
+  {
+    "LAD17CD": "W06000024",
+    "GROWTH": 4,
+    "TOTAL11": 58900,
+    "UTLA": "W06000024",
+    "REGION": "W92000004"
+  }
+];
+const Key = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let { percent, key, uk, place, max, min, step: step2, width: width2, height, name } = $$props;
+  let arr = Array.from({ length: max - min + 1 }, (_, i) => i + min);
+  let range = max - min;
+  let place_position = 1 - (max - place) / range;
+  let uk_position = 1 - (max - uk) / range;
+  if ($$props.percent === void 0 && $$bindings.percent && percent !== void 0)
+    $$bindings.percent(percent);
+  if ($$props.key === void 0 && $$bindings.key && key !== void 0)
+    $$bindings.key(key);
+  if ($$props.uk === void 0 && $$bindings.uk && uk !== void 0)
+    $$bindings.uk(uk);
+  if ($$props.place === void 0 && $$bindings.place && place !== void 0)
+    $$bindings.place(place);
+  if ($$props.max === void 0 && $$bindings.max && max !== void 0)
+    $$bindings.max(max);
+  if ($$props.min === void 0 && $$bindings.min && min !== void 0)
+    $$bindings.min(min);
+  if ($$props.step === void 0 && $$bindings.step && step2 !== void 0)
+    $$bindings.step(step2);
+  if ($$props.width === void 0 && $$bindings.width && width2 !== void 0)
+    $$bindings.width(width2);
+  if ($$props.height === void 0 && $$bindings.height && height !== void 0)
+    $$bindings.height(height);
+  if ($$props.name === void 0 && $$bindings.name && name !== void 0)
+    $$bindings.name(name);
+  return `<g transform="${" scale(0.5) translate(" + escape(width2 - 300) + "," + escape(height * 2 - 320) + ")"}"><rect x="${"-1200"}" y="${"25"}"${add_attribute("width", width2 * 3, 0)}${add_attribute("height", 300, 0)} fill="${"white"}" fill-opacity="${"0.7"}"></rect><text y="${"60"}"${add_attribute("x", 300, 0)} text-anchor="${"middle"}" font-size="${"24pt"}" fill="${"grey"}">${escape(key)}</text>${each(arr, (clr, i) => {
+    return `<rect height="${"50"}"${add_attribute("width", 500 / arr.length, 0)} y="${"100"}"${add_attribute("x", 50 + 500 / arr.length * i, 0)}${add_attribute("fill", interpolateViridis(1 - i / (arr.length - 1)), 0)}></rect>
+${clr % 10 == 0 || i == 0 || i == arr.length - 1 ? `<text y="${"90"}"${add_attribute("x", 63 + 500 / arr.length * i, 0)} fill="${"grey"}" text-anchor="${"end"}">${escape(clr)}${escape(percent ? "%" : "")}</text>` : ``}`;
+  })}<line${add_attribute("y1", 100, 0)}${add_attribute("y2", 210, 0)}${add_attribute("x1", 50 + 500 * place_position, 0)}${add_attribute("x2", 50 + place_position * 500, 0)} stroke="${"#666"}" stroke-width="${"8"}" stroke-linecap="${"round"}"></line><text y="${"210"}"${add_attribute("x", 60 + place_position * 500, 0)} fill="${"#666"}" font-size="${"24pt"}">${escape(name)}</text>${step2 == 1 ? `<line${add_attribute("y1", 100, 0)}${add_attribute("y2", 180, 0)}${add_attribute("x1", 50 + uk_position * 500, 0)}${add_attribute("x2", 50 + uk_position * 500, 0)} stroke="${"#666"}" stroke-width="${"8"}" stroke-linecap="${"round"}"></line>
+<text y="${"175"}"${add_attribute("x", 40 + uk_position * 500, 0)} text-anchor="${"end"}" fill="${"#666"}" font-size="${"24pt"}">average</text>` : ``}<text y="${"250"}"${add_attribute("x", 40, 0)} fill="${"grey"}" font-size="${"24pt"}">Greatest</text><text y="${"290"}"${add_attribute("x", 40, 0)} fill="${"grey"}" font-size="${"24pt"}">decrease</text><text y="${"250"}"${add_attribute("x", 555, 0)} text-anchor="${"end"}" fill="${"grey"}" font-size="${"24pt"}">Greatest</text><text y="${"290"}"${add_attribute("x", 555, 0)} text-anchor="${"end"}" fill="${"grey"}" font-size="${"24pt"}">increase</text></g>`;
+});
+var ZoomSvg_svelte_svelte_type_style_lang = "";
+const css$d = {
+  code: "#canvas.svelte-1rh2i4z{position:absolute;right:0;height:100vh;width:100vh}",
+  map: null
+};
+const ZoomSvg = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let $zm, $$unsubscribe_zm;
+  let $x, $$unsubscribe_x;
+  let $y, $$unsubscribe_y;
+  let $k, $$unsubscribe_k;
+  let $step, $$unsubscribe_step;
+  $$unsubscribe_zm = subscribe(zm, (value) => $zm = value);
+  $$unsubscribe_step = subscribe(step, (value) => $step = value);
+  let { viewBox = `0 0 {width} {height}`, height, width: width2, key = true, all_data } = $$props;
+  let { svg, x: x2, y: y2, k: k2 } = $$props;
+  $$unsubscribe_x = subscribe(x2, (value) => $x = value);
+  $$unsubscribe_y = subscribe(y2, (value) => $y = value);
+  $$unsubscribe_k = subscribe(k2, (value) => $k = value);
+  if ($$props.viewBox === void 0 && $$bindings.viewBox && viewBox !== void 0)
+    $$bindings.viewBox(viewBox);
+  if ($$props.height === void 0 && $$bindings.height && height !== void 0)
+    $$bindings.height(height);
+  if ($$props.width === void 0 && $$bindings.width && width2 !== void 0)
+    $$bindings.width(width2);
+  if ($$props.key === void 0 && $$bindings.key && key !== void 0)
+    $$bindings.key(key);
+  if ($$props.all_data === void 0 && $$bindings.all_data && all_data !== void 0)
+    $$bindings.all_data(all_data);
+  if ($$props.svg === void 0 && $$bindings.svg && svg !== void 0)
+    $$bindings.svg(svg);
+  if ($$props.x === void 0 && $$bindings.x && x2 !== void 0)
+    $$bindings.x(x2);
+  if ($$props.y === void 0 && $$bindings.y && y2 !== void 0)
+    $$bindings.y(y2);
+  if ($$props.k === void 0 && $$bindings.k && k2 !== void 0)
+    $$bindings.k(k2);
+  $$result.css.add(css$d);
+  $$unsubscribe_zm();
+  $$unsubscribe_x();
+  $$unsubscribe_y();
+  $$unsubscribe_k();
+  $$unsubscribe_step();
+  return `${width2 && all_data ? `<svg id="${"canvas"}"${add_attribute("viewBox", viewBox, 0)}${add_attribute("height", height, 0)}${add_attribute("width", width2, 0)}${add_attribute("zm", $zm, 0)} class="${"svelte-1rh2i4z"}"${add_attribute("this", svg, 0)}><g transform="${"translate(" + escape($x) + ", " + escape($y) + ") scale(" + escape($k) + ")"}" id="${"zoomable"}">${slots.default ? slots.default({}) : ``}</g>${key ? `${validate_component(Key, "Key").$$render($$result, {
+    percent: true,
+    width: width2,
+    height,
+    key: "percentage growth",
+    uk: "7.9",
+    place: all_data.LA.PC_CHANGE.FROM01TO11,
+    name: all_data.NAME,
+    max: "30",
+    min: -5,
+    step: $step
+  }, {}, {})}` : ``}</svg>` : ``}`;
+});
+var charts = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  {
+    chart: "xys",
+    title: "Population growth in ",
+    duration: 1e3,
+    delay: 0,
+    tooltip_metric: "% growth",
+    value: "growth",
+    sort_by: "growth",
+    zoom: 0,
+    key: 0,
+    axis: {
+      x: {
+        origin: 0,
+        spacing: 0
+      },
+      y: {
+        origin: 0,
+        spacing: 0
+      }
+    }
+  },
+  {
+    chart: "xys",
+    duration: 1e3,
+    delay: 0,
+    highlight: 0,
+    tooltip_metric: "% growth",
+    value: "growth",
+    sort_by: "growth",
+    zoom: 0,
+    neighbours_zoom: true,
+    labels: true,
+    key: 0,
+    axis: {
+      x: {
+        origin: 0,
+        spacing: 0
+      },
+      y: {
+        origin: 0,
+        spacing: 0
+      }
+    }
+  },
+  {
+    chart: "xys",
+    duration: 1e3,
+    delay: 0,
+    highlight: 0,
+    tooltip_metric: "% growth",
+    value: "growth",
+    sort_by: "growth",
+    zoom: 0,
+    neighbours_zoom: true,
+    labels: true,
+    key: 1,
+    axis: {
+      x: {
+        origin: 0,
+        spacing: 0
+      },
+      y: {
+        origin: 0,
+        spacing: 0
+      }
+    }
+  },
+  {
+    chart: "xys",
+    duration: 1e3,
+    delay: 0,
+    highlight: 0,
+    tooltip_metric: "% growth",
+    value: "growth",
+    sort_by: "growth",
+    zoom: 0,
+    neighbours_zoom: true,
+    labels: true,
+    key: 1,
+    axis: {
+      x: {
+        origin: 0,
+        spacing: 0
+      },
+      y: {
+        origin: 0,
+        spacing: 0
+      }
+    }
+  }
+];
+const { Object: Object_1$1 } = globals;
+let x = 0, y = 0, k = 1;
+const App$1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let $zm, $$unsubscribe_zm;
+  $$unsubscribe_zm = subscribe(zm, (value) => $zm = value);
+  let { country, all_data } = $$props;
+  let key = true;
+  let { progress, animation, width: width2, height, padding } = $$props;
+  let path, Greenwich, FirstMeridian;
+  const easing = cubicInOut;
+  let axes;
+  let loaded;
+  let data = [];
+  let timeline;
+  let newData;
+  let timelineMaker = (arr) => {
+    let y_labels2 = [];
+    axes = {
+      x_origin: tweened(Greenwich),
+      y_origin: tweened(height + padding + height / 10),
+      x_length: width2,
+      y_length: height,
+      hoz_bar: [y_labels2.map((e) => e.length)],
+      vert_bar: [],
+      x_offset: tweened((Greenwich - FirstMeridian) / 10),
+      y_offset: tweened((Greenwich - FirstMeridian) / 10),
+      labelRotation: 0,
+      x_zero: 0,
+      y_zero: 0,
+      xTicks: true,
+      yTicks: true,
+      xAxis: 1,
+      yAxis: 1,
+      verticalStrokes: false,
+      horizontalStrokes: true
+    };
+    let x2 = [];
+    arr.forEach((e, i) => {
+      x2.push({
+        d: tweened(arr[i].xys, { duration: 50, interpolate }),
+        centroid: arr[i].centroid,
+        fill: writable(arr[i].colour),
+        fillOpacity: tweened(1, { duration: 0, interpolate }),
+        title: writable(arr[i].properties.AREANM),
+        area_cd: writable(arr[i].properties.AREACD),
+        value: writable(arr[i].growth),
+        metric: writable("% change"),
+        pop: arr[i].pop,
+        y: writable(arr[i].centroid[1]),
+        label_opacity: tweened(0),
+        zoom: arr[i].zoom
+      });
+    });
+    return x2;
+  };
+  let zoomState = {
+    x: tweened(x, { duration: 200 }),
+    y: tweened(y, { duration: 200 }),
+    k: tweened(k, { duration: 200 })
+  };
+  function redrawData(datas, zm2) {
+    data = data.filter((e) => e.properties.AREACD[0] == country);
+    data.forEach((e) => e.growth = growth.find((el) => el.LAD17CD == e.properties.AREACD) || { GROWTH: 0, TOTAL11: 0 });
+    data.forEach((e) => {
+      let obj = e.growth;
+      e.growth = +obj.GROWTH;
+      e.pop = +obj.TOTAL11;
+      e.abs = Math.round(+obj.GROWTH * +obj.TOTAL11 / 100);
+    });
+    data.forEach((e) => e.centroid = path.centroid(e));
+    data.forEach((e) => e.y = path.centroid(e)[1] * -1);
+    data.forEach((e) => e.xys = path(e));
+    let map_charts = charts.filter((e) => e.chart == "xys");
+    map_charts.forEach((e) => {
+      e.axis.x.origin = Greenwich;
+      e.axis.x.spacing = (Greenwich - FirstMeridian) / 10;
+      e.axis.y.origin = height + padding + height / 10;
+      e.axis.y.spacing = (Greenwich - FirstMeridian) / 10;
+    });
+    data.forEach((e, i) => {
+    });
+    data.forEach((e) => e.bounds = path.bounds(e));
+    data.forEach((e) => e.zoom = Math.sqrt(1 / (Math.max(...[e.bounds[1][0] - e.bounds[0][0], e.bounds[1][1] - e.bounds[0][1]]) / width2)));
+    data.forEach((e) => e.colour = interpolateViridis(1 - scaleColor(e.growth, datas, "growth")));
+    ({
+      pop: extent(datas.map((e) => e.pop)),
+      growth: extent(datas.map((e) => e.growth)),
+      abs: extent(datas.map((e) => e.abs))
+    });
+    data = data.filter((e) => e.growth !== null);
+    data = data.sort((a, b) => b.growth - a.growth);
+    timeline = timelineMaker(data);
+    setTimeout(function() {
+      loaded = true;
+    }, 1e3);
+    return data;
+  }
+  const scaleColor = (val, dataSet, data2) => {
+    let scaleExtent = extent(dataSet.map((e) => e[data2]));
+    return val == null ? 0.5 : (val - scaleExtent[0]) / (scaleExtent[1] - scaleExtent[0]);
+  };
+  function forward(current) {
+    if (charts.length > current) {
+      axes.x_origin.set(charts[current].axis.x.origin, {
+        duration: charts[current].duration,
+        easing
+      });
+      axes.x_offset.set(charts[current].axis.x.spacing, {
+        duration: charts[current].duration,
+        easing
+      });
+      axes.y_origin.set(charts[current].axis.y.origin, {
+        duration: charts[current].duration,
+        easing
+      });
+      axes.y_offset.set(charts[current].axis.y.spacing, {
+        duration: charts[current].duration,
+        easing
+      });
+      timeline.forEach((step2, i) => {
+        step2.d.set(newData[i][charts[current].chart], {
+          duration: charts[current].duration,
+          delay: charts[current].delay * i,
+          interpolate
+        });
+        step2.metric.set(charts[current].tooltip_metric);
+        step2.value.set(newData[i][charts[current].value]);
+        step2.title.set(newData[i].properties.AREANM);
+        if (charts[current].key) {
+          key = 1;
+        } else {
+          key = 0;
+        }
+        if (charts[current].chart_key)
+          ;
+        if (charts[current].highlight) {
+          step2.fillOpacity.set(0.4);
+          step2.label_opacity.set(0, { duration: 10, easing });
+          if (charts[current].highlight == 1 && Object.values(all_data.NEIGHBOURS.PC_CHANGE).map((e) => e.CODE).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected) {
+            step2.fillOpacity.set(1);
+            step2.label_opacity.set(1, { duration: 10, easing });
+            console.log("BOUNDS", newData.filter((e) => all_data.NEIGHBOURS.CODES.includes(e.properties.AREACD)).map((e) => e.bounds));
+          }
+          if (charts[current].highlight == 2 && Object.values(all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_UP).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected)
+            step2.fillOpacity.set(1);
+          if (charts[current].highlight == 3 && all_data.REGION.HEADLINES.BIGGEST_POP_CHANGE_DOWN.lowest.LAD17CD == newData[i].properties.AREACD || newData[i].properties.AREACD == selected)
+            step2.fillOpacity.set(1);
+          if (charts[current].highlight == 4 && Object.values(all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_UP).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected)
+            step2.fillOpacity.set(1);
+          if (charts[current].highlight == 5 && Object.values(all_data.COUNTRY.HEADLINES.BIGGEST_POP_CHANGE_DOWN).map((e) => e.LAD17CD).includes(newData[i].properties.AREACD) || newData[i].properties.AREACD == selected)
+            step2.fillOpacity.set(1);
+        } else
+          step2.fillOpacity.set(1);
+      });
+    }
+  }
+  if ($$props.country === void 0 && $$bindings.country && country !== void 0)
+    $$bindings.country(country);
+  if ($$props.all_data === void 0 && $$bindings.all_data && all_data !== void 0)
+    $$bindings.all_data(all_data);
+  if ($$props.progress === void 0 && $$bindings.progress && progress !== void 0)
+    $$bindings.progress(progress);
+  if ($$props.animation === void 0 && $$bindings.animation && animation !== void 0)
+    $$bindings.animation(animation);
+  if ($$props.width === void 0 && $$bindings.width && width2 !== void 0)
+    $$bindings.width(width2);
+  if ($$props.height === void 0 && $$bindings.height && height !== void 0)
+    $$bindings.height(height);
+  if ($$props.padding === void 0 && $$bindings.padding && padding !== void 0)
+    $$bindings.padding(padding);
+  axes && loaded && country && forward(animation);
+  {
+    {
+      newData = redrawData(data);
+    }
+  }
+  $$unsubscribe_zm();
+  return `${all_data && timeline && width2 && height ? `${validate_component(ZoomSvg, "ZoomSvg").$$render($$result, Object_1$1.assign({ id: "charts2" }, { zm: $zm }, zoomState, { width: width2 }, { height }, { key }, { viewBox: "0 0 " + width2 + " " + height }, { all_data }), {}, {
+    default: () => {
+      return `<g id="${"wrapper2"}">${each(timeline, (feature, i) => {
+        return `${validate_component(Path, "Path").$$render($$result, Object_1$1.assign(feature), {}, {})}`;
+      })}</g>`;
+    }
+  })}` : ``}`;
 });
 function objectFlip(obj) {
   const ret = {};
@@ -9733,15 +12564,32 @@ const css$c = {
   map: null
 };
 const Component = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let $tracker, $$unsubscribe_tracker;
+  let $$unsubscribe_tracker;
   let $$unsubscribe_story_json;
-  $$unsubscribe_tracker = subscribe(tracker, (value) => $tracker = value);
+  $$unsubscribe_tracker = subscribe(tracker, (value) => value);
   $$unsubscribe_story_json = subscribe(story_json, (value) => value);
-  let { height, width: width2, count = 0, index = 0, offset = 0, progress = 0, family = "", component, animation = "", padding = 50, country, all_data, selected } = $$props;
-  let components = { Animated_charts: App$3, Football: App$2, Pyramids: App$1 };
+  let { height, width: width2, count = 0, index = 0, offset = 0, progress = 0, family = "", component, animation = "", padding = 50, country, all_data, selected: selected2 } = $$props;
+  let components = {
+    Animated_charts: App$5,
+    Football: App$4,
+    Pyramids: App$3,
+    MaleFemale: App$2,
+    Highlighted_map: App$1
+  };
+  let stpPrev = 0;
   function updateStep(stp) {
-    tracker.set(stp);
-    return $tracker;
+    console.log(stp);
+    if (stpPrev == 1 && stp == 0) {
+      stpPrev = stp;
+      return stp;
+    }
+    if (stpPrev != 1 && stp == 0) {
+      return stpPrev;
+    }
+    if (stpPrev != stp) {
+      stpPrev = stp;
+      return stp;
+    }
   }
   function getPadding() {
     padding = Math.min(...[height / 10, width2 / 10]);
@@ -9773,12 +12621,12 @@ const Component = create_ssr_component(($$result, $$props, $$bindings, slots) =>
     $$bindings.country(country);
   if ($$props.all_data === void 0 && $$bindings.all_data && all_data !== void 0)
     $$bindings.all_data(all_data);
-  if ($$props.selected === void 0 && $$bindings.selected && selected !== void 0)
-    $$bindings.selected(selected);
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
+    $$bindings.selected(selected2);
   $$result.css.add(css$c);
   $$unsubscribe_tracker();
   $$unsubscribe_story_json();
-  return `${animation && all_data && country ? `<div class="${"container svelte-12dbwcg"}"${add_attribute("family", family, 0)}${add_attribute("component", component, 0)}>${height ? `${animation ? `<h3 class="${"title_over svelte-12dbwcg"}"${add_attribute("x", getPadding(), 0)}${add_attribute("y", padding / 2, 0)}>${escape(createText(animation.section.actions["data-title"], all_data))}</h3>` : ``}
+  return `${animation && all_data && country ? `<div class="${"container svelte-12dbwcg"}"${add_attribute("family", family, 0)}${add_attribute("component", component, 0)}>${height ? `${animation ? `<h3 class="${"title_over svelte-12dbwcg"}"${add_attribute("x", getPadding(), 0)}${add_attribute("y", padding / 2, 0)}>${escape(animation.section.actions["data-id"])}: ${escape(createText(animation.section.actions["data-title"], all_data))}</h3>` : ``}
   <svg${add_attribute("height", height, 0)}${add_attribute("width", width2, 0)}${add_attribute("count", count, 0)}${add_attribute("index", index, 0)}${add_attribute("offset", offset, 0)}${add_attribute("progress", progress, 0)}${add_attribute("animation", animation, 0)}>${validate_component(components[component] || missing_component, "svelte:component").$$render($$result, {
     progress,
     offset,
@@ -9792,7 +12640,7 @@ const Component = create_ssr_component(($$result, $$props, $$bindings, slots) =>
     component,
     animation: updateStep(animation.section.actions["data-id"]),
     all_data,
-    selected
+    selected: selected2
   }, {}, {})}</svg>` : ``}
 <div class="${"tooltip svelte-12dbwcg"}" style="${"opacity:0"}"></div></div>` : ``}`;
 });
@@ -20306,13 +23154,13 @@ const Select = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     return `Select is focused, type to refine list, press down to open the menu.`;
   } } = $$props;
   function handleAriaSelection() {
-    let selected = void 0;
+    let selected2 = void 0;
     if (isMulti && value.length > 0) {
-      selected = value.map((v) => getSelectionLabel(v)).join(", ");
+      selected2 = value.map((v) => getSelectionLabel(v)).join(", ");
     } else {
-      selected = getSelectionLabel(value);
+      selected2 = getSelectionLabel(value);
     }
-    return ariaValues(selected);
+    return ariaValues(selected2);
   }
   function handleAriaContent() {
     if (!isFocused || !filteredItems || filteredItems.length === 0)
@@ -20757,9 +23605,9 @@ const css = {
 const App = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let items2 = [];
   Object.keys(lookup).forEach((e, i) => items2[i] = { "areacd": e, "areanm": lookup[e] });
-  let { selected = null } = $$props;
-  if ($$props.selected === void 0 && $$bindings.selected && selected !== void 0)
-    $$bindings.selected(selected);
+  let { selected: selected2 = null } = $$props;
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
+    $$bindings.selected(selected2);
   $$result.css.add(css);
   return `<form><label for="${"single"}" class="${"svelte-1iad7dh"}">Select one local authority:</label>
 	${validate_component(Select_1, "Select").$$render($$result, {
@@ -20769,7 +23617,7 @@ const App = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     items: items2
   }, {}, {})}</form>
 
-<h1>${escape(selected ? selected.areanm : "None")}</h1>`;
+<h1>${escape(selected2 ? selected2.areanm : "None")}</h1>`;
 });
 const prerender = true;
 async function load({ params, fetch, session, stuff }) {
@@ -20784,11 +23632,11 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
   let $story_json, $$unsubscribe_story_json;
   $$unsubscribe_story_json = subscribe(story_json, (value) => $story_json = value);
   let { all_data, myNeighbours } = $$props;
-  let selected;
+  let selected2;
   let currentSelect;
   if (all_data) {
-    selected = items.find((e) => e.areacd == all_data.CODE);
-    currentSelect = selected;
+    selected2 = items.find((e) => e.areacd == all_data.CODE);
+    currentSelect = selected2;
   }
   myNeighbours = {};
   Object.keys(neighbours).forEach((e) => myNeighbours[e] = neighbours[e].flat().slice(0, 9));
@@ -20819,8 +23667,8 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
           all_data.WALES = 1;
       }
     }
-    selected != currentSelect && goto(`/${selected.areacd}`) && function() {
-      currentSelect = selected;
+    selected2 != currentSelect && goto(`/${selected2.areacd}`) && function() {
+      currentSelect = selected2;
     };
     $$rendered = `${all_data && country && story ? `${validate_component(Header, "Header").$$render($$result, {
       bgcolor: "#206095",
@@ -20836,21 +23684,21 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
 	<p class="${"text-big"}" style="${"margin-top: 5px"}"><!-- HTML_TAG_START -->${story[0].lede}<!-- HTML_TAG_END --></p>
 	<br>
     
-	<div class="${"ons-field"}">${validate_component(App, "Dropdown").$$render($$result, { selected }, {
+	<div class="${"ons-field"}">${validate_component(App, "Dropdown").$$render($$result, { selected: selected2 }, {
           selected: ($$value) => {
-            selected = $$value;
+            selected2 = $$value;
             $$settled = false;
           }
         }, {})}</div>
-	${selected ? `<div style="${"margin-top: 90px;"}">${validate_component(Arrow, "Arrow").$$render($$result, { color: "white", animation }, {}, {
+	${selected2 ? `<div style="${"margin-top: 90px;"}">${validate_component(Arrow, "Arrow").$$render($$result, { color: "white", animation }, {}, {
           default: () => {
-            return `Scroll to read about ${escape(selected.areanm)}`;
+            return `Scroll to read about ${escape(selected2.areanm)}`;
           }
         })}</div>` : ``}`;
       }
     })}
 
-  ${selected ? `${each(story, (chunk, i) => {
+  ${selected2 ? `${each(story, (chunk, i) => {
       return `${chunk.type === "Scroller" ? `${validate_component(Scroller, "Scroller").$$render($$result, {
         top,
         threshold,
@@ -20903,7 +23751,7 @@ const U5Bcodeu5D = create_ssr_component(($$result, $$props, $$bindings, slots) =
             animation: chunk.foreground[index],
             country,
             all_data,
-            selected: selected.areacd
+            selected: selected2.areacd
           }, {}, {})}	  
 
 </div>`;

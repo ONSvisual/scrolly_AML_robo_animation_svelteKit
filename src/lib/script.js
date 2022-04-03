@@ -201,29 +201,34 @@ data-title: Population change by age group in {NAME}
 {}
 content:This is how {NAME} compares. There has been {LA.OVER65.ABS.Y11 LA.OVER65.ABS.Y01 >?an increase: a decrease} of {LA.OVER65.ABS.Y11 LA.OVER65.ABS.Y01 - LA.OVER65.ABS.Y01 / 100 * .0 ~abs}% in people aged 65 years and over, {LA.WORKING.ABS.Y11 LA.WORKING.ABS.Y01 >?an increase:a decrease} of {LA.WORKING.ABS.Y11 LA.WORKING.ABS.Y01 - LA.WORKING.ABS.Y01 / 100 * .0 ~abs}% in people aged 20 to 65 years, and {LA.UNDER20.ABS.Y11 LA.UNDER20.ABS.Y01 >?an increase:a decrease} of {LA.UNDER20.ABS.Y11 LA.UNDER20.ABS.Y01 - LA.UNDER20.ABS.Y01 / 100 * .0 ~abs}% in people aged under 20 years.
 {}
+[]
+{}
+****** GROWTH BY AGE GROUP ******
+{.Part}
+type:Filler
+content:In some areas in {COUNTRY_NAME}, population growth has been highest among children and young people, while in others working age or older people have increased the most. These maps show where each of the age-groups has grown the most.
+{}//end of Filler
+{.Part}
+type:Scroller
+background:Highlighted_map
 
-
-
+[.foreground]
 {.section}
 {.actions}
 data-id:17
 data-description: A map of {COUNTRY_NAME} appears, highlighting the 10 districts with the greatest increase in people aged 65 and over.{TABLE}
-data-title: Top ten districts for population increase in over-65’s 
+data-title: Top five districts for population increase in over-65’s 
 {}
-content:The places that have seen the largest increases in the proportion of people aged 65 years and over are Monmouthshire (25% increase) and Isle of Anglesey (23%).
+content:{WALES 1 ===?The places that have seen the largest increases in the proportion of people aged 65 years and over are <a href="/W06000021">Monmouthshire</a>, which has seen 25% growth, and the <a href="/W06000001">Isle of Anglesey</a> (23%):The places that have seen the largest increases in the proportion of people aged 65 years and over are <a href="/E07000089">Hart</a>, in the South East, which has seen 42% growth, and <a href="/E07000194">Lichfield</a> (40%)}.
 {}
 
-
-
-
-****** AGE_CHARACTERISTICS ******
 {.section}
 {.actions}
 data-id:18
 data-description: The map now highlights the 10 districts with the greatest increase in people aged under 15.{TABLE}
-data-title: Top ten districts for population increase in under-15’s
+data-title: Top five districts for population increase in under-15’s
 {}
-content: The number of children in every local authority district of Wales has decreased, with the exception of Wrexham, which has seen a 1% increase in people aged under 15.
+content:{WALES 1 ===?The number of children in every local authority district of Wales has decreased, with the exception of Wrexham, which has seen a 1% increase in people aged under 15:The places that have seen the largest increase in the proportion of people aged under 15 years are <a href="/E09000033">Westminster</a>, in London, which has seen 32% growth, and <a href="/E06000039">Slough</a> in the South East (26%). Seven of the ten places that have seen the greatest growth in number of children are in the London region}.
 {}
 []
 {}//end of 4th Scroller*** SEX ***
@@ -233,16 +238,16 @@ content:Around 51% of the population of {COUNTRY_NAME} is female and 49% is male
 {}//end of Filler
 {.Part}
 type:Scroller
-background:Pyramids
+background:MaleFemale
 family:verticalBar
 [.foreground]
 {.section}
 {.actions}
 data-id:19
 data-description: A bar chart is displayed with two bars showing the number of males and females aged 65 years and over in {NAME}.{TABLE}
-data-title:The split of males and females in the over-65’s age group in {NAME}
+data-title:The split of males and females aged 65 years and over in {NAME}
 {}
-content:In the 65 years and over age group, {NAME} has a split of 14,500 females to 9,600 males.
+content:In the 65 years and over age group, {NAME} has a split of {LA.OVER65.ABS.F ,} females to {LA.OVER65.ABS.M ,} males.
 {}
 {.section}
 {.actions}
@@ -251,7 +256,7 @@ data-description: A map of {COUNTRY_NAME} highlights the 5 places with the highe
 data-title:The most male and female places in {COUNTRY_NAME}
 
 {}
-content:{WALES 1 ===?Every local authority district in Wales has more females than males, with the most balanced place being Wrexham. The place with the highest ratio of females to males in {COUNTRY_NAME} is Conwy, which has 106 females for every 100 males.:The most male places in England/Wales are City of London, Richmondshire and Newham. The most female places; West Somerset, Rother and Arun. } 
+content:{WALES 1 ===?Every local authority district in Wales has more females than males, with the most balanced place being Wrexham. The place with the highest ratio of females to males in {COUNTRY_NAME} is Conwy, which has 106 females for every 100 males.:The most male places in England are the City of London, Richmondshire and Newham. The most female places; West Somerset, Rother and Arun. } 
 {}
 []
 {}//end of fifth Scroller

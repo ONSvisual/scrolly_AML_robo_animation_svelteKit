@@ -83,7 +83,7 @@
     return bars
   }
 
-  pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID01))
+//  pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID01))
 
 let changePyramid = details => console.log("do something"+details)
 let la_change=all_data.LA.PYRAMID11.map((e,i)=>e.map((el,ii)=>el-all_data.LA.PYRAMID01[i][ii]))
@@ -105,7 +105,7 @@ la_change_blended.forEach((e,i)=>{
   })
 la_change_divided[0]=la_change_divided[0].map(e=>(e/w)*w_change)
 la_change_divided[1]=la_change_divided[1].map(e=>(e/w_change)*w)
-  console.log("LA_CHANGE_DIVIDED",w, w_change,la_change_divided)
+ // console.log("LA_CHANGE_DIVIDED",w, w_change,la_change_divided)
 
 let country_change_divided=[[],[]]
 country_change_blended.forEach((e,i)=>{
@@ -114,7 +114,7 @@ country_change_blended.forEach((e,i)=>{
   })
 country_change_divided[0]=country_change_divided[0].map(e=>(e/w)*w_change)
 country_change_divided[1]=country_change_divided[1].map(e=>(e/w_change)*w)
-  console.log("COUNTRY_CHANGE_DIVIDED",w, w_change,country_change_divided)
+ // console.log("COUNTRY_CHANGE_DIVIDED",w, w_change,country_change_divided)
 
 
 let stepPrev;
@@ -122,7 +122,7 @@ let request;
     function change(stp) {
       if (stp != stepPrev) {
      //   if (stp <= 11) {request="bars";pyramidStore.set(makeDataPyramid(data.LA.PYRAMID11))}
-        if (stp == 12) {request="bars";pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID01),{easing:sineInOut})}    
+        if (stp == 12 && stepPrev !=11) {request="bars";pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID01),{easing:sineInOut})}    
         if (stp == 13) {request="bars";pyramidStore.set(makeDataPyramid(all_data.LA.PYRAMID11),{easing:sineInOut})}
         if (stp == 14) {request="bars";pyramidStore.set(makeDataPyramid(all_data.COUNTRY.PYRAMID11),{easing:sineInOut})}
         if (stp == 15) {request="bars";pyramidStore.set(makeDataPyramid(country_change_divided),{easing:sineInOut})}
@@ -136,7 +136,7 @@ let request;
 
 
 
-console.log("COUNTRY_CHANGE",country_change)
+//console.log("COUNTRY_CHANGE",country_change)
 
   $: animation && change(animation)
 </script>
